@@ -132,7 +132,7 @@
                                 <div class="form-group row">
                                     <label class="col-form-label col-md-2"></label>
                                     <div class="col-md-10">
-                                        <button type="submit" class="btn btn-primary submit-btn">Update</button>
+                                        <button type="submit" class="btn btn-primary submit-btn">UpdateTT</button>
                                     </div>
                                 </div>
                             </form>
