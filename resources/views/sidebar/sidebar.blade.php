@@ -3,6 +3,8 @@
 <div class="sidebar" id="sidebar">
     <div class="sidebar-inner slimscroll">
         <div id="sidebar-menu" class="sidebar-menu">
+        @if (Auth::user()->role_name=='Admin')
+            @if (Auth::user()->role_name=='HR' || Auth::user()->role_name == 'Admin')
             <ul>
                 <li class="menu-title">
                     <span>Main</span>
@@ -17,7 +19,7 @@
                         <li><a class="{{set_active(['em/dashboard'])}}" href="{{ route('em/dashboard') }}">Employee Dashboard</a></li>
                     </ul>
                 </li>
-                @if (Auth::user()->role_name=='Admin')
+                @endif
                     <li class="menu-title"> <span>Authentication</span> </li>
                     <li class="{{set_active(['search/user/list','userManagement','activity/log','activity/login/logout'])}} submenu">
                         <a href="#" class="{{ set_active(['search/user/list','userManagement','activity/log','activity/login/logout']) ? 'noti-dot' : '' }}">
@@ -27,7 +29,16 @@
                             <li><a class="{{set_active(['search/user/list','userManagement'])}}" href="{{ route('userManagement') }}">All User</a></li>
                         </ul>
                     </li>
-                @endif
+                <li class="menu-title"> <span>IT</span> </li>
+                    <li class="{{set_active(['form/joborders/page', 'form/joborders/save', 'form/joborders/update', 'form/joborders/delete'])}} submenu">
+                    <a href="#" class="{{ set_active(['form/joborders/page', 'form/joborders/save', 'form/joborders/update', 'form/joborders/delete']) ? 'noti-dot' : '' }}">
+                    <i class="la la-bus"></i> <span>Bus Concern</span> <span class="menu-arrow"></span>
+                    </a>
+                    <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">
+                        <li><a class="{{set_active(['form/joborders/page'])}}" href="{{ route('form/joborders/page') }}">Job Orders</a></li>
+                    </ul>
+                </li>
+            @if (Auth::user()->role_name=='HR' || Auth::user()->role_name == 'Admin')
                 <li class="menu-title"> <span>Employees</span> </li>
                 <li class="{{set_active(['all/employee/list','all/employee/list','all/employee/card','form/holidays/new','form/leaves/new',
                     'form/leavesemployee/new','form/leavesettings/page','attendance/page',
@@ -56,6 +67,7 @@
                         <li><a class="{{set_active(['form/overtime/page'])}}" href="{{ route('form/overtime/page') }}">Overtime</a></li>
                     </ul>
                 </li>
+                @endif
                 <li class="menu-title"> <span>HR</span> </li>
                 <li class="{{set_active(['create/estimate/page','form/estimates/page','payments','expenses/page'])}} submenu">
                     <a href="#" class="{{ set_active(['create/estimate/page','form/estimates/page','payments','expenses/page']) ? 'noti-dot' : '' }}">
@@ -134,6 +146,7 @@
                     </ul>
                 </li>
             </ul>
+            @endif
         </div>
     </div>
 </div>

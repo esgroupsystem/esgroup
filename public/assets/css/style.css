@@ -413,6 +413,10 @@ table.dataTable thead > tr > td.sorting {
 .block {
 	display: block !important;
 }
+.badge-large {
+    font-size: 0.8em;
+    padding: 0.4em 0.6em;
+}
 .text-ellipsis {
 	display: block;
 	max-width: 100%;
@@ -883,66 +887,70 @@ table.dataTable thead > tr > td.sorting {
 	5. Animation
 -----------------------*/
 
-@-moz-keyframes pulse {
-	0% {
-		-moz-transform: scale(0);
-		opacity: 0.0;
-	}
-	25% {
-		-moz-transform: scale(0);
-		opacity: 0.1;
-	}
-	50% {
-		-moz-transform: scale(0.1);
-		opacity: 0.3;
-	}
-	75% {
-		-moz-transform: scale(0.5);
-		opacity: 0.5;
-	}
-	100% {
-		-moz-transform: scale(1);
-		opacity: 0.0;
-	}
+@keyframes pulse {
+    0% {
+        transform: scale(0);
+        opacity: 0.0;
+    }
+    25% {
+        transform: scale(0);
+        opacity: 0.1;
+    }
+    50% {
+        transform: scale(0.1);
+        opacity: 0.3;
+    }
+    75% {
+        transform: scale(0.5);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0.0;
+    }
 }
+
 @-webkit-keyframes pulse {
-	0% {
-		-webkit-transform: scale(0);
-		opacity: 0.0;
-	}
-	25% {
-		-webkit-transform: scale(0);
-		opacity: 0.1;
-	}
-	50% {
-		-webkit-transform: scale(0.1);
-		opacity: 0.3;
-	}
-	75% {
-		-webkit-transform: scale(0.5);
-		opacity: 0.5;
-	}
-	100% {
-		-webkit-transform: scale(1);
-		opacity: 0.0;
-	}
+    0% {
+        -webkit-transform: scale(0);
+        opacity: 0.0;
+    }
+    25% {
+        -webkit-transform: scale(0);
+        opacity: 0.1;
+    }
+    50% {
+        -webkit-transform: scale(0.1);
+        opacity: 0.3;
+    }
+    75% {
+        -webkit-transform: scale(0.5);
+        opacity: 0.5;
+    }
+    100% {
+        -webkit-transform: scale(1);
+        opacity: 0.0;
+    }
 }
-@-webkit-keyframes taskHighlighter {
-	0% {
-		background: #FEEB99;
-	}
-	100% {
-		background: #fff;
-	}
-}
+
 @keyframes taskHighlighter {
-	0% {
-		background: #FEEB99;
-	}
-	100% {
-		background: #fff;
-	}
+    0% {
+        background: #FEEB99;
+    }
+    100% {
+        background: #fff;
+    }
 }
+
+@-webkit-keyframes taskHighlighter {
+    0% {
+        background: #FEEB99;
+    }
+    100% {
+        background: #fff;
+    }
+}
+
 
 /*-----------------
 	6. Toggle Button
@@ -994,9 +1002,10 @@ table.dataTable thead > tr > td.sorting {
 	margin-left: auto;
     position: relative;
 	width: 73px;
-    -webkit-user-select:none;
-	-moz-user-select:none;
-	-ms-user-select: none;
+    user-select: none;    
+    -webkit-user-select: none;    
+    -moz-user-select: none;        
+    -ms-user-select: none;   
 }
 .onoffswitch-checkbox {
     display: none;
@@ -1989,7 +1998,7 @@ table.dataTable thead > tr > td.sorting {
 	border-radius: 100%;
 	color: #f43b48;
 	display: inline-block;
-	float: left;
+	/* float: left; */
 	font-size: 30px;
 	height: 60px;
 	line-height: 60px;
@@ -2411,7 +2420,7 @@ table.dataTable thead > tr > td.sorting {
 
 .chat-avatar-sm {
     display: inline-block;
-    float: left;
+    /* float: left; */
     margin-left: 0 !important;
     margin-right: 10px;
     position: relative;

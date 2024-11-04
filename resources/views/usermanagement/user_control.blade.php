@@ -57,9 +57,6 @@
                     <button type="sumit" class="btn btn-success btn-block btn_search"> Search </button>  
                 </div>
             </div>
-
-              
-
             <!-- /Page Header -->
             <div class="row">
                 <div class="col-md-12">
