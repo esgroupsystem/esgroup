@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Joborder;
+use Carbon\Carbon;
 use DB;
 use Auth;
 
@@ -22,7 +23,7 @@ class JobOrderController extends Controller
         {
             $loggedUser = Auth::user();
             $busList = DB::Table('assets_category')
-            ->selectRaw("CONCAT(cat_name, ' - (', cat_busnum, ') - ', cat_busplate) as full_name, cat_id")
+            ->selectRaw("cat_id, cat_name, cat_busnum, CONCAT(cat_name, ' - (', cat_busnum, ') - ', cat_busplate) as full_name")
             ->get();
             return view('joborders.createjoborder', compact('busList','loggedUser'));
         }
@@ -46,23 +47,23 @@ class JobOrderController extends Controller
             
             DB::beginTransaction();
             try {
-                Holiday::create([
-                    'job_name'                 => $request->job_name,
-                    'job_type'                 => $request->job_type,
-                    'job_datestart'            => $request->job_datestart,
-                    'job_time_start'           => $request->job_time_start,
-                    'job_time_end'              => $request->job_time_end,
+                Joborder::create([
+                    'job_name'                  => $request->job_name,
+                    'job_type'                  => $request->job_type,
+                    'job_datestart'             => $request->job_datestart,
+                    'job_time_start'            => Carbon::parse($request->job_time_start)->format('H:i:s'),
+                    'job_time_end'              => Carbon::parse($request->job_time_end)->format('H:i:s'),
                     'job_sitNumber'             => $request->job_sitNumber,
                     'job_remarks'               => $request->job_remarks,
-                    'job_status'                => $request->job_status,
-                    'job_assign_person'         => $request->job_assign_person,
-                    'job_date_filled'           => $request->job_date_filled,
-                    'job_creator'               => $request->job_creator,
+                    'job_status'                => 'New',
+                    'job_assign_person'         => 'Not assigned',
+                    'job_date_filled'           => now()->format('Y-m-d H:i:s'),
+                    'job_creator'               => $request->user()->name,
                 ]);
                 
                 DB::commit();
                 flash()->success('Created new job order successfully :)');
-                return redirect()->back();
+                return redirect()->route('form/joborders/page');
             } catch (\Exception $e) {
                 DB::rollback();
                 flash()->error('Failed to add job order :)');
@@ -88,7 +89,7 @@ class JobOrderController extends Controller
             
             DB::commit();
             flash()->success('Holiday updated successfully :)');
-            return redirect()->back();
+            return redirect()->route('form/joborders/page');
         } catch (\Exception $e) {
             DB::rollback();
             flash()->error('Failed to update holiday :)');

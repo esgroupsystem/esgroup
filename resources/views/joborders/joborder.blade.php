@@ -86,7 +86,7 @@
                                 <tr>
                                     <td class="j_name">{{ $item->job_name }}</td>
                                     <td class="j_type">{{ $item->job_type }}</td>
-                                    <td class="j_filled">{{date('d F, Y',strtotime($item->job_date_filled)) }}</td>
+                                    <td class="j_filled">{{ date('d F, Y H:i:s', strtotime($item->job_date_filled)) }}</td>
                                     <td class="j_issue">{{date('d F, Y',strtotime($item->job_datestart)) }}</td>
                                     <td class="j_time_start">{{ $item->job_time_start }}</td>
                                     <td class="j_time_end">{{ $item->job_time_end }}</td>

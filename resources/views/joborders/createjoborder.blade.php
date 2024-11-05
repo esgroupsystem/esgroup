@@ -18,7 +18,8 @@
                 </div>
             </div>
             <!-- /Page Header -->
-              
+
+        <!-- Saving JobOrder -->
             <div class="row">
                 <div class="col-sm-12">
                     <form action="{{ route('form/joborders/save') }}" method="POST">
@@ -30,7 +31,7 @@
                                     <select class="select" id="j_name" name="job_name" required>
                                         <option value="">-- Select Bus --</option>  
                                         @foreach( $busList as $key=>$bus )
-                                            <option value="{{ $bus->cat_id }}">{{ $bus->full_name }}</option>                                       
+                                            <option value="{{ $bus->cat_name.'-'.$bus->cat_busnum }}">{{ $bus->full_name }}</option>                                       
                                         @endforeach
                                     </select>
                                 </div>
@@ -75,13 +76,13 @@
                             <div class="col-sm-6 col-md-3">
                                 <div class="form-group">
                                     <label>Start Time</label>
-                                    <input type="time" class="form-control" id="j_start_time" name="start_time" required>
+                                    <input type="time" class="form-control" id="j_start_time" name="job_time_start" required>
                                 </div>
                             </div>
                             <div class="col-sm-6 col-md-3">
                                 <div class="form-group">
                                     <label>End Time</label>
-                                    <input type="time" class="form-control" id="j_end_time" name="end_time" required>
+                                    <input type="time" class="form-control" id="j_end_time" name="job_time_end" required>
                                 </div>
                             </div>
                             <div class="col-sm-6 col-md-3">
@@ -105,16 +106,139 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+
+                                <!------- Seatting Diagram ------>
+                                <center>
+                                <div class="bus-container">
+                                    <h3>Select Bus Seats</h3>
+                                    <img src="{{ asset('assets/images/bus-layouts.jpeg') }}" alt="Bus Layout" class="bus-background">
+                                    <div class="seat-arrangement">
+                                        <!-- First Layer -->
+                                        @for ($i = 1; $i <= 1; $i++)
+                                            <button class="seat-button" data-seat-number="{{ $i }}">
+                                                {{ $i }}
+                                            </button>
+                                                <span class="empty-seat"></span>
+                                                    @for ($i = 2; $i <= 3; $i++)
+                                                        <button class="seat-button" data-seat-number="{{ $i }}">
+                                                             {{ $i }}
+                                                        </button>
+                                                    @endfor
+                                                    <span class="empty-seat"></span>
+                                                    @for ($i = 4; $i <= 14; $i++)
+                                                        <button class="seat-button" data-seat-number="{{ $i }}">
+                                                             {{ $i }}
+                                                        </button>
+                                                    @endfor
+                                            <!-- /First Layer -->
+                                            <!-- Second Layer -->
+                                                    <div>
+                                                    <span class="empty-seat1"></span>
+                                                        @for ($i = 15; $i <= 16; $i++)
+                                                            <button class="seat-button" data-seat-number="{{ $i }}">
+                                                                 {{ $i }}
+                                                            </button>
+                                                        @endfor
+                                                        <span class="empty-seat"></span>
+                                                        @for ($i = 17; $i <= 19; $i++)
+                                                            <button class="seat-button" data-seat-number="{{ $i }}">
+                                                                 {{ $i }}
+                                                            </button>
+                                                        @endfor
+                                                        <span class="empty-seat3"></span>
+                                                        @for ($i = 20; $i <= 24; $i++)
+                                                            <button class="seat-button" data-seat-number="{{ $i }}">
+                                                                 {{ $i }}
+                                                            </button>
+                                                        @endfor
+                                                    </div> 
+                                            <!-- /Second Layer -->  
+                                            <!-- third Layer -->
+                                                    <div>
+                                                    <span class="empty-seat4"></span>
+                                                        @for ($i = 25; $i <= 27; $i++)
+                                                            <button class="seat-button" data-seat-number="{{ $i }}">
+                                                                 {{ $i }}
+                                                            </button>
+                                                        @endfor 
+                                                        <span class="empty-seat3"></span>
+                                                        @for ($i = 28; $i <= 32; $i++)
+                                                            <button class="seat-button" data-seat-number="{{ $i }}">
+                                                                 {{ $i }}
+                                                            </button>
+                                                        @endfor 
+                                                    </div> 
+                                            <!-- /third Layer --> 
+                                             <!-- fourth Layer --> 
+                                             <div>
+                                            <span class="empty-seat6"></span>
+                                                    @for ($i = 53; $i <= 53; $i++)
+                                                        <button class="seat-button" data-seat-number="{{ $i }}">
+                                                             {{ $i }}
+                                                        </button>
+                                                    @endfor|
+                                                </div>
+                                                <!-- /fourth Layer --> 
+                                                <!-- fifth Layer --> 
+                                             <div> 
+                                            <span class="empty-seat5"></span>
+                                                    @for ($i = 33; $i <= 34; $i++)
+                                                        <button class="seat-button" data-seat-number="{{ $i }}">
+                                                             {{ $i }}
+                                                        </button>
+                                                    @endfor
+                                                    <span class="empty-seat"></span>
+                                                    @for ($i = 35; $i <= 37; $i++)
+                                                        <button class="seat-button" data-seat-number="{{ $i }}">
+                                                             {{ $i }}
+                                                        </button>
+                                                    @endfor
+                                                    <span class="empty-seat3"></span>
+                                                        @for ($i = 38; $i <= 42; $i++)
+                                                            <button class="seat-button" data-seat-number="{{ $i }}">
+                                                                 {{ $i }}
+                                                            </button>
+                                                        @endfor  
+                                            <!-- /fifth Layer --> 
+                                            <!-- sixth Layer -->
+                                                    <div>
+                                                    <span class="empty-seat1"></span>
+                                                        @for ($i = 43; $i <= 44; $i++)
+                                                            <button class="seat-button" data-seat-number="{{ $i }}">
+                                                                 {{ $i }}
+                                                            </button>
+                                                        @endfor
+                                                        <span class="empty-seat"></span>
+                                                        @for ($i = 45; $i <= 47; $i++)
+                                                            <button class="seat-button" data-seat-number="{{ $i }}">
+                                                                 {{ $i }}
+                                                            </button>
+                                                        @endfor
+                                                        <span class="empty-seat3"></span>
+                                                        @for ($i = 48; $i <= 52; $i++)
+                                                            <button class="seat-button" data-seat-number="{{ $i }}">
+                                                                 {{ $i }}
+                                                            </button>
+                                                        @endfor
+                                                    </div> 
+                                            <!-- /sixth Layer -->
+                                        @endfor
+                                    </div>
+                                    <div class="selected-seat">
+                                        <label for="selected_seat">Selected Seat:</label>
+                                        <span id="selected_seat">None</span>
+                                    </div>
+                                </div>
+                                <!------- /Seatting Diagram ------>
+                            <div class="submit-section">
+                                <button type="submit" class="btn btn-primary submit-btn">Save</button>
                         </div>
-                        <div class="submit-section">
-                            <button class="btn btn-primary submit-btn m-r-10">Save & Send</button>
-                            <button type="submit" class="btn btn-primary submit-btn">Save</button>
-                        </div>
+                        </center>
                     </form>
                 </div>
             </div>
         </div>
+        <!-- /Saving JobOrder -->
         <!-- /Page Content -->
     </div>
     <!-- /Page Wrapper -->
@@ -130,6 +254,18 @@
         });
     </script>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const seatButtons = document.querySelectorAll('.seat-button');
+            const selectedSeatLabel = document.getElementById('selected_seat');
 
+            seatButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const seatNumber = this.getAttribute('data-seat-number');
+                    selectedSeatLabel.textContent = seatNumber; // Update label with selected seat number
+                });
+            });
+        });
+    </script>
     @endsection
 @endsection
