@@ -110,9 +110,10 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
     //========================== IT DEPARTMENT JOBORDERS ====================//
 
     // ---------------------- IT JobOrders  -----------------------//
-        Route::controller(JobOrderController::class)->group(function () {
+    Route::controller(JobOrderController::class)->group(function () {
         Route::get('form/joborders/page', 'jobordersIndex')->middleware('auth')->name('form/joborders/page');
-        Route::get('create/joborders/page', 'createJobOrderIndex')->middleware('auth')->name('create/joborders/page');    
+        Route::get('create/joborders/page', 'createJobOrderIndex')->middleware('auth')->name('create/joborders/page');  
+        Route::get('view/details/{id}', 'viewSpecificDetails')->middleware('auth')->name('view/details');   
         Route::post('form/joborders/save', 'saveRecordJoborders')->middleware('auth')->name('form/joborders/save');    
         Route::post('form/joborders/update', 'updateRecordJoborders')->middleware('auth')->name('form/joborders/update');    
         Route::post('form/joborders/delete', 'deleteRecordJoborders')->middleware('auth')->name('form/joborders/delete');

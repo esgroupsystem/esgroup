@@ -956,27 +956,75 @@ table.dataTable thead > tr > td.sorting {
 	6. Toggle Button
 -----------------------*/
 
+/* General Styles for Job Order View Modal */
+#jobOrderModal .modal-dialog {
+	width: 793px;   /* A4 Width in px */
+	height: 1122px;  /* A4 Height in px */
+	margin: 30px auto;  /* Center the modal */
+}
+
+/* Ensure the modal content does not overflow */
+#jobOrderModal .modal-content {
+	height: 100%;
+	overflow-y: auto;
+}
+
+/* Styling for content inside modal */
+#jobOrderModal .modal-body {
+	padding: 30px;
+	font-size: 14px;
+	line-height: 1.6;
+}
+
+#jobOrderModal .row {
+	margin-bottom: 20px;
+}
+
+#jobOrderModal .col-sm-6 {
+	padding-right: 15px;
+	padding-left: 15px;
+}
+
+/* Ensure paragraphs have spacing */
+#jobOrderModal p {
+	margin-bottom: 15px;
+}
+
+/* Print Styles for A4 Layout */
+@media print {
+	#jobOrderModal .modal-dialog {
+		width: 100%;
+		height: 100%;
+		margin: 0;
+	}
+
+	#jobOrderModal .modal-content {
+		padding: 10px;
+	}
+
+	#jobOrderModal .modal-body {
+		font-size: 12px;
+	}
+
+	#jobOrderModal .row {
+		margin-bottom: 15px;
+	}
+
+	#jobOrderModal .col-sm-6 {
+		padding-right: 10px;
+		padding-left: 10px;
+	}
+
+	/* Optional: Remove extra margins for printing */
+	#jobOrderModal .modal-header,
+	#jobOrderModal .modal-footer {
+		display: none;
+	}
+}
+
+
+
 /*================================================== BUS SEATS FORMAT ==========================================*/
-.bus-container {
-    position: relative;
-    width: 100%;
-    height: 500px;
-    overflow: hidden; 
-}
-
-.bus-background {
-    position: absolute;
-	max-width: none;
-    top: 0;
-    left: 0;
-    width: 100%; 
-    height: 600px;
-    object-fit: cover; 
-    transform: rotate(180deg); 
-    transform-origin: center; 
-    z-index: 0;
-}
-
 .seat-button {
     margin: 2px;
 	width: 60px;
@@ -988,6 +1036,16 @@ table.dataTable thead > tr > td.sorting {
     border-radius: 5px;
     cursor: pointer;
 	font-size: 16px;
+}
+.seat-button.selected {
+    background-color: #4CAF50;
+    color: white;
+}
+.bus-container {
+    transform: rotateX(180deg);
+}
+.seat-button, .empty-seat, .empty-seat1, .empty-seat3, .empty-seat4, .empty-seat5, .empty-seat6 {
+    transform: rotateX(180deg);
 }
 .bus-container h3 {
 	position: relative;

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Http\Request;
 use App\Models\Joborder;
+use App\Models\User;
 use Carbon\Carbon;
 use DB;
 use Auth;
@@ -15,7 +17,9 @@ class JobOrderController extends Controller
         public function jobordersIndex()
         {
             $joborderview = Joborder::all();
-            return view('joborders.joborder', compact('joborderview'));
+            $users = User::whereIn('role_name', ['IT', 'Safety Office','Admin'])->get();
+
+            return view('joborders.joborder', compact('joborderview', 'users'));
         }
 
         /** Page Create Estimates */
@@ -26,6 +30,15 @@ class JobOrderController extends Controller
             ->selectRaw("cat_id, cat_name, cat_busnum, CONCAT(cat_name, ' - (', cat_busnum, ') - ', cat_busplate) as full_name")
             ->get();
             return view('joborders.createjoborder', compact('busList','loggedUser'));
+        }
+
+        /** For View of Job Order */
+        public function viewSpecificDetails($encryptedId)
+        {
+            $id = Crypt::decryptString($encryptedId);
+            $jobDetail = Joborder::findOrFail($id);
+        
+            return view('joborders.joborderview', compact('jobDetail'));
         }
 
         /** Save Record */
@@ -75,24 +88,24 @@ class JobOrderController extends Controller
     public function updateRecordJoborders(Request $request)
     {
         $request->validate([
-            'id'           => 'required|integer|exists:holidays,id',
-            'holidayName'  => 'required|string|max:255',
-            'holidayDate'  => 'required',
+            'id'                    => 'required|exists:joborders,id',
+            'job_status'            => 'required|string|max:255',
+            'job_assign_person'     => 'required|string|max:255',
         ]);
 
         DB::beginTransaction();
         try {
-            Holiday::where('id', $request->id)->update([
-                'name_holiday' => $request->holidayName,
-                'date_holiday' => $request->holidayDate,
+            Joborder::where('id', $request->id)->update([
+                'job_status'        => $request->job_status,
+                'job_assign_person' => $request->job_assign_person,
             ]);
             
             DB::commit();
-            flash()->success('Holiday updated successfully :)');
-            return redirect()->route('form/joborders/page');
+            flash()->success(' Job Order updated successfully :)');
+            return redirect()->back();
         } catch (\Exception $e) {
             DB::rollback();
-            flash()->error('Failed to update holiday :)');
+            flash()->error('Failed to update Job Order :)');
             return redirect()->back();
         }
     }
@@ -103,12 +116,12 @@ class JobOrderController extends Controller
         $request->validate(['id' => 'required|integer']);
 
         try {
-            Holiday::destroy($request->id);
-            flash()->success('Holiday deleted successfully :)');
+            Joborder::destroy($request->id);
+            flash()->success('Job Order deleted successfully :)');
             return redirect()->back();
         } catch (\Exception $e) {
-            \Log::error($e); // Log the error for debugging
-            flash()->error('Failed to delete Holiday :)');
+            \Log::error($e);
+            flash()->error('Failed to delete Job Order :)');
             return redirect()->back();
         }
     }

@@ -8,12 +8,15 @@
             <!-- Page Header -->
             <div class="page-header">
                 <div class="row">
-                    <div class="col-sm-12">
+                    <div class="col">
                         <h3 class="page-title">Create Job Order</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
                             <li class="breadcrumb-item active">Create Job Order</li>
                         </ul>
+                    </div>
+                    <div class="col-auto float-right ml-auto">
+                        <button type="submit" class="btn btn-primary submit-btn">Save</button>
                     </div>
                 </div>
             </div>
@@ -93,8 +96,9 @@
                             </div>
                             <div class="col-sm-6 col-md-3">
                                 <div class="form-group">
-                                    <label>Assign for <span class="text-danger">*</span></label>
-                                        <input class="form-control" type="text" id="j_assign_p" name="job_assign_person" value="Not assigned" placeholder="Please wait to assign. . ." disabled>
+                                    <label>Seats selected <span class="text-danger">*</span></label>
+                                        <input class="form-control" type="text" id="j_assign_p" name="job_sitNumber" disabled>
+                                        <input type="hidden" id="job_sitNumber" name="job_sitNumber">
                                     </div>
                                 </div>
                             </div>
@@ -110,23 +114,21 @@
                                 <!------- Seatting Diagram ------>
                                 <center>
                                 <div class="bus-container">
-                                    <h3>Select Bus Seats</h3>
-                                    <img src="{{ asset('assets/images/bus-layouts.jpeg') }}" alt="Bus Layout" class="bus-background">
                                     <div class="seat-arrangement">
                                         <!-- First Layer -->
                                         @for ($i = 1; $i <= 1; $i++)
-                                            <button class="seat-button" data-seat-number="{{ $i }}">
+                                            <button type="button" class="seat-button" data-seat-number="{{ $i }}">
                                                 {{ $i }}
                                             </button>
                                                 <span class="empty-seat"></span>
                                                     @for ($i = 2; $i <= 3; $i++)
-                                                        <button class="seat-button" data-seat-number="{{ $i }}">
+                                                        <button type="button" class="seat-button" data-seat-number="{{ $i }}">
                                                              {{ $i }}
                                                         </button>
                                                     @endfor
                                                     <span class="empty-seat"></span>
                                                     @for ($i = 4; $i <= 14; $i++)
-                                                        <button class="seat-button" data-seat-number="{{ $i }}">
+                                                        <button type="button" class="seat-button" data-seat-number="{{ $i }}">
                                                              {{ $i }}
                                                         </button>
                                                     @endfor
@@ -135,19 +137,19 @@
                                                     <div>
                                                     <span class="empty-seat1"></span>
                                                         @for ($i = 15; $i <= 16; $i++)
-                                                            <button class="seat-button" data-seat-number="{{ $i }}">
+                                                            <button type="button" class="seat-button" data-seat-number="{{ $i }}">
                                                                  {{ $i }}
                                                             </button>
                                                         @endfor
                                                         <span class="empty-seat"></span>
                                                         @for ($i = 17; $i <= 19; $i++)
-                                                            <button class="seat-button" data-seat-number="{{ $i }}">
+                                                            <button type="button" class="seat-button" data-seat-number="{{ $i }}">
                                                                  {{ $i }}
                                                             </button>
                                                         @endfor
                                                         <span class="empty-seat3"></span>
                                                         @for ($i = 20; $i <= 24; $i++)
-                                                            <button class="seat-button" data-seat-number="{{ $i }}">
+                                                            <button type="button" class="seat-button" data-seat-number="{{ $i }}">
                                                                  {{ $i }}
                                                             </button>
                                                         @endfor
@@ -157,13 +159,13 @@
                                                     <div>
                                                     <span class="empty-seat4"></span>
                                                         @for ($i = 25; $i <= 27; $i++)
-                                                            <button class="seat-button" data-seat-number="{{ $i }}">
+                                                            <button type="button" class="seat-button" data-seat-number="{{ $i }}">
                                                                  {{ $i }}
                                                             </button>
                                                         @endfor 
                                                         <span class="empty-seat3"></span>
                                                         @for ($i = 28; $i <= 32; $i++)
-                                                            <button class="seat-button" data-seat-number="{{ $i }}">
+                                                            <button type="button" class="seat-button" data-seat-number="{{ $i }}">
                                                                  {{ $i }}
                                                             </button>
                                                         @endfor 
@@ -173,29 +175,29 @@
                                              <div>
                                             <span class="empty-seat6"></span>
                                                     @for ($i = 53; $i <= 53; $i++)
-                                                        <button class="seat-button" data-seat-number="{{ $i }}">
+                                                        <button type="button" class="seat-button" data-seat-number="{{ $i }}">
                                                              {{ $i }}
                                                         </button>
-                                                    @endfor|
+                                                    @endfor
                                                 </div>
                                                 <!-- /fourth Layer --> 
                                                 <!-- fifth Layer --> 
                                              <div> 
                                             <span class="empty-seat5"></span>
                                                     @for ($i = 33; $i <= 34; $i++)
-                                                        <button class="seat-button" data-seat-number="{{ $i }}">
+                                                        <button type="button" class="seat-button" data-seat-number="{{ $i }}">
                                                              {{ $i }}
                                                         </button>
                                                     @endfor
                                                     <span class="empty-seat"></span>
                                                     @for ($i = 35; $i <= 37; $i++)
-                                                        <button class="seat-button" data-seat-number="{{ $i }}">
+                                                        <button type="button" class="seat-button" data-seat-number="{{ $i }}">
                                                              {{ $i }}
                                                         </button>
                                                     @endfor
                                                     <span class="empty-seat3"></span>
                                                         @for ($i = 38; $i <= 42; $i++)
-                                                            <button class="seat-button" data-seat-number="{{ $i }}">
+                                                            <button type="button" class="seat-button" data-seat-number="{{ $i }}">
                                                                  {{ $i }}
                                                             </button>
                                                         @endfor  
@@ -204,19 +206,19 @@
                                                     <div>
                                                     <span class="empty-seat1"></span>
                                                         @for ($i = 43; $i <= 44; $i++)
-                                                            <button class="seat-button" data-seat-number="{{ $i }}">
+                                                            <button type="button" class="seat-button" data-seat-number="{{ $i }}">
                                                                  {{ $i }}
                                                             </button>
                                                         @endfor
                                                         <span class="empty-seat"></span>
                                                         @for ($i = 45; $i <= 47; $i++)
-                                                            <button class="seat-button" data-seat-number="{{ $i }}">
+                                                            <button type="button" class="seat-button" data-seat-number="{{ $i }}">
                                                                  {{ $i }}
                                                             </button>
                                                         @endfor
                                                         <span class="empty-seat3"></span>
                                                         @for ($i = 48; $i <= 52; $i++)
-                                                            <button class="seat-button" data-seat-number="{{ $i }}">
+                                                            <button type="button" class="seat-button" data-seat-number="{{ $i }}">
                                                                  {{ $i }}
                                                             </button>
                                                         @endfor
@@ -224,15 +226,8 @@
                                             <!-- /sixth Layer -->
                                         @endfor
                                     </div>
-                                    <div class="selected-seat">
-                                        <label for="selected_seat">Selected Seat:</label>
-                                        <span id="selected_seat">None</span>
-                                    </div>
                                 </div>
                                 <!------- /Seatting Diagram ------>
-                            <div class="submit-section">
-                                <button type="submit" class="btn btn-primary submit-btn">Save</button>
-                        </div>
                         </center>
                     </form>
                 </div>
@@ -243,26 +238,45 @@
     </div>
     <!-- /Page Wrapper -->
 
-    @section('script')
-    
+
+
+@section('script')
+
+    {{-- Paggination --}}
     <script>
         $(document).ready(function() {
-            $('#j_type').select2({
+            $('#j_name').select2({
                 allowClear: false,
                 width: '100%',
             });
         });
     </script>
 
+    {{-- Selecting Seat --}}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const seatButtons = document.querySelectorAll('.seat-button');
-            const selectedSeatLabel = document.getElementById('selected_seat');
+            const selectedSeatDisplay = document.getElementById('j_assign_p');
+            const selectedSeatInput = document.getElementById('job_sitNumber');
+            let selectedSeats = [];
 
             seatButtons.forEach(button => {
                 button.addEventListener('click', function () {
                     const seatNumber = this.getAttribute('data-seat-number');
-                    selectedSeatLabel.textContent = seatNumber; // Update label with selected seat number
+
+                    if (selectedSeats.includes(seatNumber)) {
+                        // Deselect if already selected
+                        selectedSeats = selectedSeats.filter(seat => seat !== seatNumber);
+                        this.classList.remove('selected');
+                    } else {
+                        // Select new seat
+                        selectedSeats.push(seatNumber);
+                        this.classList.add('selected');
+                    }
+
+                    // Update displayed and hidden input values
+                    selectedSeatDisplay.value = selectedSeats.join(', ');
+                    selectedSeatInput.value = selectedSeats.join(', ');
                 });
             });
         });
