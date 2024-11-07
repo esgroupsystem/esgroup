@@ -955,7 +955,7 @@ table.dataTable thead > tr > td.sorting {
 /*-----------------
 	6. Toggle Button
 -----------------------*/
-
+/*--------------------------------------------------- START HERE MY CUSTOM CSS ----------------------------------------------*/
 /* General Styles for Job Order View Modal */
 #jobOrderModal .modal-dialog {
 	width: 793px;   /* A4 Width in px */
@@ -1015,14 +1015,52 @@ table.dataTable thead > tr > td.sorting {
 		padding-left: 10px;
 	}
 
-	/* Optional: Remove extra margins for printing */
 	#jobOrderModal .modal-header,
 	#jobOrderModal .modal-footer {
 		display: none;
 	}
 }
 
+#qualif1 {
+    height: auto;
+    min-height: calc(1.5em * 4);
+}
+/*----- Customize Logo pictue ---*/
 
+.custom-com-logo{
+	margin-top: 10%;
+	width: 250px;
+	height: auto;
+	display: block;
+}
+.custom-new-logo{
+	margin-top: 15%;
+	width: 250px;
+	height: 200px;
+	display: block; 
+}
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .custom-com-logo, .custom-new-logo {
+        max-width: 100px; /* Smaller size on mobile devices */
+    }
+}
+
+/*---- Customize for submit button ---*/
+
+.submit-section {
+	text-align: center;
+	margin-top: 40px;
+}
+.submit-btn {
+    position: relative;
+    z-index: 1;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    min-width: 8rem;
+    padding: 0.6rem 1.2rem;
+}
 
 /*================================================== BUS SEATS FORMAT ==========================================*/
 .seat-button {
@@ -2534,17 +2572,7 @@ table.dataTable thead > tr > td.sorting {
 .btn-text {
 	color: #fff;
 }
-.submit-section {
-	text-align: center;
-	margin-top: 40px;
-}
-.submit-btn {
-    border-radius: 50px;
-    font-size: 18px;
-    font-weight: 600;
-    min-width: 200px;
-    padding: 10px 20px;
-}
+
 .form-scroll {
     max-height: 400px;
     overflow-y: auto;

@@ -68,11 +68,6 @@
                                     <th>Bus Number</th>
                                     <th>Type</th>
                                     <th>Date Issue</th>
-                                    <th>Date Incident</th>
-                                    <th>Start Time</th>
-                                    <th>End Time</th>
-                                    <th>Remarks</th>
-                                    <th>Assign To</th>
                                     <th>Status</th>
                                     <th>Reported by</th>
                                     <th class="text-right">Action</th>
@@ -85,11 +80,6 @@
                                     <td class="j_name">{{ $item->job_name }}</td>
                                     <td class="j_type">{{ $item->job_type }}</td>
                                     <td class="j_filled">{{ date('j M Y (h:i A)', strtotime($item->job_date_filled)) }}</td>
-                                    <td class="j_issue">{{ date('j M Y', strtotime($item->job_datestart)) }}</td>
-                                    <td class="j_time_start">{{ $item->job_time_start }}</td>
-                                    <td class="j_time_end">{{ $item->job_time_end }}</td>
-                                    <td class="j_remarks" title="{{ $item->job_remarks }}">{{ Str::limit($item->job_remarks, 50, '...') }}</td>
-                                    <td class="j_ass_per">{{ $item->job_assign_person }}</td>
                                     <td>
                                         <span class="badge badge-large
                                                 @if($item->job_status == 'New') 

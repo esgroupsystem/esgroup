@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Joborder extends Model
 {
@@ -21,4 +22,9 @@ class Joborder extends Model
         'job_date_filled',
         'job_creator',
     ];
+    
+    public function jobFiles()
+    {
+        return $this->hasMany(JobFiles::class, 'job_id');
+    }
 }

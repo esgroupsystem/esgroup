@@ -15,9 +15,6 @@
                             <li class="breadcrumb-item active">Create Job Order</li>
                         </ul>
                     </div>
-                    <div class="col-auto float-right ml-auto">
-                        <button type="submit" class="btn btn-primary submit-btn">Save</button>
-                    </div>
                 </div>
             </div>
             <!-- /Page Header -->
@@ -112,8 +109,15 @@
                                 </div>
 
                                 <!------- Seatting Diagram ------>
-                                <center>
-                                <div class="bus-container">
+                                <div class="col-auto float-right ml-auto">
+                                    <button type="submit" class="btn btn-primary submit-btn">Save</button>
+                                    <div class="col-auto float-right ml-auto">
+                                        <a href="{{route ('form/joborders/page') }}" class="btn btn-dark submit-btn">Back</a>
+                                    </div>
+                                </div>
+
+                            <center>
+                                <div class="bus-container float-left ml-auto">
                                     <div class="seat-arrangement">
                                         <!-- First Layer -->
                                         @for ($i = 1; $i <= 1; $i++)
@@ -229,6 +233,7 @@
                                 </div>
                                 <!------- /Seatting Diagram ------>
                         </center>
+
                     </form>
                 </div>
             </div>

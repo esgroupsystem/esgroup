@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Http\Request;
 use App\Models\Joborder;
 use App\Models\User;
+use App\Models\JobFiles;
 use Carbon\Carbon;
 use DB;
 use Auth;
@@ -37,9 +40,10 @@ class JobOrderController extends Controller
         {
             $id = Crypt::decryptString($encryptedId);
             $jobDetail = Joborder::findOrFail($id);
-        
-            return view('joborders.joborderview', compact('jobDetail'));
+            $FileDetails = JobFiles::where('job_id', $id)->get(); // Retrieve files for the specific job
+            return view('joborders.joborderview', compact('jobDetail','id','FileDetails'));
         }
+
 
         /** Save Record */
         public function saveRecordJoborders(Request $request)
@@ -125,4 +129,73 @@ class JobOrderController extends Controller
             return redirect()->back();
         }
     }
+
+    /** Saving Video Files */
+    public function Job_Files(Request $request)
+    {
+        // Validate the request
+        $request->validate([
+            'job_order_id' => 'required|integer',
+            'files.*' => 'required|mimes:mp4,mp3,asf,png,jpg,jpeg|max:40480000',
+            'remarks.*' => 'nullable|string',
+            'notes.*' => 'nullable|string',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            if ($request->hasFile('files')) {
+                foreach ($request->file('files') as $index => $file) {
+
+                    $filename = time() . '_' . $file->getClientOriginalName();
+                    $filePath = $file->storeAs('assets/videos', $filename, 'public');
+
+                    JobFiles::create([
+                        'job_id' => $request->input('job_order_id'),
+                        'file_name' => $file->getClientOriginalName(),
+                        'file_remarks' => $request->input('remarks')[$index],
+                        'file_notes' => $request->input('notes')[$index],
+                        'file_path' => 'assets/videos/' . $filename,
+                    ]);
+                }
+            }
+
+            DB::commit(); // Commit the transaction
+            flash()->success('Files uploaded successfully :)');
+            return redirect()->back();
+        } catch (\Exception $e) {
+            DB::rollback();
+            \Log::error('File upload failed: ' . $e->getMessage());
+            flash()->error('Failed to upload files :)');
+            return redirect()->back();
+        }
+    }
+
+    public function deleteVideoFiles($id)
+    {
+        DB::beginTransaction();
+        
+        try {
+            $file = JobFiles::findOrFail($id);
+
+            if (Storage::exists($file->file_path)) {
+                Storage::delete($file->file_path); 
+            }
+        
+            $file->delete();
+            
+            DB::commit();
+            flash()->success('File deleted successfully :)');
+            return response()->json([
+                'success' => true,
+            ]);
+            
+        } catch (\Exception $e) {
+            DB::rollback();
+            \Log::error('File deletion failed: ' . $e->getMessage());
+            flash()->error('Failed to delete the file :)');
+            return response()->json([
+                'success' => false,
+            ], 500);
+        }
+    }    
 }
