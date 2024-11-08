@@ -1,5 +1,5 @@
 /*
-Author       : Soeng Souy
+Author       : Lenberd Ilaw
 Template Name: HR - Bootstrap Admin Template
 Version      : 3.6
 */
@@ -71,6 +71,7 @@ Version      : 3.6
 62. File Manager
 63. Subscriptions
 64. Responsive
+65. Job Order Files
 
 ========================================*/
 
@@ -1025,119 +1026,7 @@ table.dataTable thead > tr > td.sorting {
     height: auto;
     min-height: calc(1.5em * 4);
 }
-/*----- Customize Logo pictue ---*/
 
-.custom-com-logo{
-	margin-top: 10%;
-	width: 250px;
-	height: auto;
-	display: block;
-}
-.custom-new-logo{
-	margin-top: 15%;
-	width: 250px;
-	height: 200px;
-	display: block; 
-}
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .custom-com-logo, .custom-new-logo {
-        max-width: 100px; /* Smaller size on mobile devices */
-    }
-}
-
-/*---- Customize for submit button ---*/
-
-.submit-section {
-	text-align: center;
-	margin-top: 40px;
-}
-.submit-btn {
-    position: relative;
-    z-index: 1;
-    border-radius: 50px;
-    font-size: 1rem;
-    font-weight: 600;
-    min-width: 8rem;
-    padding: 0.6rem 1.2rem;
-}
-
-/*================================================== BUS SEATS FORMAT ==========================================*/
-.seat-button {
-    margin: 2px;
-	width: 60px;
-	height: 60px;
-    padding: 10px 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-	font-size: 16px;
-}
-.seat-button.selected {
-    background-color: #4CAF50;
-    color: white;
-}
-.bus-container {
-    transform: rotateX(180deg);
-}
-.seat-button, .empty-seat, .empty-seat1, .empty-seat3, .empty-seat4, .empty-seat5, .empty-seat6 {
-    transform: rotateX(180deg);
-}
-.bus-container h3 {
-	position: relative;
-	text-align: center;
-	z-index: 1;
-    margin-bottom: 65px;
-}
-.seat-arrangement {
-    position: relative;
-    z-index: 1;
-}
-
-.seat-button:hover {
-    background-color: #0056b3;
-}
-/*--- Spacing for seats ---*/
-.empty-seat {
-	margin: 2px;
-    display: inline-block; 
-    width: 30px;
-    height: 30px; 
-}
-.empty-seat1 {
-	margin: 2px;
-    display: inline-block; 
-    width: 96px;
-    height: 5px; 
-}
-.empty-seat3 {
-	margin: 2px;
-    display: inline-block; 
-    width: 195px;
-    height: 5px; 
-}
-.empty-seat4 {
-	margin: 2px;
-    display: inline-block; 
-    width: 270px;
-    height: 5px; 
-}
-.empty-seat5 {
-	margin: 2px;
-    display: inline-block; 
-    width: 95px;
-    height: 10px; 
-}
-.empty-seat6 {
-	margin: 2px;
-    display: inline-block; 
-    width: 948px;
-    height: 10px; 
-}
-/*--- /Spacing for seats ---*/
-/*================================================== /BUS SEATS FORMAT ==========================================*/
 .check {
 	display: block;
 	margin: 0;
@@ -2499,6 +2388,7 @@ table.dataTable thead > tr > td.sorting {
     font-weight: 600;
     padding: 10px 20px;
     text-align: center;
+	width: 200px;
 }
 .continue-btn:hover,
 .continue-btn:focus,
@@ -2517,6 +2407,7 @@ table.dataTable thead > tr > td.sorting {
     font-weight: 600;
     padding: 10px 20px;
     text-align: center;
+	width: 200px;
 }
 .cancel-btn:hover,
 .cancel-btn:focus,
@@ -8695,3 +8586,117 @@ ul.comment-list li ul.children {
 	border-radius: 50%;
 	background: linear-gradient(to right, #f43b48 0%, #453a94 100%);
 }
+
+/*-------- 65. Job Order Files --------
+------------------------------------ */
+/*----- Customize Logo pictue ---*/
+
+.custom-com-logo{
+	margin-top: 10%;
+	width: 250px;
+	height: auto;
+	display: block;
+}
+.custom-new-logo{
+	margin-top: 15%;
+	width: 250px;
+	height: 200px;
+	display: block; 
+}
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .custom-com-logo, .custom-new-logo {
+        max-width: 100px; /* Smaller size on mobile devices */
+    }
+}
+
+/*---- Customize for submit button ---*/
+
+.submit-section {
+	text-align: center;
+	margin-top: 40px;
+}
+.submit-btn1 {
+    position: relative;
+    z-index: 1;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    min-width: 8rem;
+    padding: 0.6rem 1.2rem;
+}
+
+.seat-button {
+    margin: 2px;
+	width: 60px;
+	height: 60px;
+    padding: 10px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+	font-size: 16px;
+}
+.seat-button.selected {
+    background-color: #4CAF50;
+    color: white;
+}
+.bus-container {
+    transform: rotateX(180deg);
+}
+.seat-button, .empty-seat, .empty-seat1, .empty-seat3, .empty-seat4, .empty-seat5, .empty-seat6 {
+    transform: rotateX(180deg);
+}
+.bus-container h3 {
+	position: relative;
+	text-align: center;
+	z-index: 1;
+    margin-bottom: 65px;
+}
+.seat-arrangement {
+    position: relative;
+    z-index: 1;
+}
+
+.seat-button:hover {
+    background-color: #0056b3;
+}
+/*--- Spacing for seats ---*/
+.empty-seat {
+	margin: 2px;
+    display: inline-block; 
+    width: 30px;
+    height: 30px; 
+}
+.empty-seat1 {
+	margin: 2px;
+    display: inline-block; 
+    width: 96px;
+    height: 5px; 
+}
+.empty-seat3 {
+	margin: 2px;
+    display: inline-block; 
+    width: 195px;
+    height: 5px; 
+}
+.empty-seat4 {
+	margin: 2px;
+    display: inline-block; 
+    width: 270px;
+    height: 5px; 
+}
+.empty-seat5 {
+	margin: 2px;
+    display: inline-block; 
+    width: 95px;
+    height: 10px; 
+}
+.empty-seat6 {
+	margin: 2px;
+    display: inline-block; 
+    width: 948px;
+    height: 10px; 
+}
+/*--- /Spacing for seats ---*/

@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Crypt;
+use FFMpeg\FFMpeg;
+use FFMpeg\Format\Video\X264;
 use Illuminate\Http\Request;
 use App\Models\Joborder;
 use App\Models\User;
@@ -40,8 +44,10 @@ class JobOrderController extends Controller
         {
             $id = Crypt::decryptString($encryptedId);
             $jobDetail = Joborder::findOrFail($id);
-            $FileDetails = JobFiles::where('job_id', $id)->get(); // Retrieve files for the specific job
-            return view('joborders.joborderview', compact('jobDetail','id','FileDetails'));
+            $FileDetails = JobFiles::where('job_id', $id)->get();
+            $relatedTasks = JobOrder::where('id', $id)->whereIn('job_status', ['New', 'On Process'])->get();
+            
+            return view('joborders.joborderview', compact('jobDetail','id','FileDetails', 'relatedTasks'));
         }
 
 
@@ -88,32 +94,63 @@ class JobOrderController extends Controller
             }
         }
 
-    /** Update Record */
-    public function updateRecordJoborders(Request $request)
-    {
-        $request->validate([
-            'id'                    => 'required|exists:joborders,id',
-            'job_status'            => 'required|string|max:255',
-            'job_assign_person'     => 'required|string|max:255',
-        ]);
+        /** Update Record */
+        public function updateRecordJoborders(Request $request)
+        {
+            // Check if this is an AJAX request for status update
+            if ($request->ajax()) {
+                // Validate the request
+                $request->validate([
+                    'id'         => 'required|exists:joborders,id',
+                    'job_status' => 'required|string|max:255',
+                ]);
 
-        DB::beginTransaction();
-        try {
-            Joborder::where('id', $request->id)->update([
-                'job_status'        => $request->job_status,
-                'job_assign_person' => $request->job_assign_person,
-            ]);
-            
-            DB::commit();
-            flash()->success(' Job Order updated successfully :)');
-            return redirect()->back();
-        } catch (\Exception $e) {
-            DB::rollback();
-            flash()->error('Failed to update Job Order :)');
-            return redirect()->back();
+                try {
+                    // Begin database transaction
+                    DB::beginTransaction();
+
+                    // Update job order status
+                    $jobOrder = Joborder::find($request->id);
+                    $jobOrder->job_status = $request->job_status;
+                    $jobOrder->save();
+
+                    // Commit the transaction
+                    DB::commit();
+
+                    // Return a success response for AJAX
+                    return response()->json(['success' => true, 'message' => 'Job Status updated successfully']);
+                } catch (\Exception $e) {
+                    // Rollback transaction on error
+                    DB::rollback();
+
+                    // Return a failure response for AJAX
+                    return response()->json(['success' => false, 'message' => 'Failed to update Job Status']);
+                }
+            } else {
+                // For regular form submission (not an AJAX request)
+                $request->validate([
+                    'id'                    => 'required|exists:joborders,id',
+                    'job_status'            => 'required|string|max:255',
+                    'job_assign_person'     => 'required|string|max:255',
+                ]);
+
+                DB::beginTransaction();
+                try {
+                    Joborder::where('id', $request->id)->update([
+                        'job_status'        => $request->job_status,
+                        'job_assign_person' => $request->job_assign_person,
+                    ]);
+
+                    DB::commit();
+                    flash()->success('Job Order updated successfully :)');
+                    return redirect()->back();
+                } catch (\Exception $e) {
+                    DB::rollback();
+                    flash()->error('Failed to update Job Order :)');
+                    return redirect()->back();
+                }
+            }
         }
-    }
-
     /** Delete Record */
     public function deleteRecordJoborders(Request $request)
     {
@@ -130,46 +167,72 @@ class JobOrderController extends Controller
         }
     }
 
-    /** Saving Video Files */
+    /* Saving a Files or Video ----*/
     public function Job_Files(Request $request)
     {
-        // Validate the request
         $request->validate([
             'job_order_id' => 'required|integer',
             'files.*' => 'required|mimes:mp4,mp3,asf,png,jpg,jpeg|max:40480000',
             'remarks.*' => 'nullable|string',
             'notes.*' => 'nullable|string',
         ]);
-
+    
         DB::beginTransaction();
         try {
             if ($request->hasFile('files')) {
                 foreach ($request->file('files') as $index => $file) {
-
-                    $filename = time() . '_' . $file->getClientOriginalName();
+                    $originalName = $file->getClientOriginalName();
+                    $extension = $file->getClientOriginalExtension();
+                    $filename = time() . '_' . pathinfo($originalName, PATHINFO_FILENAME) . '.' . $extension;
                     $filePath = $file->storeAs('assets/videos', $filename, 'public');
 
+                    if ($extension === 'asf') {
+                        $mp4Filename = time() . '_' . pathinfo($originalName, PATHINFO_FILENAME) . '.mp4';
+                        $mp4FilePath = 'assets/videos/' . $mp4Filename;
+    
+                        $ffmpegPath = env('FFMPEG_PATH', 'C:/ffmpeg/bin/ffmpeg.exe');
+                        if (!file_exists($ffmpegPath)) {
+                            $ffmpegPath = '/usr/bin/ffmpeg';
+                        }
+
+                        if (!file_exists($ffmpegPath)) {
+                            throw new \Exception('FFmpeg is not installed or path is incorrect.');
+                        }
+    
+                        $process = new Process([$ffmpegPath, '-i', storage_path('app/public/' . $filePath), storage_path('app/public/' . $mp4FilePath)]);
+                        $process->run();
+    
+                        if (!$process->isSuccessful()) {
+                            \Log::error('FFmpeg conversion failed for file: ' . $originalName);
+                            throw new ProcessFailedException($process);
+                        }
+
+                        Storage::disk('public')->delete($filePath);
+                        $filePath = $mp4FilePath;
+                    }
+    
                     JobFiles::create([
                         'job_id' => $request->input('job_order_id'),
                         'file_name' => $file->getClientOriginalName(),
                         'file_remarks' => $request->input('remarks')[$index],
                         'file_notes' => $request->input('notes')[$index],
-                        'file_path' => 'assets/videos/' . $filename,
+                        'file_path' => $filePath,
                     ]);
                 }
             }
-
-            DB::commit(); // Commit the transaction
-            flash()->success('Files uploaded successfully :)');
+    
+            DB::commit();
+            flash()->success('Files uploaded and converted successfully.');
             return redirect()->back();
         } catch (\Exception $e) {
             DB::rollback();
-            \Log::error('File upload failed: ' . $e->getMessage());
-            flash()->error('Failed to upload files :)');
+            \Log::error('File upload or conversion failed: ' . $e->getMessage(), ['exception' => $e]);
+            flash()->error('Failed to upload or convert files.');
             return redirect()->back();
         }
-    }
+    }    
 
+    /*---- Deleteing Files or Video ---*/
     public function deleteVideoFiles($id)
     {
         DB::beginTransaction();
@@ -187,6 +250,7 @@ class JobOrderController extends Controller
             flash()->success('File deleted successfully :)');
             return response()->json([
                 'success' => true,
+                'flash' => true,
             ]);
             
         } catch (\Exception $e) {
@@ -195,6 +259,7 @@ class JobOrderController extends Controller
             flash()->error('Failed to delete the file :)');
             return response()->json([
                 'success' => false,
+                'flash' => true,
             ], 500);
         }
     }    

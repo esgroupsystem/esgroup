@@ -15,6 +15,7 @@
         "laravel/ui": "^4.5",
         "maatwebsite/excel": "^3.1",
         "oriceon/toastr-5-laravel": "^2.0",
+        "php-ffmpeg/php-ffmpeg": "^1.2",
         "php-flasher/flasher-laravel": "^2.0"
     },
     "require-dev": {

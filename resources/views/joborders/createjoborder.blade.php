@@ -110,9 +110,9 @@
 
                                 <!------- Seatting Diagram ------>
                                 <div class="col-auto float-right ml-auto">
-                                    <button type="submit" class="btn btn-primary submit-btn">Save</button>
+                                    <button type="submit" class="btn btn-primary submit-btn1">Save</button>
                                     <div class="col-auto float-right ml-auto">
-                                        <a href="{{route ('form/joborders/page') }}" class="btn btn-dark submit-btn">Back</a>
+                                        <a href="{{route ('form/joborders/page') }}" class="btn btn-dark submit-btn1">Back</a>
                                     </div>
                                 </div>
 

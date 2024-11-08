@@ -103,11 +103,11 @@
                                             <div class="dropdown-menu dropdown-menu-right">
                                                 <a class="dropdown-item view_joborder" href="{{ route('view/details', ['id' => \Illuminate\Support\Facades\Crypt::encryptString($item->id)]) }}"><i class="fa fa-eye m-r-5"></i> View </a>                                                
                                                 <a class="dropdown-item edit_joborder" href="#"
-                                                        data-id="{{ $item->id }}" 
-                                                        data-job_status="{{ $item->job_status }}" 
-                                                        data-job_assign-person="{{ $item->job_assign_person }}" 
-                                                        data-toggle="modal" 
-                                                        data-target="#edit_joborder"><i class="fa fa-pencil m-r-5"></i> Edit</a>
+                                                    data-id="{{ $item->id }}" 
+                                                    data-job_status="{{ $item->job_status }}" 
+                                                    data-job_assign-person="{{ $item->job_assign_person }}" 
+                                                    data-toggle="modal" 
+                                                    data-target="#edit_joborder"><i class="fa fa-pencil m-r-5"></i> Edit</a>
                                                 <a class="dropdown-item delete_order" href="#" data-toggle="modal"  data-target="#delete_order"><i class="fa fa-trash-o m-r-5"></i> Delete</a>
                                             </div>
                                         </div>
@@ -185,14 +185,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-sm-6"> 
-                                    <label>Photo</label>
-                                    <input class="form-control" type="file" id="image" name="images">
-                                    <input type="hidden" name="hidden_image" id="e_image" value="">
-                                    <div class="form-text">Allowed file types: png, jpg, jpeg.</div>
-                                </div>
-                            </div>
-                        <br>
+                            <br>
                             <div class="submit-section">
                                 <button type="submit" class="btn btn-primary submit-btn">Update</button>
                             </div>
