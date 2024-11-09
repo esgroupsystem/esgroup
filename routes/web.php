@@ -123,7 +123,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
 
     // --------------------------------- job ---------------------------------//
     Route::controller(JobController::class)->group(function () {
-        Route::get('form/job/list','jobList')->name('form/job/list');
+        Route::get('form/job/list','categoryIndex')->name('form/job/list');
         Route::get('form/job/view/{id}', 'jobView');
         Route::get('user/dashboard/index', 'userDashboard')->middleware('auth')->name('user/dashboard/index');    
         Route::get('jobs/dashboard/index', 'jobsDashboard')->middleware('auth')->name('jobs/dashboard/index');    
@@ -320,6 +320,33 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
     // ---------------------- bank information  -----------------------//
     Route::controller(BankInformationController::class)->group(function () {
         Route::post('bank/information/save', 'saveRecord')->middleware('auth')->name('bank/information/save');
+    });
+
+
+    // ==================== Maintenance Inventory ===========================//
+
+    //------------------ Products -----------------//
+    Route::controller(ProductController::class)->group(function () {
+        // --- All Products -- //
+        Route::get('unit/list', 'brandIndex')->middleware('auth')->name('unit/list');
+        Route::post('form/unit/saving', 'saveUnit')->middleware('auth')->name('form/unit/saving');  
+        Route::post('form/unit/brandupdate', 'updateUnit')->middleware('auth')->name('form/unit/update');   
+        Route::post('form/unit/branddelete', 'deleteUnit')->middleware('auth')->name('form/unit/delete'); 
+        // --- Category -- //
+        Route::get('category/list', 'categoryIndex')->middleware('auth')->name('category/list');
+        Route::post('form/saving', 'saveCategory')->middleware('auth')->name('form/saving');  
+        Route::post('form/update', 'updateCategory')->middleware('auth')->name('form/update');   
+        Route::post('form/delete', 'deleteCategory')->middleware('auth')->name('form/delete');  
+        // -- Brand -- //
+        Route::get('brand/list', 'brandIndex')->middleware('auth')->name('brand/list');
+        Route::post('form/brand/saving', 'saveBrand')->middleware('auth')->name('form/brand/saving');  
+        Route::post('form/brand/brandupdate', 'updateBrand')->middleware('auth')->name('form/brand/update');   
+        Route::post('form/brand/branddelete', 'deleteBrand')->middleware('auth')->name('form/brand/delete'); 
+        // -- Unit -- //
+        Route::get('unit/list', 'brandIndex')->middleware('auth')->name('unit/list');
+        Route::post('form/unit/saving', 'saveUnit')->middleware('auth')->name('form/unit/saving');  
+        Route::post('form/unit/brandupdate', 'updateUnit')->middleware('auth')->name('form/unit/update');   
+        Route::post('form/unit/branddelete', 'deleteUnit')->middleware('auth')->name('form/unit/delete'); 
     });
 
 });

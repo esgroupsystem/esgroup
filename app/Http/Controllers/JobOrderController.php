@@ -97,37 +97,25 @@ class JobOrderController extends Controller
         /** Update Record */
         public function updateRecordJoborders(Request $request)
         {
-            // Check if this is an AJAX request for status update
             if ($request->ajax()) {
-                // Validate the request
                 $request->validate([
                     'id'         => 'required|exists:joborders,id',
                     'job_status' => 'required|string|max:255',
                 ]);
 
                 try {
-                    // Begin database transaction
                     DB::beginTransaction();
-
-                    // Update job order status
                     $jobOrder = Joborder::find($request->id);
                     $jobOrder->job_status = $request->job_status;
                     $jobOrder->save();
 
-                    // Commit the transaction
                     DB::commit();
-
-                    // Return a success response for AJAX
                     return response()->json(['success' => true, 'message' => 'Job Status updated successfully']);
                 } catch (\Exception $e) {
-                    // Rollback transaction on error
                     DB::rollback();
-
-                    // Return a failure response for AJAX
                     return response()->json(['success' => false, 'message' => 'Failed to update Job Status']);
                 }
             } else {
-                // For regular form submission (not an AJAX request)
                 $request->validate([
                     'id'                    => 'required|exists:joborders,id',
                     'job_status'            => 'required|string|max:255',
@@ -140,7 +128,6 @@ class JobOrderController extends Controller
                         'job_status'        => $request->job_status,
                         'job_assign_person' => $request->job_assign_person,
                     ]);
-
                     DB::commit();
                     flash()->success('Job Order updated successfully :)');
                     return redirect()->back();
@@ -151,6 +138,7 @@ class JobOrderController extends Controller
                 }
             }
         }
+        
     /** Delete Record */
     public function deleteRecordJoborders(Request $request)
     {
