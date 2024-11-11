@@ -17,8 +17,143 @@ use Auth;
 
 class ProductController extends Controller
 {
+    /**
+     * Product All
+     * Product All
+     * Product All
+     * 
+     */
+    public function productIndex()
+    {
+        $loggedUser = Auth::user();
+        $productview = Products::leftJoin('product_categories', 'products.product_category', '=', 'product_categories.id')
+                                ->leftJoin('product_brands', 'products.product_brand', '=', 'product_brands.id')
+                                ->leftJoin('product_units', 'products.product_unit', '=', 'product_units.id')
+                                ->select('products.*', 
+                                        'product_categories.category_name', 
+                                        'product_brands.brand_name', 
+                                        'product_units.unit_name')
+                                ->get();
+        $category = ProductCategory::all();
+        $brand = ProductBrand::all();
+        $unit = ProductUnit::all();
+    
+        return view('products.product', compact('productview', 'loggedUser', 'category', 'brand', 'unit'));
+    }
 
-/** Display All Category */
+    /** Save Record */
+    public function saveProduct(Request $request)
+    {
+        $request->validate([
+            'product_code'     => 'required|string|max:255',
+            'product_serial'   => 'required|string|max:255',	
+            'product_name'	   => 'required|string|max:255',
+            'product_category' => 'required|integer',
+            'product_brand'    => 'required|integer',
+            'product_unit'     => 'required|integer',
+        ]);
+        
+        DB::beginTransaction();
+        try {
+            Products::create([
+                'product_code'      => $request->product_code,
+                'product_serial'	=> $request->product_serial,
+                'product_name'      => $request->product_name,
+                'product_category'  => $request->product_category,
+                'product_brand'     => $request->product_brand,
+                'product_unit'      => $request->product_unit,
+                'product_parts_details' => $request->product_details,
+                'product_status'    => 'Active',
+                'product_creator'   => $request->user()->name,
+            ]);
+            
+            DB::commit();
+            flash()->success('Created new product successfully :)');
+            return redirect()->back();
+        } catch (\Exception $e) {
+            DB::rollback();
+            flash()->error('Failed to add product :)');
+            return redirect()->back();
+        }
+    }
+    
+    // Auto generate of product code
+    public function getProductCode(Request $request)
+    {
+        $categoryId = $request->input('category_id');
+        
+        $category = ProductCategory::find($categoryId);
+        $categoryCode = $category->category_code;
+        
+        $lastProduct = Products::where('id', $categoryId)
+                               ->orderBy('id', 'desc')
+                               ->first();
+        
+        $nextProductNumber = $lastProduct ? intval(substr($lastProduct->product_code, -5)) + 1 : 1;
+        do {
+            $formattedCode = $categoryCode . '-' . str_pad($nextProductNumber, 5, '0', STR_PAD_LEFT);
+            $existingProduct = Products::where('product_code', $formattedCode)->first();
+    
+            if ($existingProduct) {
+                $nextProductNumber++;
+            }
+        } while ($existingProduct);
+
+        return response()->json(['product_code' => $formattedCode]);
+    }
+
+    /** Update Record */
+    public function updateProduct(Request $request)
+    {
+        $request->validate([
+            'id'                => 'required|integer|exists:products,id',
+            'product_status'   => 'required|string|max:255',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            Products::where('id', $request->id)->update([
+                'product_status'   => $request->product_status,
+            ]);
+            
+            DB::commit();
+            flash()->success('Product updated successfully :)');
+            return redirect()->back();
+        } catch (\Exception $e) {
+            DB::rollback();
+            flash()->error('Failed to update product :(');
+            return redirect()->back();
+        }
+    }
+        /** Delete Record */
+        public function deleteProduct(Request $request)
+        {
+            $request->validate([
+                'id' => 'required|integer',
+            ]);
+            
+            try {
+                $product = Products::find($request->id);
+                
+                if ($product) {
+                    $product->delete();
+                    flash()->success('Product deleted successfully!');
+                } else {
+                    flash()->error('Product not found!');
+                }
+                return redirect()->back();
+            } catch (\Exception $e) {
+                flash()->error('Failed to delete product.');
+                return redirect()->back();
+            }
+        }
+
+    /** 
+     * Display All Category
+     * Display All Category
+     * Display All Category
+     * 
+     * */
     public function categoryIndex()
     {
         $loggedUser = Auth::user();
@@ -31,13 +166,15 @@ class ProductController extends Controller
     public function saveCategory(Request $request)
     {
         $request->validate([
-            'category_name'             => 'required|string|max:255',
+            'category_name'     => 'required|string|max:255',
+            'category_code'     => 'required|string|max:255',
         ]);
         
         DB::beginTransaction();
         try {
             ProductCategory::create([
                 'category_name'                  => $request->category_name,
+                'category_name'                  => $request->category_code,
                 'category_status'                => 'Active',
                 'category_creator'               => $request->user()->name,
             ]);
@@ -59,13 +196,15 @@ class ProductController extends Controller
             'id'                => 'required|integer|exists:product_categories,id',
             'category_name'     => 'required|string|max:255',
             'category_status'   => 'required|string|max:255',
+            'category_code'     => 'required|string|max:255',
         ]);
 
         DB::beginTransaction();
         try {
             ProductCategory::where('id', $request->id)->update([
-                'category_name' => $request->category_name,
-                'category_status' => $request->category_status,
+                'category_name'     => $request->category_name,
+                'category_code'     => $request->category_code,
+                'category_status'   => $request->category_status,
             ]);
             
             DB::commit();

@@ -146,12 +146,18 @@
                     </ul>
                 </li>
                 <li class="menu-title"> <span>Maintenance</span> </li>
-                    <li class="{{set_active(['category/list', 'form/saving', 'form/delete', 'brand/list', 'form/brand/saving', 'form/brand/update', 'form/brand/delete','unit/list', 'form/unit/saving', 'form/unit/update', 'form/unit/delete'])}} submenu">
-                    <a href="#" class="{{ set_active(['category/list', 'form/saving', 'form/delete', 'brand/list', 'form/brand/saving', 'form/brand/update', 'form/brand/delete','unit/list', 'form/unit/saving', 'form/unit/update', 'form/unit/delete']) ? 'noti-dot' : '' }}">
+                    <li class="{{set_active(['category/list', 'form/saving', 'form/delete', 'brand/list', 
+                                            'form/brand/saving', 'form/brand/update', 'form/brand/delete',
+                                            'unit/list', 'form/unit/saving', 'form/unit/update', 'form/unit/delete', 
+                                            'product/list', 'form/product/saving', 'getProductCode'])}} submenu">
+                    <a href="#" class="{{ set_active(['category/list', 'form/saving', 'form/delete', 'brand/list', 
+                                                    'form/brand/saving', 'form/brand/update', 'form/brand/delete',
+                                                    'unit/list', 'form/unit/saving', 'form/unit/update', 'form/unit/delete', 
+                                                    'product/list', 'form/product/saving', 'form/product/update', 'form/product/delete', 'getProductCode']) ? 'noti-dot' : '' }}">
                     <i class="la la-bus"></i> <span>Products</span> <span class="menu-arrow"></span>
                     </a>
                     <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">
-                        <li><a class="{{set_active(['form/joborders/page'])}}" href="{{ route('form/joborders/page') }}">All Product</a></li>
+                        <li><a class="{{set_active(['product/list'])}}" href="{{ route('product/list') }}">All Product</a></li>
                         <li><a class="{{set_active(['category/list'])}}" href="{{ route('category/list') }}">Category</a></li>
                         <li><a class="{{set_active(['brand/list'])}}" href="{{ route('brand/list') }}">Brand</a></li>
                         <li><a class="{{set_active(['unit/list'])}}" href="{{ route('unit/list') }}">Unit</a></li>

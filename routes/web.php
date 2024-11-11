@@ -328,10 +328,11 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
     //------------------ Products -----------------//
     Route::controller(ProductController::class)->group(function () {
         // --- All Products -- //
-        Route::get('unit/list', 'brandIndex')->middleware('auth')->name('unit/list');
-        Route::post('form/unit/saving', 'saveUnit')->middleware('auth')->name('form/unit/saving');  
-        Route::post('form/unit/brandupdate', 'updateUnit')->middleware('auth')->name('form/unit/update');   
-        Route::post('form/unit/branddelete', 'deleteUnit')->middleware('auth')->name('form/unit/delete'); 
+        Route::get('product/list', 'productIndex')->middleware('auth')->name('product/list');
+        Route::post('form/product/saving', 'saveProduct')->middleware('auth')->name('form/product/saving');  
+        Route::post('form/product/brandupdate', 'updateProduct')->middleware('auth')->name('form/product/update');   
+        Route::post('form/product/branddelete', 'deleteProduct')->middleware('auth')->name('form/product/delete'); 
+        Route::post('/get-product-code', 'getProductCode')->name('get.product.code');
         // --- Category -- //
         Route::get('category/list', 'categoryIndex')->middleware('auth')->name('category/list');
         Route::post('form/saving', 'saveCategory')->middleware('auth')->name('form/saving');  
@@ -343,7 +344,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
         Route::post('form/brand/brandupdate', 'updateBrand')->middleware('auth')->name('form/brand/update');   
         Route::post('form/brand/branddelete', 'deleteBrand')->middleware('auth')->name('form/brand/delete'); 
         // -- Unit -- //
-        Route::get('unit/list', 'brandIndex')->middleware('auth')->name('unit/list');
+        Route::get('unit/list', 'unitIndex')->middleware('auth')->name('unit/list');
         Route::post('form/unit/saving', 'saveUnit')->middleware('auth')->name('form/unit/saving');  
         Route::post('form/unit/brandupdate', 'updateUnit')->middleware('auth')->name('form/unit/update');   
         Route::post('form/unit/branddelete', 'deleteUnit')->middleware('auth')->name('form/unit/delete'); 

@@ -29,6 +29,7 @@
                                 <tr>
                                     <th hidden>ID</th> 
                                     <th>No</th>
+                                    <th>Code</th>
                                     <th>Category Name</th>
                                     <th>Status</th>
                                     <th>Created by</th>
@@ -40,6 +41,7 @@
                                     <tr>
                                         <td hidden class="id">{{ $items->id }}</td>
                                         <td>{{ ++$key }}</td>
+                                        <td class="category_code">{{$items->category_code }}</td>
                                         <td class="category_name">{{ $items->category_name }}</td>
                                         <td class="category_status">
                                             <span class="badge badge-large
@@ -85,6 +87,10 @@
                         <form action="{{ route('form/saving') }}" method="POST">
                             @csrf
                             <div class="form-group">
+                                <label>Code <span class="text-danger">*</span></label>
+                                <input class="form-control" type="text" id="nameCode" name="category_code">
+                            </div>
+                            <div class="form-group">
                                 <label>Category Name <span class="text-danger">*</span></label>
                                 <input class="form-control" type="text" id="nameCategory" name="category_name">
                             </div>
@@ -112,6 +118,11 @@
                         <form action="{{ route('form/update') }}" method="POST">
                             @csrf
                             <input type="hidden" name="id" id="e_id" value="">
+                            
+                            <div class="form-group">
+                                <label>Code <span class="text-danger">*</span></label>
+                                <input class="form-control" type="text" id="nameCode" name="category_code">
+                            </div>
                             <div class="form-group">
                                 <label>Category Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="catname_edit" name="category_name">
