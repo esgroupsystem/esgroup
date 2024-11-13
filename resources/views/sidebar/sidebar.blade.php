@@ -149,12 +149,14 @@
                     <li class="{{set_active(['category/list', 'form/saving', 'form/delete', 'brand/list', 
                                             'form/brand/saving', 'form/brand/update', 'form/brand/delete',
                                             'unit/list', 'form/unit/saving', 'form/unit/update', 'form/unit/delete', 
-                                            'product/list', 'form/product/saving', 'getProductCode'])}} submenu">
+                                            'product/list', 'form/product/saving', 'getProductCode',
+                                            'garageIndex'])}} submenu">
+                                            
                     <a href="#" class="{{ set_active(['category/list', 'form/saving', 'form/delete', 'brand/list', 
                                                     'form/brand/saving', 'form/brand/update', 'form/brand/delete',
                                                     'unit/list', 'form/unit/saving', 'form/unit/update', 'form/unit/delete', 
                                                     'product/list', 'form/product/saving', 'form/product/update', 'form/product/delete', 'getProductCode']) ? 'noti-dot' : '' }}">
-                    <i class="la la-bus"></i> <span>Products</span> <span class="menu-arrow"></span>
+                    <i class="la la-cube"></i> <span>Products</span> <span class="menu-arrow"></span>
                     </a>
                     <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">
                         <li><a class="{{set_active(['product/list'])}}" href="{{ route('product/list') }}">All Product</a></li>
@@ -163,6 +165,31 @@
                         <li><a class="{{set_active(['unit/list'])}}" href="{{ route('unit/list') }}">Unit</a></li>
                     </ul>
                 </li>
+                <li class="{{set_active(['garageIndex', 'garage/list'])}} submenu"> 
+                    <a href="#" class="{{ set_active(['garageIndex', 'garage/list' ]) ? 'noti-dot' : '' }}">
+                    <i class="la la-building"></i> <span>Garage</span> <span class="menu-arrow"></span>
+                    </a>
+                    <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">
+                        <li><a class="{{set_active(['garage/list'])}}" href="{{ route('garage/list') }}">List</a></li>
+                    </ul>
+                </li>
+                <li class="{{set_active(['supplierIndex', 'supplier/list'])}} submenu"> 
+                    <a href="#" class="{{ set_active(['supplierIndex', 'supplier/list' ]) ? 'noti-dot' : '' }}">
+                    <i class="la la-box"></i> <span>Supplier</span> <span class="menu-arrow"></span>
+                    </a>
+                    <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">
+                        <li><a class="{{set_active(['supplier/list'])}}" href="{{ route('supplier/list') }}">List</a></li>
+                    </ul>
+                </li>
+                <li class="menu-title"> <span>Request</span> </li>
+                <li class="{{set_active(['form/joborders/page'])}} submenu">
+                <a href="#" class="{{ set_active(['form/joborders/page']) ? 'noti-dot' : '' }}">
+                <i class="la la-bus"></i> <span>Purchase Order</span> <span class="menu-arrow"></span>
+                </a>
+                <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">
+                    <li><a class="{{set_active(['form/joborders/page'])}}" href="{{ route('form/joborders/page') }}">Job Orders</a></li>
+                </ul>
+            </li>
             </ul>
             @endif
         </div>

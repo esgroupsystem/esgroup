@@ -23,13 +23,11 @@ class JobController extends Controller
     /** Job View */
     public function jobView($id)
     { 
-        // Find the job post by ID and increment the count
         $post = AddJob::find($id);
         $update = ['count' =>$post->count + 1,];
         AddJob::where('id',$post->id)->update($update);
-
         $job_view = DB::table('add_jobs')->where('id',$id)->get();
-        // Return the view with the job details
+
         return view('job.jobview',compact('job_view'));
     }
 
@@ -125,10 +123,9 @@ class JobController extends Controller
     /** Update Ajax Status */
     public function jobTypeStatusUpdate(Request $request)
     {
-        // Find the first non-empty job type value from the request
         $job_type = $request->only(['full_time', 'part_time', 'internship', 'temporary', 'remote', 'others']);
-        $job_type = array_filter($job_type); // Remove empty values
-        $job_type = reset($job_type); // Get the first non-empty value
+        $job_type = array_filter($job_type);
+        $job_type = reset($job_type);
     
         if ($job_type) {
             AddJob::where('id', $request->id_update)->update(['job_type' => $job_type]);
@@ -176,11 +173,9 @@ class JobController extends Controller
         DB::beginTransaction();
     
         try {
-            // Upload file
             $cv_uploads = time() . '.' . $request->file('cv_upload')->extension();
             $request->file('cv_upload')->move(public_path('assets/images'), $cv_uploads);
-    
-            // Save application
+
             ApplyForJob::create([
                 'job_title' => $validatedData['job_title'],
                 'name'      => $validatedData['name'],
@@ -305,13 +300,11 @@ class JobController extends Controller
             'code_snippets'      => 'nullable|string',
             'answer_explanation' => 'nullable|string|max:255',
             'video_link'         => 'nullable|url',
-            'image_to_question'  => 'required|image|max:2048', // Assuming image validation
+            'image_to_question'  => 'required|image|max:2048',
         ]);
 
         DB::beginTransaction();
-
         try {
-            /** upload file */
             $imageName = time().'.'.$request->image_to_question->extension();  
             $request->image_to_question->move(public_path('assets/images/question'), $imageName);
 
@@ -365,14 +358,12 @@ class JobController extends Controller
         try {
             $question = Question::findOrFail($request->id);
 
-            // Handle file upload if a new image is provided
             if ($request->hasFile('image_to_question')) {
                 $imageName = time().'.'.$request->image_to_question->extension();
                 $request->image_to_question->move(public_path('assets/images/question'), $imageName);
                 $question->image_to_question = $imageName;
             }
 
-            // Update other fields
             $question->category            = $request->category;
             $question->department          = $request->department;
             $question->questions           = $request->questions;
@@ -402,13 +393,9 @@ class JobController extends Controller
     public function questionsDelete(Request $request)
     {
         try {
-            // Find the question to delete
             $question = Question::findOrFail($request->id);
-
-            // Optionally delete associated image if needed
             unlink('assets/images/question/'.$question->image_to_question);
 
-            // Delete the question
             $question->delete();
 
             flash()->success('Question deleted successfully :)');

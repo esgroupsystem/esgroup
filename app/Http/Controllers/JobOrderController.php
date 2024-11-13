@@ -191,7 +191,6 @@ class JobOrderController extends Controller
                         $process->run();
     
                         if (!$process->isSuccessful()) {
-                            \Log::error('FFmpeg conversion failed for file: ' . $originalName);
                             throw new ProcessFailedException($process);
                         }
 
@@ -214,7 +213,6 @@ class JobOrderController extends Controller
             return redirect()->back();
         } catch (\Exception $e) {
             DB::rollback();
-            \Log::error('File upload or conversion failed: ' . $e->getMessage(), ['exception' => $e]);
             flash()->error('Failed to upload or convert files.');
             return redirect()->back();
         }
@@ -243,7 +241,6 @@ class JobOrderController extends Controller
             
         } catch (\Exception $e) {
             DB::rollback();
-            \Log::error('File deletion failed: ' . $e->getMessage());
             flash()->error('Failed to delete the file :)');
             return response()->json([
                 'success' => false,

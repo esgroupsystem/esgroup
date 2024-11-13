@@ -404,9 +404,7 @@ class UserManagementController extends Controller
         DB::beginTransaction();
         try {
             $dt = Carbon::now();
-            $todayDate = $dt->toDateTimeString(); // Change this line
-    
-            // Log the deletion activity
+            $todayDate = $dt->toDateTimeString();
             $activityLog = [
                 'user_name'    => Session::get('name'),
                 'email'        => Session::get('email'),
@@ -414,21 +412,17 @@ class UserManagementController extends Controller
                 'status'       => Session::get('status'),
                 'role_name'    => Session::get('role_name'),
                 'modify_user'  => 'Delete',
-                'date_time'    => $todayDate, // Now this will be in the correct format
+                'date_time'    => $todayDate,
             ];
     
             DB::table('user_activity_logs')->insert($activityLog);
-    
-            // Handle the deletion of user-related information
             $userId = $request->id;
             $avatar = $request->avatar;
     
-            // Delete user and related records
             User::destroy($userId);
             PersonalInformation::destroy($userId);
             UserEmergencyContact::destroy($userId);
     
-            // Delete the avatar image if it's not the default
             if ($avatar !== 'photo_defaults.jpg') {
                 $filePath = 'assets/images/' . $avatar;
                 
@@ -444,7 +438,6 @@ class UserManagementController extends Controller
             return redirect()->back();
         } catch (\Exception $e) {
             DB::rollback();
-            \Log::error('Error deleting user: ' . $e->getMessage()); // Log error details
             flash()->error('User deletion failed :)');
             return redirect()->back();
         }
@@ -466,22 +459,16 @@ class UserManagementController extends Controller
         ]);
 
         try {
-            // Find the authenticated user
             $user = Auth::user();
-            // Update the user's password
             $user->update(['password' => Hash::make($request->new_password)]);
-            // Commit the transaction
+
             DB::commit();
-            // Show success message
             flash()->success('Password changed successfully :)');
-            // Redirect to the intended route
             return redirect()->intended('home');
+
         } catch (\Exception $e) {
-            // Rollback the transaction in case of error
             DB::rollBack();
-            // Optionally log the error or show an error message
             flash()->error('An error occurred while changing the password. Please try again.');
-            // Redirect back
             return redirect()->back();
         }
     }
@@ -489,7 +476,6 @@ class UserManagementController extends Controller
     /** user profile Emergency Contact */
     public function emergencyContactSaveOrUpdate(Request $request)
     {
-        // Validate form input
         $request->validate([
             'name_primary'           => 'required',
             'relationship_primary'   => 'required',
@@ -502,7 +488,7 @@ class UserManagementController extends Controller
         ]);
 
         try {
-            // Save or update emergency contact
+    
             $saveRecord = UserEmergencyContact::updateOrCreate(
                 ['user_id' => $request->user_id],
                 [
@@ -517,11 +503,8 @@ class UserManagementController extends Controller
                 ]
             );
 
-            // Success message
             flash()->success('Emergency contact updated successfully :)');
         } catch (Exception $e) {
-            // Log the error and show failure message
-            \Log::error('Failed to save emergency contact: ' . $e->getMessage());
             flash()->error('Failed to update emergency contact');
         }
         // Redirect back
