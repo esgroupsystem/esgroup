@@ -38,6 +38,14 @@ class PurchaseOrderController extends Controller
 
         return view('purchase.create_request', compact('allProduct', 'allSupplier', 'transaction_id', 'allGarage', 'allCategory', 'poNO', 'loggedUser'));
     }
+    public function recieptIndex()
+    {
+        $allpurchase = PurchaseOrder::leftJoin('garages', 'purchase_orders.garage_id', '=', 'garages.id')
+            ->select('purchase_orders.*', 'garages.garage_name')
+            ->get();
+    
+        return view('purchase.receipt', compact('allpurchase'));
+    }
 
     //Save
     public function purchaseSave(Request $request)
@@ -47,8 +55,6 @@ class PurchaseOrderController extends Controller
         DB::beginTransaction();
         try {
             foreach ($request->category as $key => $category) {
-                \Log::info('Processing category', ['category' => $category]);
-    
                 if (isset($request->po_no[$key], $request->product_name[$key], $request->product_code[$key], 
                           $request->garage_name[$key], $request->amount[$key], $request->qty[$key])) 
                     {

@@ -8699,26 +8699,50 @@ ul.comment-list li ul.children {
     width: 948px;
     height: 10px; 
 }
-/*--- /Spacing for seats ---*/
+
+/* For Purchase Order index */
+
 .stats-info {
     padding: 15px;
     border-radius: 5px;
-    color: white; /* Text color */
+    color: white;
     text-align: center;
 }
 
 .pending {
-    background-color: #f39c12; /* Orange */
+    background-color: #f39c12;
 }
 
 .not-approved {
-    background-color: #e74c3c; /* Red */
+    background-color: #e74c3c;
 }
 
 .waiting-delivery {
-    background-color: #3498db; /* Blue */
+    background-color: #3498db;
 }
 
 .partial-received {
-    background-color: #2ecc71; /* Green */
+    background-color: #2ecc71;
+}
+.bodyreceipt{
+    margin-top:10px;
+    background:#eee;    
+}
+
+/** FOR RECIEPT */
+
+#purchase-order-header {
+    padding: 20px 30px;
+    margin-bottom: 20px; 
+    background-color: #f8f9fa;  
+}
+
+#purchase-order-header .page-title {
+    margin-bottom: 10px;
+}
+
+#purchase-order-header .breadcrumb {
+    margin-bottom: 0;
+    padding: 0;
+    background: transparent;
 }

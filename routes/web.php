@@ -367,6 +367,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
     Route::controller(PurchaseOrderController::class)->group(function () {
         Route::get('/list', 'purchaseIndex')->middleware('auth')->name('purchase.list');
         Route::get('/create/request', 'requestIndex')->middleware('auth')->name('/create/request');
+        Route::get('/receipt', 'recieptIndex')->middleware('auth')->name('/receipt');
         Route::post('/request', 'purchaseSave')->middleware('auth')->name('request.items');
         Route::post('/update', 'updateSupplier')->middleware('auth')->name('form/supplier/update');   
         Route::post('/delete', 'deleteSupplier')->middleware('auth')->name('form/supplier/delete'); 

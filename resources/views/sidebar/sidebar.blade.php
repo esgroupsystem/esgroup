@@ -40,12 +40,13 @@
                     *
                     *-->
                 <li class="menu-title"> <span>Request P/O</span> </li>
-                    <li class="{{set_active(['purchase.list', '/create/request', '/requesting'])}} submenu">
-                    <a href="#" class="{{ set_active(['purchase.list', '/create/request', '/requesting']) ? 'noti-dot' : '' }}">
+                    <li class="{{set_active(['purchase.list', '/create/request', '/requesting', '/receipt'])}} submenu">
+                    <a href="#" class="{{ set_active(['purchase.list', '/create/request', '/requesting', '/receipt']) ? 'noti-dot' : '' }}">
                         <i class="la la-money"></i> <span>Purchase Order</span> <span class="menu-arrow"></span>
                     </a>
                     <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">
                         <li><a class="{{set_active(['purchase.list'])}}" href="{{ route('purchase.list') }}">Dashboard</a></li>
+                        <li><a class="{{set_active(['/receipt'])}}" href="{{ route('/receipt') }}">Reciept</a></li>
                     </ul>
                 </li>
                 <!--*
