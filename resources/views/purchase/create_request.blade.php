@@ -33,7 +33,7 @@
                             <div class="col-sm-6 col-md-3">
                                 <div class="form-group">
                                     <label>Store / Supplier <span class="text-danger">*</span></label>
-                                    <select class="select" id="supp_name" name="supplier_name[]" required>
+                                    <select class="select" id="supp_name" name="supplier_name" required>
                                         <option value="" > -- Select Supplier -- </option>
                                         @foreach($allSupplier as $item)
                                             <option value="{{ $item->supplier_name }}">{{ $item->supplier_name }}</option>
@@ -48,7 +48,7 @@
                                     <table class="table table-hover table-white" id="tablePurchaseOrder">
                                         <thead>
                                             <tr>
-                                                <th class="po_id">P/O No</th>
+                                                <th hidden class="po_id">P/O No</th>
                                                 <th hidden style="width: 20px">#</th>
                                                 <th class="col-sm-2">Category</th>
                                                 <th class="col-md-2">Product Code</th>
@@ -64,7 +64,7 @@
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td><input type="" name="po_no[]" class="auto_po_id" value="{{ $poNO }}"></td>
+                                                <td hidden ><input type="" name="po_no[]" class="auto_po_id" value="" readonly></td>
                                                 <td hidden >1</td>
                                                 <td>
                                                     <select class="form-control category-select" style="min-width:150px" name="category[]">
@@ -92,7 +92,7 @@
                                                     <select class="form-control" style="min-width:150px" id="garage" name="garage_name[]">
                                                         <option value="">Selection Area</option>
                                                         @foreach ($allGarage as $item )
-                                                            <option value="{{ $item->garage_name }}">{{ $item->garage_name }}</option>  
+                                                            <option value="{{ $item->id }}">{{ $item->garage_name }}</option>  
                                                         @endforeach
                                                     </select>  
                                                 </td>
@@ -173,13 +173,13 @@
                     var $brand = $(this).closest('tr').find('.brand');
                     var $unit = $(this).closest('tr').find('.unit');
                     var $productName = $(this).closest('tr').find('.product_name');
-
+        
                     // Clear previous selections
                     $productCodeSelect.empty().append('<option value=""> --Choose Product Code-- </option>');
                     $brand.val('');
                     $unit.val('');
                     $productName.val('');
-
+        
                     if (categoryId) {
                         $.ajax({
                             url: '/getCategory/' + categoryId,
@@ -204,7 +204,7 @@
                     var $brand = $(this).closest('tr').find('#brand');
                     var $unit = $(this).closest('tr').find('#unit');
                     var $productName = $(this).closest('tr').find('#p_name');
-
+        
                     if (productCode) {
                         $.ajax({
                             url: '/getProductDetails/' + productCode,
@@ -223,30 +223,47 @@
                     }
                 });
         
+                // Function to fetch a unique PO number from the server
+                async function fetchPONumber() {
+                    try {
+                        const response = await fetch('/check-po-number');
+                        if (response.ok) {
+                            const data = await response.json();  // Parse the JSON response
+                            return data.po_no;  // Return the PO number from the backend
+                        } else {
+                            throw new Error('Failed to fetch PO number');
+                        }
+                    } catch (error) {
+                        console.error('Error fetching PO number:', error);
+                        return 'PO-ERROR';  // Return a placeholder in case of an error
+                    }
+                }
+        
+                // Set the PO number in the first row input field on page load
+                $(async function () {
+                    const poNumber = await fetchPONumber();
+                    $(".auto_po_id").first().val(poNumber);  // Populate the first PO number field
+        
+                    // Optional: Populate more rows with PO numbers if necessary
+                    $(".auto_po_id").each(async function (index) {
+                        if ($(this).val() === "") {  // Only set if the field is empty
+                            const poNumber = await fetchPONumber();
+                            $(this).val(poNumber);
+                        }
+                    });
+                });
+        
                 // Adding a new row
                 var rowIdx = 1;
                 $("#addBtn").on("click", async function () {
-                    // Function to fetch a unique PO number from the server
-                    async function fetchPONumber() {
-                        try {
-                            const response = await fetch('/check-po-number');  // Call the route that generates PO numbers
-                            const data = await response.json();
-                            return data.po_no;  // Expecting the PO number from the backend
-                        } catch (error) {
-                            console.error('Error fetching PO number:', error);
-                            return 'PO-ERROR';  // In case of error, use a placeholder
-                        }
-                    }
-        
-                    // Fetch the unique PO number
+                    // When the "Add" button is clicked, fetch a new PO number for the new row
                     const poNumber = await fetchPONumber();
-                    console.log("Generated PO Number:", poNumber);
         
                     // Create a new row with the fetched PO number
                     const newRow = `
                         <tr id="R${++rowIdx}">
                             <td hidden class="row-index text-center"><p> ${rowIdx}</p></td>
-                            <td><input type="" name="po_no[]" class="auto_po_id" value="${poNumber}"></td>  <!-- Display PO number here -->
+                            <td hidden ><input type="" name="po_no[]" class="auto_po_id" value="${poNumber}" readonly></td>
                             <td>
                                 <select class="form-control category-select" style="min-width:150px" name="category[]">
                                     <option value="">Selection Area</option>
@@ -307,6 +324,6 @@
                     rowIdx--;
                 });
             });
-        </script>
+        </script>        
     @endsection
 @endsection

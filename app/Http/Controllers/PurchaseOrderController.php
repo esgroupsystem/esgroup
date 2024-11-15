@@ -20,8 +20,10 @@ class PurchaseOrderController extends Controller
     /** Display All Purchase */
     public function purchaseIndex()
     {
-        $allpurchase = PurchaseOrder::all();
-
+        $allpurchase = PurchaseOrder::leftJoin('garages', 'purchase_orders.garage_id', '=', 'garages.id')
+            ->select('purchase_orders.*', 'garages.garage_name')
+            ->get();
+    
         return view('purchase.purchase_order', compact('allpurchase'));
     }
     public function requestIndex()
@@ -40,42 +42,61 @@ class PurchaseOrderController extends Controller
     //Save
     public function purchaseSave(Request $request)
     {
+        $arrayLength = count($request->category);
 
         DB::beginTransaction();
         try {
             foreach ($request->category as $key => $category) {
-                PurchaseOrder::create([
-                    'po_no'          => $request->po_no[$key],
-                    'product_name'   => $request->product_name[$key],
-                    'product_id'     => $request->product_code[$key],
-                    'supplier_id'    => $request->supplier_name[$key],
-                    'garage_id'      => $request->garage_name[$key],
-                    'total_amount'   => $request->amount[$key],
-                    'requestor_id'   => $request->user()->name,
-                    'request_date'   => now()->format('Y-m-d H:i:s'),
-                    'isapproved'     => '0',
-                ]);
-            
+                \Log::info('Processing category', ['category' => $category]);
     
-            PurchaseDetails::create([
-                'transaction_id'  => $request->transaction_id,
-                'po_no_id'        => $request->po_no[$key],
-                'store_id'        => $request->garage_name[$key],
-                'order_qty'       => $request->qty[$key],
-                'product_id'      => $request->product_code[$key],
-            ]);
-        }
+                if (isset($request->po_no[$key], $request->product_name[$key], $request->product_code[$key], 
+                          $request->garage_name[$key], $request->amount[$key], $request->qty[$key])) 
+                    {
+                        $categoryModel = ProductCategory::find($category);
+                        $categoryName = $categoryModel->category_name;
+        
+                        // Save the PurchaseOrder record
+                        PurchaseOrder::create([
+                            'po_no' => $request->po_no[$key],
+                            'product_name' => $request->product_name[$key],
+                            'product_id' => $request->product_code[$key],
+                            'supplier_id' => $request->supplier_name,
+                            'garage_id' => $request->garage_name[$key],
+                            'total_amount' => $request->amount[$key],
+                            'requestor_id' => $request->user()->name,
+                            'request_date' => now()->format('Y-m-d H:i:s'),
+                            'isapproved' => '0',
+                            'category_name' => $categoryName,
+                        ]);
+                    
+                    // Save the PurchaseDetails record
+                        PurchaseDetails::create([
+                            'transaction_id' => $request->transaction_id,
+                            'po_no_id' => $request->po_no[$key],
+                            'store_id' => $request->garage_name[$key],
+                            'order_qty' => $request->qty[$key],
+                            'product_id' => $request->product_code[$key],
+                        ]);
+                } else {
+                    \Log::error('Missing data for key: ' . $key, ['key' => $key]);
+                    flash()->error('Missing data for key: ' . $key);
+                    DB::rollback();
+                    return redirect()->back();
+                }
+            }
     
             DB::commit();
-            flash()->success('Request successfully, Please wait for approval :)');
+            flash()->success('Request successfully submitted, Please wait for approval :)');
             return redirect()->route('purchase.list');
         } catch (\Exception $e) {
             DB::rollback();
-            \Log::error('Failed to request items', ['error_message' => $e->getMessage()]);
-            flash()->error('Failed to Request items :(');
+            \Log::error('Failed to request items', ['error_message' => $e->getMessage(), 'stack_trace' => $e->getTraceAsString()]);
+            flash()->error('Failed to request items :(');
             return redirect()->back();
         }
     }
+    
+    
 
     //Generate TransactionID
     private function generateUniqueTransactionID()
@@ -90,7 +111,7 @@ class PurchaseOrderController extends Controller
     }
 
     //Generate PO NO
-    private function checkPONumber()
+    public function checkPONumber()
     {
         do {
             $date = Carbon::now();
@@ -98,13 +119,14 @@ class PurchaseOrderController extends Controller
             $month = $date->month < 10 ? '0' . $date->month : $date->month;
             $day = $date->day < 10 ? '0' . $date->day : $date->day;
             $randomNum = mt_rand(1000, 9999);
-            
+    
             $poID = "PO-{$year}{$month}{$day}-{$randomNum}";
-
+    
             $exists = PurchaseOrder::where('po_no', $poID)->exists();
         } while ($exists);
     
-        return $poID;
+        // Return the PO number as JSON response
+        return response()->json(['po_no' => $poID]);
     }
 
     public function getProductsByCategory($categoryId)

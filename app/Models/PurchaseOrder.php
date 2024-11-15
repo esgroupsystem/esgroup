@@ -19,5 +19,6 @@ class PurchaseOrder extends Model
         'isapproved',
         'total_amount',
         'grand_total',
+        'category_name',
     ];
 }

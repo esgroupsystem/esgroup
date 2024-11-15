@@ -74,7 +74,7 @@
                                     <td class="po_no">{{ $item->po_no }}</td>
                                     <td class="po_product">{{ $item->product_id }}</td>
                                     <td class="po_supp">{{ $item->supplier_id }}</td>
-                                    <td class="po_garage">{{ $item->garage_id }}</td>
+                                    <td class="po_garage">{{ $item->garage_name }}</td>
                                     <td class="po_requestor">{{ $item->requestor_id }}</td>
                                     <td class="po_garage">{{ date('j M Y (h:i A)', strtotime($item->request_date)) }}</td>
                                     <td class="text-center">
