@@ -71,11 +71,11 @@
                                 @foreach ($allpurchase as $item )
                                 <tr>
                                     <td hidden class="id"> {{ $item->id }}</td>
-                                    <td class="j_name">{{ $item->po_no }}</td>
-                                    <td class="j_type">{{ $item->product_id }}</td>
-                                    <td class="j_type">{{ $item->supplier_id }}</td>
-                                    <td class="j_type">{{ $item->garage_id }}</td>
-                                    <td class="j_filled">{{ date('j M Y (h:i A)', strtotime($item->request_date)) }}</td>
+                                    <td class="po_no">{{ $item->po_no }}</td>
+                                    <td class="po_product">{{ $item->product_id }}</td>
+                                    <td class="po_supp">{{ $item->supplier_id }}</td>
+                                    <td class="po_garage">{{ $item->garage_id }}</td>
+                                    <td class="po_garage">{{ date('j M Y (h:i A)', strtotime($item->request_date)) }}</td>
                                     <td class="text-center">
                                         <div class="action-label">
                                             <a class="btn btn-white btn-sm btn-rounded" href="javascript:void(0);">

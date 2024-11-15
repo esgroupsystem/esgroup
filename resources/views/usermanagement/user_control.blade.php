@@ -198,7 +198,7 @@
                     </div>
                     <br>
                     <div class="modal-body">
-                        <form action="{{ route('update') }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('user.update') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <input type="hidden" name="user_id" id="e_id">
                             <div class="row"> 

@@ -40,8 +40,8 @@
                     *
                     *-->
                 <li class="menu-title"> <span>Request P/O</span> </li>
-                    <li class="{{set_active(['purchase.list', '/create/request'])}} submenu">
-                    <a href="#" class="{{ set_active(['purchase.list', '/create/request']) ? 'noti-dot' : '' }}">
+                    <li class="{{set_active(['purchase.list', '/create/request', '/requesting'])}} submenu">
+                    <a href="#" class="{{ set_active(['purchase.list', '/create/request', '/requesting']) ? 'noti-dot' : '' }}">
                         <i class="la la-money"></i> <span>Purchase Order</span> <span class="menu-arrow"></span>
                     </a>
                     <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">

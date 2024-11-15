@@ -90,7 +90,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
         Route::post('profile/information/save', 'profileInformation')->name('profile/information/save');
         Route::get('userManagement', 'index')->middleware('auth')->name('userManagement');
         Route::post('user/add/save', 'addNewUserSave')->name('user/add/save');
-        Route::post('update', 'update')->name('update');
+        Route::post('form/user/update', 'update')->middleware('auth')->name('user.update');
         Route::post('user/delete', 'delete')->middleware('auth')->name('user/delete');
         Route::get('change/password', 'changePasswordView')->middleware('auth')->name('change/password');
         Route::post('change/password/db', 'changePasswordDB')->name('change/password/db');
@@ -360,19 +360,19 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
     Route::controller(SupplierController::class)->group(function () {
         Route::get('supplier/list', 'supplierIndex')->middleware('auth')->name('supplier/list');
         Route::post('supplier/save', 'saveSupplier')->middleware('auth')->name('supplier/save');
-        Route::post('form/supplier/brandupdate', 'updateSupplier')->middleware('auth')->name('form/supplier/update');   
-        Route::post('form/supplier/branddelete', 'deleteSupplier')->middleware('auth')->name('form/supplier/delete'); 
+        Route::post('form/supplier/update', 'updateSupplier')->middleware('auth')->name('form/supplier/update');   
+        Route::post('form/supplier/delete', 'deleteSupplier')->middleware('auth')->name('form/supplier/delete'); 
     });
     // ---------------------- purchase order information  -----------------------//
     Route::controller(PurchaseOrderController::class)->group(function () {
         Route::get('/list', 'purchaseIndex')->middleware('auth')->name('purchase.list');
         Route::get('/create/request', 'requestIndex')->middleware('auth')->name('/create/request');
-        Route::post('/request', 'saveSupplier')->middleware('auth')->name('supplier/save');
+        Route::post('/request', 'purchaseSave')->middleware('auth')->name('request.items');
         Route::post('/update', 'updateSupplier')->middleware('auth')->name('form/supplier/update');   
         Route::post('/delete', 'deleteSupplier')->middleware('auth')->name('form/supplier/delete'); 
-        Route::get('/getProduct/{categoryId}', 'getProductsByCategory');
+        Route::get('/getCategory/{categoryId}', 'getProductsByCategory');
         Route::get('/getProductDetails/{productCode}', 'getProductDetails');
-        Route::get('/check-po-number', 'checkPONumber')->middleware('auth')->name('check.po.number'); 
+        Route::get('/check-po-number', 'checkPONumber'); 
     });
 
 });

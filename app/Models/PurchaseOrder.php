@@ -11,11 +11,13 @@ class PurchaseOrder extends Model
 
     protected $fillable = [
         'po_no',
+        'product_name',
         'product_id',
         'supplier_id',
         'garage_id',
         'requestor_id',
         'isapproved',
         'total_amount',
+        'grand_total',
     ];
 }
