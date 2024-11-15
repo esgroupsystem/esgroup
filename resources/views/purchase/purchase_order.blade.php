@@ -24,26 +24,26 @@
             <!-- Leave Statistics -->
             <div class="row">
                 <div class="col-md-3">
-                    <div class="stats-info">
-                        <h6>Annual Leave</h6>
+                    <div class="stats-info pending">
+                        <h6>Pending</h6>
                         <h4>0</h4>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="stats-info">
-                        <h6>Medical Leave</h6>
+                    <div class="stats-info not-approved">
+                        <h6>Not Approved</h6>
                         <h4>0</h4>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="stats-info">
-                        <h6>Other Leave</h6>
+                    <div class="stats-info waiting-delivery">
+                        <h6>Waiting for Delivery</h6>
                         <h4>0</h4>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="stats-info">
-                        <h6>Remaining Leave</h6>
+                    <div class="stats-info partial-received">
+                        <h6>Partial Received</h6>
                         <h4>0</h4>
                     </div>
                 </div>
@@ -75,6 +75,7 @@
                                     <td class="po_product">{{ $item->product_id }}</td>
                                     <td class="po_supp">{{ $item->supplier_id }}</td>
                                     <td class="po_garage">{{ $item->garage_id }}</td>
+                                    <td class="po_requestor">{{ $item->requestor_id }}</td>
                                     <td class="po_garage">{{ date('j M Y (h:i A)', strtotime($item->request_date)) }}</td>
                                     <td class="text-center">
                                         <div class="action-label">

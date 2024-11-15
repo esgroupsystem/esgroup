@@ -52,13 +52,15 @@ class PurchaseOrderController extends Controller
                     'garage_id'      => $request->garage_name[$key],
                     'total_amount'   => $request->amount[$key],
                     'requestor_id'   => $request->user()->name,
+                    'request_date'   => now()->format('Y-m-d H:i:s'),
+                    'isapproved'     => '0',
                 ]);
             
     
             PurchaseDetails::create([
                 'transaction_id'  => $request->transaction_id,
                 'po_no_id'        => $request->po_no[$key],
-                'store_id'      => $request->garage_name[$key],
+                'store_id'        => $request->garage_name[$key],
                 'order_qty'       => $request->qty[$key],
                 'product_id'      => $request->product_code[$key],
             ]);
@@ -95,16 +97,12 @@ class PurchaseOrderController extends Controller
             $year = $date->year;
             $month = $date->month < 10 ? '0' . $date->month : $date->month;
             $day = $date->day < 10 ? '0' . $date->day : $date->day;
-            
-            // Generate random 4-digit number
             $randomNum = mt_rand(1000, 9999);
             
-            // Create PO number
             $poID = "PO-{$year}{$month}{$day}-{$randomNum}";
-    
-            // Check if the PO number already exists
+
             $exists = PurchaseOrder::where('po_no', $poID)->exists();
-        } while ($exists);  // If it exists, generate a new one
+        } while ($exists);
     
         return $poID;
     }

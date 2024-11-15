@@ -8700,3 +8700,25 @@ ul.comment-list li ul.children {
     height: 10px; 
 }
 /*--- /Spacing for seats ---*/
+.stats-info {
+    padding: 15px;
+    border-radius: 5px;
+    color: white; /* Text color */
+    text-align: center;
+}
+
+.pending {
+    background-color: #f39c12; /* Orange */
+}
+
+.not-approved {
+    background-color: #e74c3c; /* Red */
+}
+
+.waiting-delivery {
+    background-color: #3498db; /* Blue */
+}
+
+.partial-received {
+    background-color: #2ecc71; /* Green */
+}

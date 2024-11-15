@@ -55,7 +55,7 @@
                                                 <th class="col-md-3">Product Name</th>
                                                 <th class="col-md-1">Brand</th>
                                                 <th class="col-md-1">Unit</th>
-                                                <th class="col-md-2">Unit</th>
+                                                <th class="col-md-2">Garage</th>
                                                 <th class="col-md-1">Stock</th>
                                                 <th class="col-md-1">Qty</th>
                                                 <th >Amount</th>
