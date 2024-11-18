@@ -365,15 +365,11 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
     });
     // ---------------------- purchase order information  -----------------------//
     Route::controller(PurchaseOrderController::class)->group(function () {
-        Route::get('/list', 'purchaseIndex')->middleware('auth')->name('purchase.list');
-        Route::get('/create/request', 'requestIndex')->middleware('auth')->name('/create/request');
-        Route::get('/receipt', 'recieptIndex')->middleware('auth')->name('/receipt');
-        Route::post('/request', 'purchaseSave')->middleware('auth')->name('request.items');
-        Route::post('/update', 'updateSupplier')->middleware('auth')->name('form/supplier/update');   
-        Route::post('/delete', 'deleteSupplier')->middleware('auth')->name('form/supplier/delete'); 
-        Route::get('/getCategory/{categoryId}', 'getProductsByCategory');
-        Route::get('/getProductDetails/{productCode}', 'getProductDetails');
-        Route::get('/check-po-number', 'checkPONumber'); 
+        Route::get('/mainIndex', 'mainIndex')->middleware('auth')->name('purchase.index');
+        Route::get('/purchaseIndex', 'purchaseIndex')->middleware('auth')->name('request.index');
+        Route::get('/get-latest-request-number', 'getLatestRequestNumber')->middleware('auth');
+        Route::get('/get-product-codes', 'getProductCodes')->middleware('auth');
+        Route::get('/get-product-details', 'getProductDetails')->middleware('auth');
     });
 
 });

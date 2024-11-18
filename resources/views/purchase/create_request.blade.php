@@ -9,10 +9,10 @@
             <div class="page-header">
                 <div class="row">
                     <div class="col-sm-12">
-                        <h3 class="page-title">Request Purchase Order</h3>
+                        <h3 class="page-title">Purchase Order Request</h3>
                         <ul class="breadcrumb">
                             <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Request</li>
+                            <li class="breadcrumb-item active">Purchase Order</li>
                         </ul>
                     </div>
                 </div>
@@ -21,23 +21,29 @@
               
             <div class="row">
                 <div class="col-sm-12">
-                    <form action="{{ route('request.items') }}" method="POST">
+                    <form action="#" method="POST">
                         @csrf
                         <div class="row">
                             <div class="col-sm-6 col-md-3">
                                 <div class="form-group">
-                                    <label>Transaction ID <span class="text-danger">*</span></label>
-                                    <input class="form-control" id="auto_transaction_id" name="transaction_id" value="{{ $transaction_id }}" readonly required>
+                                    <label>Request ID <span class="text-danger">*</span></label>
+                                    <input class="form-control" id="auto_po_id" name="request_id" value="" readonly required>
                                 </div>
                             </div>
                             <div class="col-sm-6 col-md-3">
                                 <div class="form-group">
-                                    <label>Store / Supplier <span class="text-danger">*</span></label>
-                                    <select class="select" id="supp_name" name="supplier_name" required>
-                                        <option value="" > -- Select Supplier -- </option>
-                                        @foreach($allSupplier as $item)
-                                            <option value="{{ $item->supplier_name }}">{{ $item->supplier_name }}</option>
-                                        @endforeach
+                                    <label>Purchase Order ID <span class="text-danger">*</span></label>
+                                    <input class="form-control" id="auto_transaction_id" name="po_number" value="" readonly required>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <div class="form-group">
+                                    <label>Garage<span class="text-danger">*</span></label>
+                                    <select class="select" id="gar_name" name="gar_name" required>
+                                        <option value="">Select Garage</option>
+                                            @foreach($garage as $item)
+                                                <option value="{{ $item->garage_name }}">{{ $item->garage_name }}</option>
+                                            @endforeach
                                     </select>
                                 </div>
                             </div>
@@ -49,13 +55,13 @@
                                         <thead>
                                             <tr>
                                                 <th hidden class="po_id">P/O No</th>
-                                                <th hidden style="width: 20px">#</th>
+                                                <th hidden style="width:20px">#</th>
                                                 <th class="col-sm-2">Category</th>
                                                 <th class="col-md-2">Product Code</th>
                                                 <th class="col-md-3">Product Name</th>
                                                 <th class="col-md-1">Brand</th>
                                                 <th class="col-md-1">Unit</th>
-                                                <th class="col-md-2">Garage</th>
+                                                <th class="col-md-2">Supplier</th>
                                                 <th class="col-md-1">Stock</th>
                                                 <th class="col-md-1">Qty</th>
                                                 <th >Amount</th>
@@ -64,20 +70,20 @@
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td hidden ><input type="" name="po_no[]" class="auto_po_id" value="" readonly></td>
-                                                <td hidden >1</td>
+                                                <td hidden ><input type="text" name="po_no[]" class="auto_po_id" value="" readonly></td>
+                                                <td hidden>1</td>
                                                 <td>
                                                     <select class="form-control category-select" style="min-width:150px" name="category[]">
                                                         <option value="">Selection Area</option>
-                                                        @foreach ($allCategory as $item )
-                                                            <option value="{{ $item->id }}">{{ $item->category_name }}</option>  
+                                                        @foreach ($category as $item)
+                                                            <option value="{{ $item->id }}">{{ $item->category_name }}</option>
                                                         @endforeach
-                                                    </select>                                                
+                                                    </select>                                                 
                                                 </td>
                                                 <td>
                                                     <select class="form-control product-code-select" style="min-width:150px" id="p_code" name="product_code[]">
-                                                        <option value="">Selection Area </option>
-                                                    </select>                                                
+                                                        <option value="">Selection Area</option>
+                                                    </select>                                                 
                                                 </td>
                                                 <td>
                                                     <input class="form-control" style="min-width:100px" type="text" id="p_name" name="product_name[]" readonly>
@@ -91,8 +97,8 @@
                                                 <td>
                                                     <select class="form-control" style="min-width:150px" id="garage" name="garage_name[]">
                                                         <option value="">Selection Area</option>
-                                                        @foreach ($allGarage as $item )
-                                                            <option value="{{ $item->id }}">{{ $item->garage_name }}</option>  
+                                                        @foreach ($supplier as $item)
+                                                            <option value="{{ $item->id }}">{{ $item->supplier_name }}</option>
                                                         @endforeach
                                                     </select>  
                                                 </td>
@@ -100,16 +106,16 @@
                                                     <input class="form-control" style="min-width:120px" type="text" id="stock" name="stock[]" value="0" readonly>
                                                 </td>
                                                 <td>
-                                                    <input class="form-control" style="min-width:80px" type="text" id="qty" name="qty[]">
+                                                    <input class="form-control" style="min-width:80px" type="text" id="qty" name="qty[]" placeholder="0">
                                                 </td>
                                                 <td>
-                                                    <input class="form-control" style="min-width:120px" type="text" id="amount" name="amount[]" value="0">
+                                                    <input class="form-control" style="min-width:120px" type="text" id="amount" name="amount[]" placeholder="0">
                                                 </td>
                                                 <td>
                                                     <a href="javascript:void(0)" class="text-success font-18" title="Add" id="addBtn"><i class="fa fa-plus"></i></a>
                                                 </td>
                                             </tr>
-                                        </tbody>
+                                        </tbody>                                        
                                     </table>
                                 </div>
                                 <div class="table-responsive">
@@ -162,168 +168,167 @@
     <!-- /Page Wrapper -->
  
     @section('script')
-
-        {{-- add multiple row --}}
-        <script>
-            $(document).ready(function() {
-                // Category selection change event
-                $(document).on('change', '.category-select', function() {
-                    var categoryId = $(this).val();
-                    var $productCodeSelect = $(this).closest('tr').find('.product-code-select');
-                    var $brand = $(this).closest('tr').find('.brand');
-                    var $unit = $(this).closest('tr').find('.unit');
-                    var $productName = $(this).closest('tr').find('.product_name');
-        
-                    // Clear previous selections
-                    $productCodeSelect.empty().append('<option value=""> --Choose Product Code-- </option>');
-                    $brand.val('');
-                    $unit.val('');
-                    $productName.val('');
-        
-                    if (categoryId) {
-                        $.ajax({
-                            url: '/getCategory/' + categoryId,
-                            method: 'GET',
-                            success: function(data) {
-                                if (data.products) {
-                                    $.each(data.products, function(index, product) {
-                                        $productCodeSelect.append(`<option value="${product.product_code}">${product.product_code}</option>`);
-                                    });
-                                }
-                            },
-                            error: function() {
-                                alert('Failed to fetch product details.');
-                            }
-                        });
-                    }
-                });
-        
-                // Product code selection change event
-                $(document).on('change', '.product-code-select', function() {
-                    var productCode = $(this).val();
-                    var $brand = $(this).closest('tr').find('#brand');
-                    var $unit = $(this).closest('tr').find('#unit');
-                    var $productName = $(this).closest('tr').find('#p_name');
-        
-                    if (productCode) {
-                        $.ajax({
-                            url: '/getProductDetails/' + productCode,
-                            method: 'GET',
-                            success: function(data) {
-                                if (data.product) {
-                                    $brand.val(data.product.product_brand);
-                                    $unit.val(data.product.product_unit);
-                                    $productName.val(data.product.product_name);
-                                }
-                            },
-                            error: function() {
-                                alert('Failed to fetch product details.');
-                            }
-                        });
-                    }
-                });
-        
-                // Function to fetch a unique PO number from the server
-                async function fetchPONumber() {
-                    try {
-                        const response = await fetch('/check-po-number');
-                        if (response.ok) {
-                            const data = await response.json();  // Parse the JSON response
-                            return data.po_no;  // Return the PO number from the backend
+    <script>
+        $(document).ready(function () {
+            function generatePONumber() {
+                $.ajax({
+                    url: '/get-latest-request-number',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.success) {
+                            const latestNumber = response.latest_po_number || 0;
+                            const nextNumber = parseInt(latestNumber) + 1;
+                            const paddedNumber = String(nextNumber).padStart(4, '0');
+                            const poNumber = `s -${paddedNumber}`;
+                            $('#auto_po_id').val(poNumber);
                         } else {
-                            throw new Error('Failed to fetch PO number');
+                            alert('Error fetching PO number');
                         }
-                    } catch (error) {
-                        console.error('Error fetching PO number:', error);
-                        return 'PO-ERROR';  // Return a placeholder in case of an error
+                    },
+                    error: function () {
+                        alert('Unable to fetch data');
                     }
-                }
-        
-                // Set the PO number in the first row input field on page load
-                $(async function () {
-                    const poNumber = await fetchPONumber();
-                    $(".auto_po_id").first().val(poNumber);  // Populate the first PO number field
-        
-                    // Optional: Populate more rows with PO numbers if necessary
-                    $(".auto_po_id").each(async function (index) {
-                        if ($(this).val() === "") {  // Only set if the field is empty
-                            const poNumber = await fetchPONumber();
-                            $(this).val(poNumber);
+                });
+            }
+            generatePONumber();
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            // Handle category selection change
+            $(document).on('change', '.category-select', function () {
+                const selectedCategory = $(this).val();
+                const $productCodeDropdown = $(this).closest('tr').find('.product-code-select');
+                $productCodeDropdown.empty().append('<option value="">Select Product Code</option>');
+
+                if (selectedCategory) {
+                    $.ajax({
+                        url: '/get-product-codes',
+                        type: 'GET',
+                        data: { category: selectedCategory },
+                        success: function (response) {
+                            if (response.success) {
+                                response.product_codes.forEach(function (productCode) {
+                                    $productCodeDropdown.append(
+                                        `<option value="${productCode.code}">${productCode.code}</option>`
+                                    );
+                                });
+                            } else {
+                                alert('No product codes found for this category.');
+                            }
+                        },
+                        error: function () {
+                            alert('Failed to fetch product codes.');
                         }
                     });
-                });
-        
-                // Adding a new row
-                var rowIdx = 1;
-                $("#addBtn").on("click", async function () {
-                    // When the "Add" button is clicked, fetch a new PO number for the new row
-                    const poNumber = await fetchPONumber();
-        
-                    // Create a new row with the fetched PO number
-                    const newRow = `
-                        <tr id="R${++rowIdx}">
-                            <td hidden class="row-index text-center"><p> ${rowIdx}</p></td>
-                            <td hidden ><input type="" name="po_no[]" class="auto_po_id" value="${poNumber}" readonly></td>
-                            <td>
-                                <select class="form-control category-select" style="min-width:150px" name="category[]">
-                                    <option value="">Selection Area</option>
-                                    @foreach ($allCategory as $item )
-                                        <option value="{{ $item->id }}">{{ $item->category_name }}</option>  
-                                    @endforeach
-                                </select>                                                 
-                            </td>
-                            <td>
-                                <select class="form-control product-code-select" style="min-width:150px" id="p_code" name="product_code[]">
-                                    <option value="">Selection Area </option>
-                                </select>                                                 
-                            </td>
-                            <td>
-                                <input class="form-control unit_price" style="min-width:100px" type="text" id="p_name" name="product_name[]" readonly>
-                            </td>
-                            <td>
-                                <input class="form-control qty" style="min-width:80px" type="text" id="brand" name="brand[]" readonly>
-                            </td>
-                            <td>
-                                <input class="form-control qty" style="min-width:80px" type="text" id="unit" name="unit[]" readonly>
-                            </td>
-                            <td>
-                                <select class="form-control" style="min-width:150px" id="garage" name="garage_name[]">
-                                    <option value="">Selection Area</option>
-                                    @foreach ($allGarage as $item )
-                                        <option value="{{ $item->id }}">{{ $item->garage_name }}</option>  
-                                    @endforeach
-                                </select>  
-                            </td>
-                            <td>
-                                <input class="form-control total" style="min-width:120px" type="text" id="stock" name="stock[]" value="0" readonly>
-                            </td>
-                            <td>
-                                <input class="form-control qty" style="min-width:80px" type="text" id="qty" name="qty[]">
-                            </td>
-                            <td>
-                                <input class="form-control total" style="min-width:120px" type="text" id="amount" name="amount[]" value="0">
-                            </td>
-                            <td><a href="javascript:void(0)" class="text-danger font-18 remove" title="Remove"><i class="fa fa-trash-o"></i></a></td>
-                        </tr>`;
-        
-                    // Append the new row
-                    $("#tablePurchaseOrder tbody").append(newRow);
-                });
-        
-                // Remove row logic
-                $("#tablePurchaseOrder tbody").on("click", ".remove", function () {
-                    var child = $(this).closest("tr").nextAll();
-                    child.each(function () {
-                        var id = $(this).attr("id");
-                        var idx = $(this).children(".row-index").children("p");
-                        var dig = parseInt(id.substring(1));
-                        idx.html(`${dig - 1}`);
-                        $(this).attr("id", `R${dig - 1}`);
-                    });
-                    $(this).closest("tr").remove();
-                    rowIdx--;
-                });
+                }
             });
-        </script>        
+
+            $(document).on('change', '.product-code-select', function () {
+                const selectedProductCode = $(this).val();
+                const $row = $(this).closest('tr');
+                const $productNameField = $row.find('#p_name');
+                const $brandField = $row.find('#brand');
+                const $unitField = $row.find('#unit');
+
+                if (selectedProductCode) {
+                    $.ajax({
+                        url: '/get-product-details',
+                        type: 'GET',
+                        data: { product_code: selectedProductCode },
+                        success: function (response) {
+                            if (response.success) {
+                                const product = response.product;
+                                $productNameField.val(product.product_name);
+                                $brandField.val(product.brand_name);
+                                $unitField.val(product.unit_name);
+                            } else {
+                                alert('Product details not found.');
+                            }
+                        },
+                        error: function () {
+                            alert('Failed to fetch product details.');
+                        }
+                    });
+                } else {
+                    // Clear the fields if no product is selected
+                    $productNameField.val('');
+                    $brandField.val('');
+                    $unitField.val('');
+                }
+            });
+        });
+    </script>
+
+    <script>
+        var rowIdx = 1;
+        $("#addBtn").on("click", async function () {
+            const poNumber = await fetchPONumber();
+            const newRow = `
+                <tr id="R${++rowIdx}">
+                    <td hidden class="row-index text-center"><p> ${rowIdx}</p></td>
+                    <td hidden ><input type="" name="po_no[]" class="auto_po_id" value="${poNumber}" readonly></td>
+                    <td>
+                        <select class="form-control category-select" style="min-width:150px" name="category[]">
+                            <option value="">Selection Area</option>
+                            @foreach ($category as $item )
+                                <option value="{{ $item->category_name }}">{{ $item->category_name }}</option>  
+                            @endforeach
+                        </select>                                                
+                    </td>
+                    <td>
+                        <select class="form-control product-code-select" style="min-width:150px" id="p_code" name="product_code[]">
+                            <option value="">Selection Area </option>
+                        </select>                                                
+                    </td>
+                    <td>
+                        <input class="form-control" style="min-width:100px" type="text" id="p_name" name="product_name[]" readonly>
+                    </td>
+                    <td>
+                        <input class="form-control" style="min-width:80px" type="text" id="brand" name="brand[]" readonly>
+                    </td>
+                    <td>
+                        <input class="form-control" style="min-width:80px" type="text" id="unit" name="unit[]" readonly>
+                    </td>
+                    <td>
+                        <select class="form-control" style="min-width:150px" id="garage" name="garage_name[]">
+                            <option value="">Selection Area</option>
+                            @foreach ($supplier as $item )
+                                <option value="{{ $item->id }}">{{ $item->supplier_name }}</option>  
+                            @endforeach
+                        </select>  
+                    </td>
+                    <td>
+                        <input class="form-control" style="min-width:120px" type="text" id="stock" name="stock[]" value="0" readonly>
+                    </td>
+                    <td>
+                        <input class="form-control" style="min-width:80px" type="text" id="qty" name="qty[]">
+                    </td>
+                    <td>
+                        <input class="form-control" style="min-width:120px" type="text" id="amount" name="amount[]" value="0">
+                    </td>
+                    <td><a href="javascript:void(0)" class="text-danger font-18 remove" title="Remove"><i class="fa fa-trash-o"></i></a></td>
+                </tr>`;
+
+            // Append the new row
+            $("#tablePurchaseOrder tbody").append(newRow);
+        });
+
+        // Remove row logic
+        $("#tablePurchaseOrder tbody").on("click", ".remove", function () {
+            var child = $(this).closest("tr").nextAll();
+            child.each(function () {
+                var id = $(this).attr("id");
+                var idx = $(this).children(".row-index").children("p");
+                var dig = parseInt(id.substring(1));
+                idx.html(`${dig - 1}`);
+                $(this).attr("id", `R${dig - 1}`);
+            });
+            $(this).closest("tr").remove();
+            rowIdx--;
+        });
+    </script>        
     @endsection
 @endsection

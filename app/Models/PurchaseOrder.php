@@ -10,15 +10,21 @@ class PurchaseOrder extends Model
     use HasFactory;
 
     protected $fillable = [
-        'po_no',
+
+        'request_id',
+        'po_number',
+        'garage_name',
+        'product_code',
+        'product_serial',
         'product_name',
-        'product_id',
-        'supplier_id',
-        'garage_id',
-        'requestor_id',
-        'isapproved',
-        'total_amount',
-        'grand_total',
-        'category_name',
+        'product_category',
+        'product_brand',
+        'product_unit',
+        'product_supplier',
+        'product_details',
+        'payment_terms',
+        'remarks',
+        'purchase_date',
+        'status',
     ];
 }

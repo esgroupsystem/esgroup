@@ -17,6 +17,8 @@ class Products extends Model
     'product_brand',
     'product_unit',
     'product_parts_details',
+    'product_instock',
+    'product_outstock',
     'product_status',
     'product_creator',
     ];
