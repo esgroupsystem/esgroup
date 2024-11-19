@@ -39,17 +39,18 @@ class PurchaseOrderController extends Controller
         return view('purchase.create_request', compact('garage','category', 'brand', 'unit', 'supplier', 'product', 'requestOrder', 'poOrder'));
     }
 
-    public function getLatestRequestNumber(){
+    public function getLatestRequestNumber() {
         $latestRequest = PurchaseOrder::orderBy('id', 'desc')->first();
         $latestNumber = 0;
-
-        if ($latestRequest) {
-            $latestNumber = (int) str_replace('#Request-', '', $latestRequest->po_number);
+    
+        if ($latestRequest && preg_match('/#Request-(\d+)/', $latestRequest->po_number, $matches)) {
+            $latestNumber = (int) $matches[1];
         }
-
+        $formattedNumber = str_pad($latestNumber + 1, 3, '0', STR_PAD_LEFT); // Increment the latest number
+    
         return response()->json([
             'success' => true,
-            'latest_po_number' => $latestNumber
+            'latest_request_number' => $formattedNumber // Match the key name
         ]);
     }
 

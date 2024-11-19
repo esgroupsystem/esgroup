@@ -27,13 +27,13 @@
                             <div class="col-sm-6 col-md-3">
                                 <div class="form-group">
                                     <label>Request ID <span class="text-danger">*</span></label>
-                                    <input class="form-control" id="auto_po_id" name="request_id" value="" readonly required>
+                                    <input class="form-control" id="auto_request_id" name="request_id" value="" readonly required>
                                 </div>
                             </div>
                             <div class="col-sm-6 col-md-3">
                                 <div class="form-group">
-                                    <label>Purchase Order ID <span class="text-danger">*</span></label>
-                                    <input class="form-control" id="auto_transaction_id" name="po_number" value="" readonly required>
+                                    <label>Purchase Order ID <span class="text-danger">(For Accounting)*</span></label>
+                                    <input class="form-control" id="auto_po_id" name="po_number" value="" readonly required>
                                 </div>
                             </div>
                             <div class="col-sm-6 col-md-3">
@@ -47,6 +47,17 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="col-sm-6 col-md-3">
+                                <div class="form-group">
+                                    <label>Supplier<span class="text-danger"> (For Accounting)*</span></label>
+                                    <select class="form-control" style="min-width:150px" id="garage" name="garage_name[]" readonly>
+                                        <option value="">Selection Area</option>
+                                        @foreach ($supplier as $item)
+                                            <option value="{{ $item->id }}">{{ $item->supplier_name }}</option>
+                                        @endforeach
+                                    </select> 
+                                </div>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-md-12 col-sm-12">
@@ -54,14 +65,11 @@
                                     <table class="table table-hover table-white" id="tablePurchaseOrder">
                                         <thead>
                                             <tr>
-                                                <th hidden class="po_id">P/O No</th>
-                                                <th hidden style="width:20px">#</th>
                                                 <th class="col-sm-2">Category</th>
                                                 <th class="col-md-2">Product Code</th>
                                                 <th class="col-md-3">Product Name</th>
                                                 <th class="col-md-1">Brand</th>
                                                 <th class="col-md-1">Unit</th>
-                                                <th class="col-md-2">Supplier</th>
                                                 <th class="col-md-1">Stock</th>
                                                 <th class="col-md-1">Qty</th>
                                                 <th >Amount</th>
@@ -70,8 +78,6 @@
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td hidden ><input type="text" name="po_no[]" class="auto_po_id" value="" readonly></td>
-                                                <td hidden>1</td>
                                                 <td>
                                                     <select class="form-control category-select" style="min-width:150px" name="category[]">
                                                         <option value="">Selection Area</option>
@@ -93,14 +99,6 @@
                                                 </td>
                                                 <td>
                                                     <input class="form-control" style="min-width:80px" type="text" id="unit" name="unit[]" readonly>
-                                                </td>
-                                                <td>
-                                                    <select class="form-control" style="min-width:150px" id="garage" name="garage_name[]">
-                                                        <option value="">Selection Area</option>
-                                                        @foreach ($supplier as $item)
-                                                            <option value="{{ $item->id }}">{{ $item->supplier_name }}</option>
-                                                        @endforeach
-                                                    </select>  
                                                 </td>
                                                 <td>
                                                     <input class="form-control" style="min-width:120px" type="text" id="stock" name="stock[]" value="0" readonly>
@@ -167,36 +165,69 @@
     </div>
     <!-- /Page Wrapper -->
  
-    @section('script')
+@section('script')
     <script>
         $(document).ready(function () {
-            function generatePONumber() {
-                $.ajax({
-                    url: '/get-latest-request-number',
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function (response) {
-                        if (response.success) {
-                            const latestNumber = response.latest_po_number || 0;
-                            const nextNumber = parseInt(latestNumber) + 1;
-                            const paddedNumber = String(nextNumber).padStart(4, '0');
-                            const poNumber = `s -${paddedNumber}`;
-                            $('#auto_po_id').val(poNumber);
-                        } else {
-                            alert('Error fetching PO number');
-                        }
-                    },
-                    error: function () {
-                        alert('Unable to fetch data');
-                    }
-                });
-            }
-            generatePONumber();
-        });
-    </script>
+            let rowIdx = 1;
 
-    <script>
-        $(document).ready(function () {
+            // Function to add a new row
+            function addRow(poNumber) {
+                const newRow = `
+                    <tr>
+                        <td>
+                            <select class="form-control category-select" style="min-width:150px" name="category[]">
+                                <option value="">Selection Area</option>
+                                @foreach ($category as $item)
+                                    <option value="{{ $item->id }}">{{ $item->category_name }}</option>
+                                @endforeach
+                            </select>                                                  
+                        </td>
+                        <td>
+                            <select class="form-control product-code-select" style="min-width:150px" name="product_code[]">
+                                <option value="">Selection Area</option>
+                            </select>                                                  
+                        </td>
+                        <td>
+                            <input class="form-control" style="min-width:100px" type="text" name="product_name[]" readonly>
+                        </td>
+                        <td>
+                            <input class="form-control" style="min-width:80px" type="text" name="brand[]" readonly>
+                        </td>
+                        <td>
+                            <input class="form-control" style="min-width:80px" type="text" name="unit[]" readonly>
+                        </td>
+                        <td>
+                            <input class="form-control" style="min-width:120px" type="text" name="stock[]" value="0" readonly>
+                        </td>
+                        <td>
+                            <input class="form-control" style="min-width:80px" type="text" name="qty[]" placeholder="0">
+                        </td>
+                        <td>
+                            <input class="form-control" style="min-width:120px" type="text" name="amount[]" placeholder="0">
+                        </td>
+                        <td><a href="javascript:void(0)" class="text-danger font-18 remove" title="Remove"><i class="fa fa-trash-o"></i></a></td>
+                    </tr>`;
+
+                // Append the new row to the table
+                $("#tablePurchaseOrder tbody").append(newRow);
+                rowIdx++;  // Increment row index
+            }
+
+            // Event listener for adding a new row
+            $(document).on('click', '#addBtn', function () {
+                fetchLatestRequestNumber(function (latestPoNumber) {
+                    const nextPoNumber = `#Request-${latestPoNumber + 1}`;
+                    $('#auto_po_id').val(nextPoNumber); // Set the next PO number in the input field
+                    addRow(nextPoNumber);  // Add the new row to the table
+                });
+            });
+
+            // Event listener for removing a row
+            $(document).on('click', '.remove', function () {
+                $(this).closest('tr').remove();
+                rowIdx--; // Decrement row index
+            });
+
             // Handle category selection change
             $(document).on('change', '.category-select', function () {
                 const selectedCategory = $(this).val();
@@ -226,12 +257,13 @@
                 }
             });
 
+            // Handle product code selection change
             $(document).on('change', '.product-code-select', function () {
                 const selectedProductCode = $(this).val();
                 const $row = $(this).closest('tr');
-                const $productNameField = $row.find('#p_name');
-                const $brandField = $row.find('#brand');
-                const $unitField = $row.find('#unit');
+                const $productNameField = $row.find('input[name="product_name[]"]');
+                const $brandField = $row.find('input[name="brand[]"]');
+                const $unitField = $row.find('input[name="unit[]"]');
 
                 if (selectedProductCode) {
                     $.ajax({
@@ -259,76 +291,31 @@
                     $unitField.val('');
                 }
             });
+
+            // Fetch the latest PO number and set the input field when the page loads
+            function fetchLatestRequestNumber(callback) {
+                $.ajax({
+                    url: '/get-latest-request-number',
+                    type: 'GET',
+                    success: function (response) {
+                        if (response.success) {
+                            callback(response.latest_request_number);
+                        } else {
+                            console.log('Error fetching request number');
+                        }
+                    },
+                    error: function () {
+                        console.log('An error occurred while fetching request number');
+                    }
+                });
+            }
+
+            fetchLatestRequestNumber(function (latestNumber) {
+                const nextRequestNumber = `#Request - ${latestNumber}`;
+                $('#auto_request_id').val(nextRequestNumber);
+            });
         });
     </script>
-
-    <script>
-        var rowIdx = 1;
-        $("#addBtn").on("click", async function () {
-            const poNumber = await fetchPONumber();
-            const newRow = `
-                <tr id="R${++rowIdx}">
-                    <td hidden class="row-index text-center"><p> ${rowIdx}</p></td>
-                    <td hidden ><input type="" name="po_no[]" class="auto_po_id" value="${poNumber}" readonly></td>
-                    <td>
-                        <select class="form-control category-select" style="min-width:150px" name="category[]">
-                            <option value="">Selection Area</option>
-                            @foreach ($category as $item )
-                                <option value="{{ $item->category_name }}">{{ $item->category_name }}</option>  
-                            @endforeach
-                        </select>                                                
-                    </td>
-                    <td>
-                        <select class="form-control product-code-select" style="min-width:150px" id="p_code" name="product_code[]">
-                            <option value="">Selection Area </option>
-                        </select>                                                
-                    </td>
-                    <td>
-                        <input class="form-control" style="min-width:100px" type="text" id="p_name" name="product_name[]" readonly>
-                    </td>
-                    <td>
-                        <input class="form-control" style="min-width:80px" type="text" id="brand" name="brand[]" readonly>
-                    </td>
-                    <td>
-                        <input class="form-control" style="min-width:80px" type="text" id="unit" name="unit[]" readonly>
-                    </td>
-                    <td>
-                        <select class="form-control" style="min-width:150px" id="garage" name="garage_name[]">
-                            <option value="">Selection Area</option>
-                            @foreach ($supplier as $item )
-                                <option value="{{ $item->id }}">{{ $item->supplier_name }}</option>  
-                            @endforeach
-                        </select>  
-                    </td>
-                    <td>
-                        <input class="form-control" style="min-width:120px" type="text" id="stock" name="stock[]" value="0" readonly>
-                    </td>
-                    <td>
-                        <input class="form-control" style="min-width:80px" type="text" id="qty" name="qty[]">
-                    </td>
-                    <td>
-                        <input class="form-control" style="min-width:120px" type="text" id="amount" name="amount[]" value="0">
-                    </td>
-                    <td><a href="javascript:void(0)" class="text-danger font-18 remove" title="Remove"><i class="fa fa-trash-o"></i></a></td>
-                </tr>`;
-
-            // Append the new row
-            $("#tablePurchaseOrder tbody").append(newRow);
-        });
-
-        // Remove row logic
-        $("#tablePurchaseOrder tbody").on("click", ".remove", function () {
-            var child = $(this).closest("tr").nextAll();
-            child.each(function () {
-                var id = $(this).attr("id");
-                var idx = $(this).children(".row-index").children("p");
-                var dig = parseInt(id.substring(1));
-                idx.html(`${dig - 1}`);
-                $(this).attr("id", `R${dig - 1}`);
-            });
-            $(this).closest("tr").remove();
-            rowIdx--;
-        });
-    </script>        
+     
     @endsection
 @endsection
