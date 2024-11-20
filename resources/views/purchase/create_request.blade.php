@@ -21,7 +21,7 @@
               
             <div class="row">
                 <div class="col-sm-12">
-                    <form action="#" method="POST">
+                    <form action="{{ route('save.request') }}" method="POST">
                         @csrf
                         <div class="row">
                             <div class="col-sm-6 col-md-3">
@@ -33,13 +33,13 @@
                             <div class="col-sm-6 col-md-3">
                                 <div class="form-group">
                                     <label>Purchase Order ID <span class="text-danger">(For Accounting)*</span></label>
-                                    <input class="form-control" id="auto_po_id" name="po_number" value="" readonly required>
+                                    <input class="form-control" id="auto_po_id" name="po_number" value="" readonly>
                                 </div>
                             </div>
                             <div class="col-sm-6 col-md-3">
                                 <div class="form-group">
                                     <label>Garage<span class="text-danger">*</span></label>
-                                    <select class="select" id="gar_name" name="gar_name" required>
+                                    <select class="select" id="garage" name="gar_name" required>
                                         <option value="">Select Garage</option>
                                             @foreach($garage as $item)
                                                 <option value="{{ $item->garage_name }}">{{ $item->garage_name }}</option>
@@ -50,7 +50,7 @@
                             <div class="col-sm-6 col-md-3">
                                 <div class="form-group">
                                     <label>Supplier<span class="text-danger"> (For Accounting)*</span></label>
-                                    <select class="form-control" style="min-width:150px" id="garage" name="garage_name[]" readonly>
+                                    <select class="form-control" style="min-width:150px" id="supplier" name="supp_name" readonly>
                                         <option value="">Selection Area</option>
                                         @foreach ($supplier as $item)
                                             <option value="{{ $item->id }}">{{ $item->supplier_name }}</option>
@@ -292,27 +292,27 @@
                 }
             });
 
-            // Fetch the latest PO number and set the input field when the page loads
+            // Fetch the latest REQUEST number and set the input field when the page loads
             function fetchLatestRequestNumber(callback) {
                 $.ajax({
                     url: '/get-latest-request-number',
                     type: 'GET',
                     success: function (response) {
                         if (response.success) {
-                            callback(response.latest_request_number);
+                            callback(response.latest_request_id);
                         } else {
-                            console.log('Error fetching request number');
+                            console.error('Error fetching request number');
                         }
                     },
                     error: function () {
-                        console.log('An error occurred while fetching request number');
+                        console.error('An error occurred while fetching request number');
                     }
                 });
             }
 
-            fetchLatestRequestNumber(function (latestNumber) {
-                const nextRequestNumber = `#Request - ${latestNumber}`;
-                $('#auto_request_id').val(nextRequestNumber);
+            // On page load, fetch and set the next Request ID
+            fetchLatestRequestNumber(function (latestRequestId) {
+                $('#auto_request_id').val(latestRequestId);
             });
         });
     </script>

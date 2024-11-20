@@ -370,6 +370,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
         Route::get('/get-latest-request-number', 'getLatestRequestNumber')->middleware('auth');
         Route::get('/get-product-codes', 'getProductCodes')->middleware('auth');
         Route::get('/get-product-details', 'getProductDetails')->middleware('auth');
+        Route::post('/saving/request', 'saveRequest')->middleware('auth')->name('save.request');
     });
 
 });

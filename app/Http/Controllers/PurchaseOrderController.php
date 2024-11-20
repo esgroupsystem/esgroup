@@ -17,12 +17,14 @@ use Auth;
 
 class PurchaseOrderController extends Controller
 {
-    public function mainIndex(Request $request){
-
+    public function mainIndex(Request $request)
+    {
         $requestOrder = RequestOrder::get();
-        $poOrder = PurchaseOrder::get();
 
-        return view('purchase.purchase_order', compact('requestOrder', 'poOrder'));
+        $poOrder = PurchaseOrder::get();
+        $poOrder = $poOrder->unique('request_id');
+    
+        return view('purchase.purchase_order', compact('poOrder', 'requestOrder'));
     }
 
     public function purchaseIndex(Request $request){
@@ -40,17 +42,25 @@ class PurchaseOrderController extends Controller
     }
 
     public function getLatestRequestNumber() {
-        $latestRequest = PurchaseOrder::orderBy('id', 'desc')->first();
+        // Fetch the latest request_id
+        $latestRequest = PurchaseOrder::where('request_id', 'like', '#Request-%')
+            ->orderBy('request_id', 'desc')
+            ->first();
+        
         $latestNumber = 0;
     
-        if ($latestRequest && preg_match('/#Request-(\d+)/', $latestRequest->po_number, $matches)) {
-            $latestNumber = (int) $matches[1];
+        // Extract the numeric part from the request_id
+        if ($latestRequest && preg_match('/#Request-(\d+)/', $latestRequest->request_id, $matches)) {
+            $latestNumber = (int)$matches[1];
         }
-        $formattedNumber = str_pad($latestNumber + 1, 3, '0', STR_PAD_LEFT); // Increment the latest number
+    
+        // Increment and format the next number
+        $formattedNumber = str_pad($latestNumber + 1, 3, '0', STR_PAD_LEFT);
+        $nextRequestId = "#Request-" . $formattedNumber;
     
         return response()->json([
             'success' => true,
-            'latest_request_number' => $formattedNumber // Match the key name
+            'latest_request_id' => $nextRequestId
         ]);
     }
 
@@ -85,5 +95,50 @@ class PurchaseOrderController extends Controller
             'success' => true,
             'product' => $product
         ]);
+    }
+
+    public function saveRequest(Request $request){
+
+        $request->validate([
+            'request_id'      => 'required|string|max:255',
+            'gar_name'        => 'required|string|max:255',
+            'category'        => 'required|array',
+            'category.*'      => 'required|string|max:255',
+            'product_code'    => 'required|array',
+            'product_code.*'  => 'required|string|max:255',
+            'product_name'    => 'required|array',
+            'product_name.*'  => 'required|string|max:255',
+            'brand'           => 'required|array',
+            'brand.*'         => 'required|string|max:255',
+            'unit'            => 'required|array',
+            'unit.*'          => 'required|string|max:255',
+        ]);
+
+        DB::beginTransaction();
+        try{
+            foreach ($request->product_code as $key => $product_code) {
+
+                PurchaseOrder::create([
+                    'request_id'        => $request->request_id,
+                    'garage_name'       => $request->gar_name,
+                    'product_code'      => $product_code,
+                    'product_name'      => $request->product_name[$key],
+                    'product_category'  => $request->category[$key],
+                    'product_brand'     => $request->brand[$key],
+                    'product_unit'      => $request->unit[$key],
+                    'status'            => 'Pending',
+                    'request_date'      => now()->toDateString(),
+                ]);
+            }
+            
+            DB::commit();
+            flash()->success('Successfully submitted, please for conformation :)');
+            return redirect()->route('purchase.index');
+        }catch (\Exception $e) {
+            DB::rollback();
+            \Log::error('Request failed: ' . $e->getMessage());
+            flash()->error('Failed to request :(');
+            return redirect()->back();
+        }
     }
 }

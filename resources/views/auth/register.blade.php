@@ -36,7 +36,7 @@
                                 @enderror
                             </div>
                             {{-- insert defaults --}}
-                            <input type="hidden" class="image" name="image" value="photo_defaults.jpg">
+                            <input type="hidden" class="image" name="image" value="eslogobg.png">
                             <div class="form-group">
                                 <label class="col-form-label">Role Name</label>
                                 <select class="select @error('role_name') is-invalid @enderror" name="role_name" id="role_name">

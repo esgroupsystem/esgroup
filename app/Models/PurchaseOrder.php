@@ -25,6 +25,7 @@ class PurchaseOrder extends Model
         'payment_terms',
         'remarks',
         'purchase_date',
+        'request_date',
         'status',
     ];
 }

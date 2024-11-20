@@ -215,7 +215,7 @@ class UserManagementController extends Controller
             {
                 $image_name = $request->hidden_image;
                 $image = $request->file('images');
-                if($image_name =='photo_defaults.jpg')
+                if($image_name =='eslogobg.png')
                 {
                     if($image != '')
                     {
@@ -345,7 +345,7 @@ class UserManagementController extends Controller
     
             $image = $request->file('images');
             if ($image) {
-                if ($image_name && $image_name != 'photo_defaults.jpg') {
+                if ($image_name && $image_name != 'eslogobg.png') {
                     // Delete the old image if it exists
                     $oldImagePath = public_path('assets/images/' . $image_name);
                     if (file_exists($oldImagePath)) {
@@ -423,7 +423,7 @@ class UserManagementController extends Controller
             PersonalInformation::destroy($userId);
             UserEmergencyContact::destroy($userId);
     
-            if ($avatar !== 'photo_defaults.jpg') {
+            if ($avatar !== 'eslogobg.png') {
                 $filePath = 'assets/images/' . $avatar;
                 
                 if (file_exists($filePath)) {

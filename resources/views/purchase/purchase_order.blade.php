@@ -16,7 +16,7 @@
                         </ul>
                     </div>
                     <div class="col-auto float-right ml-auto">
-                        <a href="{{ route('request.index') }}" class="btn add-btn"><i class="fa fa-plus"></i> Create Job</a>
+                        <a href="{{ route('request.index') }}" class="btn add-btn"><i class="fa fa-plus"></i> Request Items</a>
                     </div>
                 </div>
             </div>
@@ -63,23 +63,34 @@
                                     <thead>
                                         <tr>
                                             <th>Request ID</th>
+                                            <th>Garage</th>
                                             <th>Status</th>
                                             <th>Request Date</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($requestOrder as $item )
+                                        @foreach ($poOrder as $item)
+                                        <tr>
                                             <td id="requestID"><a href="invoice-view.html">{{ $item->request_id }}</a></td>
-                                            <td id="status">{{ $item->status }}</td>
+                                            <td id="requestGarage">{{ $item->garage_name }}</td>
+                                            <td>
+                                                <!-- Apply different badge styles based on the status -->
+                                                @if($item->status == 'Pending')
+                                                    <span class="badge bg-inverse-warning">Pending</span>
+                                                @elseif($item->status == 'Completed')
+                                                    <span class="badge bg-inverse-success">Completed</span>
+                                                @elseif($item->status == 'Cancelled')
+                                                    <span class="badge bg-inverse-danger">Cancelled</span>
+                                                @else
+                                                    <span class="badge bg-inverse-info">Unknown</span>
+                                                @endif
+                                            </td>
                                             <td id="requestDATE">{{ $item->request_date }}</td>
+                                        </tr>
                                         @endforeach
-                                        <!-- Rows go here -->
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
-                        <div class="card-footer">
-                            <div id="paginationRequest" class="pagination"></div>
                         </div>
                     </div>
                 </div>
@@ -147,54 +158,7 @@
     <!-- /Page Wrapper -->
     @section('script')
     <script>
-        $(document).ready(function () {
-            function setupPagination(tableId, paginationId, rowsPerPage) {
-                const table = $(`#${tableId}`);
-                const tbody = table.find("tbody");
-                const rows = tbody.find("tr");
-                const pagination = $(`#${paginationId}`);
-                let currentPage = 1;
-                const totalPages = Math.ceil(rows.length / rowsPerPage);
-    
-                // Display rows for the current page
-                function displayPage(page) {
-                    const start = (page - 1) * rowsPerPage;
-                    const end = start + rowsPerPage;
-    
-                    rows.hide().slice(start, end).show();
-                    updatePagination();
-                }
-    
-                // Update pagination buttons
-                function updatePagination() {
-                    pagination.empty();
-                    for (let i = 1; i <= totalPages; i++) {
-                        const btn = $("<button></button>")
-                            .text(i)
-                            .addClass("page-btn")
-                            .css({
-                                margin: "0 5px",
-                                padding: "5px 10px",
-                                border: i === currentPage ? "2px solid #007bff" : "1px solid #ddd",
-                                backgroundColor: i === currentPage ? "#f0f8ff" : "#fff",
-                            })
-                            .on("click", function () {
-                                currentPage = i;
-                                displayPage(currentPage);
-                            });
-    
-                        pagination.append(btn);
-                    }
-                }
-    
-                // Initialize pagination
-                displayPage(currentPage);
-            }
-    
-            // Apply pagination to both tables
-            setupPagination("requestOrderTable", "paginationRequest", 2); // 2 rows per page
-            setupPagination("purchaseOrderTable", "paginationPurchase", 2); // 2 rows per page
-        });
+
     </script>
     @endsection
 @endsection
