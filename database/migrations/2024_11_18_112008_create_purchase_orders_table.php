@@ -15,21 +15,22 @@ return new class extends Migration
             $table->id();
             $table->string('request_id');
             $table->string('po_number')->nullable();
-            $table->string('garage_name');
-            $table->string('product_code');
-            $table->string('product_serial');
-            $table->string('product_name');
-            $table->string('product_category');
-            $table->string('product_brand');
-            $table->string('product_unit');
+            $table->string('garage_name')->nullable();
+            $table->string('product_code')->nullable();
+            $table->string('product_serial')->nullable();
+            $table->string('product_name')->nullable();
+            $table->string('product_category')->nullable();
+            $table->string('product_brand')->nullable();
+            $table->string('product_unit')->nullable();
             $table->string('product_supplier')->nullable();
-            $table->string('product_details');
-            $table->string('payment_terms');
-            $table->string('remarks');
-            $table->string('request_date');
+            $table->string('product_details')->nullable();
+            $table->string('payment_terms')->nullable();
+            $table->string('remarks')->nullable();
+            $table->string('request_date')->nullable();
             $table->string('purchase_date')->nullable();
-            $table->string('status');
+            $table->string('status')->nullable();
             $table->timestamps();
+            $table->index('request_id');
         });
     }
 

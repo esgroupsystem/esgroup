@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\PurchaseOrder;
+use App\Models\PurchaseOrderItem;
 use App\Models\RequestOrder;
 use App\Models\ProductCategory;
 use App\Models\Supplier;
@@ -17,6 +18,7 @@ use Auth;
 
 class PurchaseOrderController extends Controller
 {
+    // Index for main
     public function mainIndex(Request $request)
     {
         $requestOrder = RequestOrder::get();
@@ -27,6 +29,7 @@ class PurchaseOrderController extends Controller
         return view('purchase.purchase_order', compact('poOrder', 'requestOrder'));
     }
 
+    // View for Request
     public function purchaseIndex(Request $request){
 
         $garage = Garage::get();
@@ -41,20 +44,43 @@ class PurchaseOrderController extends Controller
         return view('purchase.create_request', compact('garage','category', 'brand', 'unit', 'supplier', 'product', 'requestOrder', 'poOrder'));
     }
 
+    // View for updating request
+    public function requestIndex(Request $request, $requestId)
+    {
+        \Log::debug("Request ID: " . $requestId);
+        dd($requestId);
+        $requestOrders = PurchaseOrder::where('request_id', $requestId)
+                                      ->with('items') 
+                                      ->get();
+        $supplier = Supplier::all();
+        $newPoNumber = $this->generateNewPoNumber();
+    
+        return view('purchase.update_request_to_purchase', compact('requestOrders', 'newPoNumber', 'supplier'));
+    }    
+
+    public function generatePoNumber()
+    {
+        $lastPo = PurchaseOrder::orderBy('created_at', 'desc')->first();
+        $lastPoNumber = $lastPo ? (int) substr($lastPo->po_number, 3) : 0;
+
+        $newPoNumber = $lastPoNumber + 1;
+        $newPoNumberFormatted = 'PO-' . str_pad($newPoNumber, 4, '0', STR_PAD_LEFT);
+
+        return $newPoNumberFormatted;
+    }
+
     public function getLatestRequestNumber() {
-        // Fetch the latest request_id
+
         $latestRequest = PurchaseOrder::where('request_id', 'like', '#Request-%')
             ->orderBy('request_id', 'desc')
             ->first();
         
         $latestNumber = 0;
     
-        // Extract the numeric part from the request_id
         if ($latestRequest && preg_match('/#Request-(\d+)/', $latestRequest->request_id, $matches)) {
             $latestNumber = (int)$matches[1];
         }
     
-        // Increment and format the next number
         $formattedNumber = str_pad($latestNumber + 1, 3, '0', STR_PAD_LEFT);
         $nextRequestId = "#Request-" . $formattedNumber;
     
@@ -118,7 +144,7 @@ class PurchaseOrderController extends Controller
         try{
             foreach ($request->product_code as $key => $product_code) {
 
-                PurchaseOrder::create([
+                $purchaseOrder = PurchaseOrder::create([
                     'request_id'        => $request->request_id,
                     'garage_name'       => $request->gar_name,
                     'product_code'      => $product_code,
@@ -128,6 +154,15 @@ class PurchaseOrderController extends Controller
                     'product_unit'      => $request->unit[$key],
                     'status'            => 'Pending',
                     'request_date'      => now()->toDateString(),
+                ]);
+
+                PurchaseOrderItem::create([
+                    'purchase_order_id' => $purchaseOrder->id,
+                    'request_id'        => $purchaseOrder->request_id,
+                    'product_code'      => $product_code,
+                    'product_name'      => $request->product_name[$key],
+                    'qty'               => $request->qty[$key],
+                    'amount'            => $request->amount[$key],
                 ]);
             }
             

@@ -28,4 +28,10 @@ class PurchaseOrder extends Model
         'request_date',
         'status',
     ];
+
+    public function items()
+    {
+        return $this->hasMany(PurchaseOrderItem::class, 'request_id', 'request_id');
+    }
+
 }

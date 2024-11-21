@@ -70,23 +70,24 @@
                                     </thead>
                                     <tbody>
                                         @foreach ($poOrder as $item)
-                                        <tr>
-                                            <td id="requestID"><a href="invoice-view.html">{{ $item->request_id }}</a></td>
-                                            <td id="requestGarage">{{ $item->garage_name }}</td>
-                                            <td>
-                                                <!-- Apply different badge styles based on the status -->
-                                                @if($item->status == 'Pending')
-                                                    <span class="badge bg-inverse-warning">Pending</span>
-                                                @elseif($item->status == 'Completed')
-                                                    <span class="badge bg-inverse-success">Completed</span>
-                                                @elseif($item->status == 'Cancelled')
-                                                    <span class="badge bg-inverse-danger">Cancelled</span>
-                                                @else
-                                                    <span class="badge bg-inverse-info">Unknown</span>
-                                                @endif
-                                            </td>
-                                            <td id="requestDATE">{{ $item->request_date }}</td>
-                                        </tr>
+                                            <tr>
+                                                <td id="requestID"><a href="{{ route('update.index', ['requestId' => $item->request_id]) }}">{{ $item->request_id }}</a></td>
+                                                <td id="requestGarage">{{ $item->garage_name }}</td>
+                                                <td>
+                                                    @if($item->status == 'Pending')
+                                                        <span class="badge bg-inverse-warning">Pending</span>
+                                                    @elseif($item->status == 'Approved')
+                                                        <span class="badge bg-inverse-success">Completed</span>
+                                                    @elseif($item->status == 'Not Approved')
+                                                        <span class="badge bg-inverse-danger">Cancelled</span>
+                                                    @elseif($item->status == 'Not all Approved')
+                                                        <span class="badge bg-inverse-info">Not all Approved</span>
+                                                    @else
+                                                        <span class="badge bg-inverse-info">Unknown</span>
+                                                    @endif
+                                                </td>
+                                                <td id="requestDATE">{{ $item->request_date }}</td>
+                                            </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
@@ -157,8 +158,24 @@
     </div>
     <!-- /Page Wrapper -->
     @section('script')
-    <script>
-
-    </script>
+        <script>
+            $(document).ready(function() {
+                $('#requestOrderTable').DataTable({
+                    "paging": true,  
+                    "searching": true,  
+                    "ordering": true,  
+                    "info": false,   
+                    "lengthChange": false,   
+                    "pageLength": 5,          
+                    "language": {
+                        "paginate": {
+                            "previous": "<",
+                            "next": ">" 
+                        },
+                        "lengthMenu": "Show _MENU_ entries",
+                    }
+                });
+            });
+        </script>
     @endsection
 @endsection

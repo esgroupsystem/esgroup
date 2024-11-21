@@ -50,7 +50,7 @@
                             <div class="col-sm-6 col-md-3">
                                 <div class="form-group">
                                     <label>Supplier<span class="text-danger"> (For Accounting)*</span></label>
-                                    <select class="form-control" style="min-width:150px" id="supplier" name="supp_name" readonly>
+                                    <select class="form-control" style="min-width:150px" id="supplier" name="supp_name" disabled>
                                         <option value="">Selection Area</option>
                                         @foreach ($supplier as $item)
                                             <option value="{{ $item->id }}">{{ $item->supplier_name }}</option>
@@ -215,11 +215,9 @@
 
             // Event listener for adding a new row
             $(document).on('click', '#addBtn', function () {
-                fetchLatestRequestNumber(function (latestPoNumber) {
-                    const nextPoNumber = `#Request-${latestPoNumber + 1}`;
-                    $('#auto_po_id').val(nextPoNumber); // Set the next PO number in the input field
-                    addRow(nextPoNumber);  // Add the new row to the table
-                });
+                
+                $('#auto_po_id').val("");
+                addRow();
             });
 
             // Event listener for removing a row

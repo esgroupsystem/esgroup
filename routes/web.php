@@ -367,6 +367,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
     Route::controller(PurchaseOrderController::class)->group(function () {
         Route::get('/mainIndex', 'mainIndex')->middleware('auth')->name('purchase.index');
         Route::get('/purchaseIndex', 'purchaseIndex')->middleware('auth')->name('request.index');
+        Route::get('/requestIndex/{requestId}','requestIndex')->middleware('auth')->name('update.index');
         Route::get('/get-latest-request-number', 'getLatestRequestNumber')->middleware('auth');
         Route::get('/get-product-codes', 'getProductCodes')->middleware('auth');
         Route::get('/get-product-details', 'getProductDetails')->middleware('auth');
