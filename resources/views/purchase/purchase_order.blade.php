@@ -76,8 +76,8 @@
                                                 <td>
                                                     @if($item->status == 'Pending')
                                                         <span class="badge bg-inverse-warning">Pending</span>
-                                                    @elseif($item->status == 'Approved')
-                                                        <span class="badge bg-inverse-success">Completed</span>
+                                                    @elseif($item->status == 'Done')
+                                                        <span class="badge bg-inverse-success">Done</span>
                                                     @elseif($item->status == 'Not Approved')
                                                         <span class="badge bg-inverse-danger">Cancelled</span>
                                                     @elseif($item->status == 'Not all Approved')

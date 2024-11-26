@@ -26,14 +26,8 @@
                         <div class="row">
                             <div class="col-sm-6 col-md-3">
                                 <div class="form-group">
-                                    <label>Request ID <span class="text-danger">*</span></label>
+                                    <label>Request ID <span class="text-danger">(Auto Generated)*</span></label>
                                     <input class="form-control" id="auto_request_id" name="request_id" value="" readonly required>
-                                </div>
-                            </div>
-                            <div class="col-sm-6 col-md-3">
-                                <div class="form-group">
-                                    <label>Purchase Order ID <span class="text-danger">(For Accounting)*</span></label>
-                                    <input class="form-control" id="auto_po_id" name="po_number" value="" readonly>
                                 </div>
                             </div>
                             <div class="col-sm-6 col-md-3">
@@ -45,17 +39,6 @@
                                                 <option value="{{ $item->garage_name }}">{{ $item->garage_name }}</option>
                                             @endforeach
                                     </select>
-                                </div>
-                            </div>
-                            <div class="col-sm-6 col-md-3">
-                                <div class="form-group">
-                                    <label>Supplier<span class="text-danger"> (For Accounting)*</span></label>
-                                    <select class="form-control" style="min-width:150px" id="supplier" name="supp_name" disabled>
-                                        <option value="">Selection Area</option>
-                                        @foreach ($supplier as $item)
-                                            <option value="{{ $item->id }}">{{ $item->supplier_name }}</option>
-                                        @endforeach
-                                    </select> 
                                 </div>
                             </div>
                         </div>
@@ -72,7 +55,6 @@
                                                 <th class="col-md-1">Unit</th>
                                                 <th class="col-md-1">Stock</th>
                                                 <th class="col-md-1">Qty</th>
-                                                <th >Amount</th>
                                                 <th> </th>
                                             </tr>
                                         </thead>
@@ -106,53 +88,12 @@
                                                 <td>
                                                     <input class="form-control" style="min-width:80px" type="text" id="qty" name="qty[]" placeholder="0">
                                                 </td>
-                                                <td>
-                                                    <input class="form-control" style="min-width:120px" type="text" id="amount" name="amount[]" placeholder="0">
-                                                </td>
-                                                <td>
+                                                <td class="text-center">
                                                     <a href="javascript:void(0)" class="text-success font-18" title="Add" id="addBtn"><i class="fa fa-plus"></i></a>
                                                 </td>
                                             </tr>
                                         </tbody>                                        
                                     </table>
-                                </div>
-                                <div class="table-responsive">
-                                    <table class="table table-hover table-white">
-                                        <tbody>
-                                            <tr>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td class="text-right">Total</td>
-                                                <td>
-                                                    <input class="form-control text-right total" type="text" id="sum_total" name="total" value="0" readonly>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="5" class="text-right">Tax</td>
-                                                <td>
-                                                    <input class="form-control text-right"type="text" id="tax_1" name="tax_1" value="0" readonly>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="5" class="text-right">
-                                                    Discount %
-                                                </td>
-                                                <td>
-                                                    <input class="form-control text-right discount" type="text" id="discount" name="discount" value="0">
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="5" style="text-align: right; font-weight: bold">
-                                                    Grand Total
-                                                </td>
-                                                <td style="font-size: 16px;width: 230px">
-                                                    <input class="form-control text-right" type="text" id="grand_total" name="grand_total" value="₱ 0.00" readonly>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>                               
                                 </div>
                         <div class="submit-section">
                             <button type="submit" class="btn btn-primary submit-btn">Save</button>
@@ -203,9 +144,8 @@
                             <input class="form-control" style="min-width:80px" type="text" name="qty[]" placeholder="0">
                         </td>
                         <td>
-                            <input class="form-control" style="min-width:120px" type="text" name="amount[]" placeholder="0">
+                            <a href="javascript:void(0)" class="text-danger font-18 remove" id="trashBIN" title="Remove"><i class="fa fa-trash-o"></i></a>
                         </td>
-                        <td><a href="javascript:void(0)" class="text-danger font-18 remove" title="Remove"><i class="fa fa-trash-o"></i></a></td>
                     </tr>`;
 
                 // Append the new row to the table

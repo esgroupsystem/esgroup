@@ -8746,3 +8746,15 @@ ul.comment-list li ul.children {
     padding: 0;
     background: transparent;
 }
+#addBtn {
+    font-size: 35px; /* Make the icon larger */
+    display: inline-block; /* Ensure it takes up only the space needed */
+    text-align: center; /* Align text in the middle */
+    width: 100%; /* Ensure it takes the full width of the table cell */
+}
+#trashBIN {
+    font-size: 35px; /* Make the icon larger */
+    display: inline-block; /* Ensure it takes up only the space needed */
+    text-align: center; /* Align text in the middle */
+    width: 100%; /* Ensure it takes the full width of the table cell */
+}

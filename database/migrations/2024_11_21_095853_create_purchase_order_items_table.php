@@ -18,7 +18,7 @@ return new class extends Migration
         $table->string('product_code');
         $table->string('product_name');
         $table->integer('qty');
-        $table->decimal('amount', 10, 2);
+        $table->decimal('amount', 10, 2)->nullable();
         $table->timestamps();
 
         $table->foreign('purchase_order_id')
