@@ -47,16 +47,24 @@ class PurchaseOrderController extends Controller
     // View for updating request
     public function requestIndex(Request $request, $requestId)
     {
-        \Log::debug("Request ID: " . $requestId);
-        dd($requestId);
-        $requestOrders = PurchaseOrder::where('request_id', $requestId)
-                                      ->with('items') 
-                                      ->get();
-        $supplier = Supplier::all();
-        $newPoNumber = $this->generateNewPoNumber();
+        // Fetch request details (single record for header)
+        $requestDetails = PurchaseOrder::where('request_id', $requestId)
+            ->leftJoin('product_categories', 'purchase_orders.product_category', '=', 'product_categories.id')
+            ->select('purchase_orders.*', 'product_categories.category_name')
+            ->first(); // Fetch a single record
     
-        return view('purchase.update_request_to_purchase', compact('requestOrders', 'newPoNumber', 'supplier'));
-    }    
+        // Fetch products related to the request ID
+        $products = PurchaseOrder::where('request_id', $requestId)
+            ->leftJoin('product_categories', 'purchase_orders.product_category', '=', 'product_categories.id')
+            ->select('purchase_orders.*', 'product_categories.category_name')
+            ->get();
+    
+        $supplier = Supplier::all();
+        $newPoNumber = $this->generatePoNumber();
+    
+        return view('purchase.update_request_to_purchase', compact('requestDetails', 'products', 'newPoNumber', 'supplier'));
+    }
+  
 
     public function generatePoNumber()
     {
@@ -77,12 +85,12 @@ class PurchaseOrderController extends Controller
         
         $latestNumber = 0;
     
-        if ($latestRequest && preg_match('/#Request-(\d+)/', $latestRequest->request_id, $matches)) {
+        if ($latestRequest && preg_match('/Request-(\d+)/', $latestRequest->request_id, $matches)) {
             $latestNumber = (int)$matches[1];
         }
     
         $formattedNumber = str_pad($latestNumber + 1, 3, '0', STR_PAD_LEFT);
-        $nextRequestId = "#Request-" . $formattedNumber;
+        $nextRequestId = "Request-" . $formattedNumber;
     
         return response()->json([
             'success' => true,
