@@ -86,7 +86,9 @@
                                                         <span class="badge bg-inverse-info">Unknown</span>
                                                     @endif
                                                 </td>
-                                                <td id="requestDATE">{{ $item->request_date }}</td>
+                                                <td id="requestDATE">
+                                                    {{ $item->request_date ? \Carbon\Carbon::parse($item->request_date)->format('F j, Y') : 'N/A' }}
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -106,20 +108,34 @@
                                     <thead>
                                         <tr>
                                             <th>PO Number</th>
-                                            <th>Item Code</th>
+                                            <th>Request No</th>
                                             <th>Status</th>
                                             <th>Payment Terms</th>
                                             <th>Total Amount</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($requestOrder as $item )
-                                            <td id="reqID">{{ $item->request_id }}</td>
-                                            <td id="poID"><a href="invoice-view.html">{{ $item->po_number }}</a></td>
-                                            <td id="status">{{ $item->status }}</td>
-                                            <td id="requestDATE">{{ $item->request_date }}</td>
+                                        @foreach ($requestOrder as $item)
+                                        <tr> 
+                                            <td id="poID">{{ $item->purchase_id }}</td> 
+                                            <td id="item_code">{{ $item->request_id }}</td> 
+                                            <td id="receving">
+                                                @if($item->status_receiving == 'For Delivery')
+                                                    <span class="badge bg-inverse-warning">Waiting for delivery</span>
+                                                @elseif($item->status_receiving == 'Partial Delivery')
+                                                    <span class="badge bg-inverse-info">Partial Delivery</span>
+                                                @elseif($item->status_receiving == 'Delivered')
+                                                    <span class="badge bg-inverse-success">Delivered</span>
+                                                @else
+                                                    <span class="badge bg-inverse-danger">Contact Admin</span>
+                                                @endif
+                                            </td>
+                                            <td id="terms">{{ $item->payment_terms }} days</td>
+                                            <td id="total">{{ $item->total_amount }}</td> 
+                                        </tr>
                                         @endforeach
                                     </tbody>
+                                    
                                 </table>
                             </div>
                         </div>
@@ -158,24 +174,68 @@
     </div>
     <!-- /Page Wrapper -->
     @section('script')
-        <script>
-            $(document).ready(function() {
-                $('#requestOrderTable').DataTable({
-                    "paging": true,  
-                    "searching": true,  
-                    "ordering": true,  
-                    "info": false,   
-                    "lengthChange": false,   
-                    "pageLength": 5,          
-                    "language": {
-                        "paginate": {
-                            "previous": "<",
-                            "next": ">" 
-                        },
-                        "lengthMenu": "Show _MENU_ entries",
+
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTable
+            var table = $('#requestOrderTable').DataTable({
+                pageLength: 5,
+                processing: true,
+                serverSide: false,
+                ordering: true,
+                dom: 't<"bottom"p>',
+                order: [[2, 'desc']],
+                columnDefs: [
+                    {
+                        "targets": 2,
+                        "orderDataType": "dom-status" 
+                    }
+                ]
+            });
+            $.fn.dataTable.ext.order['dom-status'] = function(settings, colIdx) {
+                return this.api()
+                    .column(colIdx, { order: 'index' })
+                    .nodes()
+                    .map(function(td) {
+                        const statusText = $(td).text().trim();
+                        switch (statusText) {
+                            case 'Pending': return 1;
+                            case 'Done': return 2;
+                            case 'Not Approved': return 3;
+                            case 'Not all Approved': return 4;
+                            default: return 5;
+                        }
+                    });
+            };
+            function disableDoneRows() {
+                $('#requestOrderTable tbody tr').each(function() {
+                    var status = $(this).find('td:eq(2)').text().trim();
+    
+                    if (status === 'Done') {
+                        $(this).find('td:eq(0) a').removeAttr('href'); 
+                        $(this).addClass('disabled-row');  
                     }
                 });
+            }
+            table.on('draw', function() {
+                disableDoneRows();
             });
-        </script>
+
+            disableDoneRows();
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            const table = $('#purchaseOrderTable').DataTable({
+                pageLength: 5,
+                processing: true,
+                serverSide: false,
+                ordering: true,
+                dom: 't<"bottom"p>',
+            });
+        });
+    </script>
+    
     @endsection
 @endsection

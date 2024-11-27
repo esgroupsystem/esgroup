@@ -45,7 +45,7 @@
                             <div class="col-sm-6 col-md-3">
                                 <div class="form-group">
                                     <label>Supplier<span class="text-danger"> (For Accounting)*</span></label>
-                                    <select class="form-control" style="min-width:150px" id="supplier" name="supp_name">
+                                    <select class="form-control" style="min-width:150px" id="supplier" name="supp_name" required>
                                         <option value="">Selection Area</option>
                                         @foreach ($supplier as $item)
                                             <option value="{{ $item->id }}">{{ $item->supplier_name }}</option>
@@ -114,7 +114,7 @@
                                                         Payment Terms
                                                     </td>
                                                     <td style="font-size: 16px;width: 230px">
-                                                        <input class="form-control text-right" type="text" id="payment_terms" name="payment_terms">
+                                                        <input class="form-control text-right" type="text" id="payment_terms" name="payment_terms" required>
                                                     </td>
                                                 </tr>
                                                 <tr>

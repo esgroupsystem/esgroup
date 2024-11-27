@@ -8758,3 +8758,6 @@ ul.comment-list li ul.children {
     text-align: center; /* Align text in the middle */
     width: 100%; /* Ensure it takes the full width of the table cell */
 }
+.custom-modal-wide .modal-dialog {
+	max-width: 100%; /* You can adjust this to your desired width */
+}

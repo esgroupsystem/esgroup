@@ -48,12 +48,11 @@
                                     <table class="table table-hover table-white" id="tablePurchaseOrder">
                                         <thead>
                                             <tr>
-                                                <th class="col-sm-2">Category</th>
-                                                <th class="col-md-2">Product Code</th>
+                                                <th class="col-sm-3">Category</th>
+                                                <th class="col-md-3">Product Code</th>
                                                 <th class="col-md-3">Product Name</th>
                                                 <th class="col-md-1">Brand</th>
                                                 <th class="col-md-1">Unit</th>
-                                                <th class="col-md-1">Stock</th>
                                                 <th class="col-md-1">Qty</th>
                                                 <th> </th>
                                             </tr>
@@ -81,9 +80,6 @@
                                                 </td>
                                                 <td>
                                                     <input class="form-control" style="min-width:80px" type="text" id="unit" name="unit[]" readonly>
-                                                </td>
-                                                <td>
-                                                    <input class="form-control" style="min-width:120px" type="text" id="stock" name="stock[]" value="0" readonly>
                                                 </td>
                                                 <td>
                                                     <input class="form-control" style="min-width:80px" type="text" id="qty" name="qty[]" placeholder="0">

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Models\product_total_stocks;
+use App\Models\PurchaseTransaction;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use App\Models\RequestOrder;
@@ -22,7 +24,8 @@ class PurchaseOrderController extends Controller
     // Index for main
     public function mainIndex(Request $request)
     {
-        $requestOrder = RequestOrder::get();
+        $requestOrder = PurchaseTransaction::get();
+        // $requestOrder = $requestOrder->unique('po_number');
 
         $poOrder = PurchaseOrder::get();
         $poOrder = $poOrder->unique('request_id');
@@ -55,8 +58,8 @@ class PurchaseOrderController extends Controller
     
             $products = PurchaseOrder::where('purchase_orders.request_id', $requestId)
             ->leftJoin('product_categories', 'purchase_orders.product_category', '=', 'product_categories.id')
-            ->leftJoin('purchase_order_items', 'purchase_orders.id', '=', 'purchase_order_items.purchase_order_id') // Join with purchase_order_item table
-            ->select('purchase_orders.*', 'product_categories.category_name', 'purchase_order_items.qty') // Select the qty from purchase_order_item
+            ->leftJoin('purchase_order_items', 'purchase_orders.id', '=', 'purchase_order_items.purchase_order_id')
+            ->select('purchase_orders.*', 'product_categories.category_name', 'purchase_order_items.qty')
             ->get();
     
         $supplier = Supplier::all();
@@ -64,17 +67,48 @@ class PurchaseOrderController extends Controller
     
         return view('purchase.update_request_to_purchase', compact('requestDetails', 'products', 'newPoNumber', 'supplier'));
     }
-  
+
+    // Viewing for Receicing all products
+    public function receivingIndex(Request $request)
+    {
+        $purchaseReceived = PurchaseTransaction::get();
+
+        return view('purchase.recieving_po', compact('purchaseReceived'));
+    }
+
+    // Retrieve the PO
+    public function fetchPurchaseOrder($id)
+    {
+        $purchaseOrder = PurchaseOrder::where('po_number', $id)->first();
+        $relatedOrders = PurchaseOrder::with('items')
+            ->where('po_number', $purchaseOrder->po_number)
+            ->get();
+
+        $uniqueOrders = $relatedOrders->map(function ($order) {
+            
+            $order->items = $order->items->unique('product_code');
+            return $order;
+        });
+        return response()->json(['purchaseOrders' => $uniqueOrders]);
+    }
+    
     // Generate New PO Number
     public function generatePoNumber()
     {
-        $lastPo = PurchaseOrder::orderBy('created_at', 'desc')->first();
-        $lastPoNumber = $lastPo ? (int) substr($lastPo->po_number, 3) : 0;
+        $lastPo = PurchaseOrder::where('po_number', 'like', 'PO-%')
+            ->orderByRaw('CAST(SUBSTRING(po_number, 4) AS UNSIGNED) DESC')
+            ->first();
+    
+        $latestNumber = 0;
+    
+        if ($lastPo && preg_match('/^PO-(\d{4})$/', $lastPo->po_number, $matches)) {
+            $latestNumber = (int) $matches[1];
+        }
 
-        $newPoNumber = $lastPoNumber + 1;
-        $newPoNumberFormatted = 'PO-' . str_pad($newPoNumber, 4, '0', STR_PAD_LEFT);
-
-        return $newPoNumberFormatted;
+        $formattedNumber = str_pad($latestNumber + 1, 4, '0', STR_PAD_LEFT);
+        $nextPoNumber = "PO-" . $formattedNumber;
+    
+        return $nextPoNumber;
     }
 
     // Generate New Request Number
@@ -131,6 +165,7 @@ class PurchaseOrderController extends Controller
         ]);
     }
 
+    // This function is for saving REQUEST
     public function saveRequest(Request $request){
 
         $request->validate([
@@ -170,7 +205,6 @@ class PurchaseOrderController extends Controller
                     'product_code'      => $product_code,
                     'product_name'      => $request->product_name[$key],
                     'qty'               => $request->qty[$key],
-                    // 'amount'            => $request->amount[$key],
                 ]);
             }
             
@@ -185,10 +219,9 @@ class PurchaseOrderController extends Controller
         }
     }
 
-
+    // This is process of purchasing a items
     public function updateRequest(Request $request)
     {
-
         DB::beginTransaction();
         try {
 
@@ -213,23 +246,27 @@ class PurchaseOrderController extends Controller
                 $itemTotal = $request->qty[$key] * $request->amount[$key];
 
                 $updateCount = PurchaseOrderItem::where('request_id', $request->request_id)
-                        ->where('product_code', $productCode) // Use product_code here
+                        ->where('product_code', $productCode)
                         ->update([
                             'amount'       => $request->amount[$key],
-                            'total_amount' => $itemTotal, // Update total amount for this product
-                        ]);
+                            'total_amount' => $itemTotal,
+                        ]);   
+                    }
 
-                product_total_stocks::create([
-                    'product_id' => $product->id,
-                    'InQty'      => $request->qty[$key],
-                    'OutQty'     => 0,
+                PurchaseTransaction::create([
+                    'purchase_id'       => $request->po_number,
+                    'request_id'        => $request->request_id,
+                    'total_amount'      => $request->grand_total, 
+                    'payment_terms'     => $request->payment_terms,  
                 ]);
-    
-                \Log::info("Inserted stock record for product_id: {$product->id} with InQty: {$request->qty[$key]}");
-            }
+                // product_total_stocks::create([
+                //     'product_id' => $product->id,
+                //     'InQty'      => $request->qty[$key],
+                //     'OutQty'     => 0,
+                // ]);
     
             DB::commit();
-            flash()->success('Successfully updated the purchase order.');
+            flash()->success('Successfully Purchase Order, please wait for delivery.');
             return redirect()->route('purchase.index');
         } catch (\Exception $e) {
             DB::rollback();
@@ -238,4 +275,43 @@ class PurchaseOrderController extends Controller
             return redirect()->back();
         }
     }    
+
+    // Function for receiving a items
+    public function saveReceived(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $validated = $request->validate([
+                'product_id' => 'required|array',
+                'product_id.*' => 'integer|exists:purchase_order_items,id',
+                'received_qty' => 'required|array',
+                'received_qty.*' => 'integer|min:0',
+            ]);
+    
+            if (count($request->product_id) !== count($request->received_qty)) {
+                return redirect()->back()->withErrors('Mismatched product and quantity arrays.');
+            }
+
+            foreach ($request->product_id as $index => $productId) {
+
+                $orderItem = PurchaseOrderItem::findOrFail($productId);
+                
+                if ($orderItem->qty < $request->received_qty[$index]) {
+                    return redirect()->back()->withErrors('Received quantity cannot be more than the ordered quantity.');
+                }
+                $orderItem->qty_received = $request->received_qty[$index];
+                $orderItem->save();
+            }
+    
+            DB::commit();
+            flash()->success('Successfully save the records :)');
+            return redirect()->route('receiving.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+            \Log::error('Update request failed: ' . $e->getMessage());
+            flash()->error('Failed to update the purchase order.');
+            return redirect()->back();
+        }
+    }
+    
 }
