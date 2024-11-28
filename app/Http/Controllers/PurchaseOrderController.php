@@ -284,17 +284,23 @@ class PurchaseOrderController extends Controller
     {
         DB::beginTransaction();
         try {
+            // Validate request data
             $validated = $request->validate([
                 'product_id' => 'required|array',
                 'product_id.*' => 'integer|exists:purchase_order_items,id',
                 'received_qty' => 'required|array',
-                'received_qty.*' => 'integer|min:0',
+                'received_qty.*' => 'integer|min:0', // Ensure received_qty is non-negative
+                'purchase_id' => 'required|exists:purchase_transactions,purchase_id', // Validate purchase_id
             ]);
     
+            // Check for mismatched arrays
             if (count($request->product_id) !== count($request->received_qty)) {
                 return redirect()->back()->withErrors('Mismatched product and quantity arrays.');
             }
     
+            $allItemsFullyReceived = true;
+    
+            // Update purchase order items
             foreach ($request->product_id as $index => $productId) {
                 $orderItem = PurchaseOrderItem::findOrFail($productId);
                 $newQty = $orderItem->qty_received + $request->received_qty[$index];
@@ -305,7 +311,24 @@ class PurchaseOrderController extends Controller
     
                 $orderItem->qty_received = $newQty;
                 $orderItem->save();
+    
+                // Check if the item is fully received
+                if ($newQty < $orderItem->qty) {
+                    $allItemsFullyReceived = false;
+                }
             }
+    
+            // Attempt to fetch the PurchaseTransaction
+            $purchaseTransaction = PurchaseTransaction::where('purchase_id', $request->purchase_id)->first();
+    
+            // If no PurchaseTransaction exists, return an error message
+            if (!$purchaseTransaction) {
+                return redirect()->back()->withErrors('Purchase transaction not found.');
+            }
+    
+            // Update the status of receiving
+            $purchaseTransaction->status_receiving = $allItemsFullyReceived ? 'Delivered' : 'Partial Delivered';
+            $purchaseTransaction->save();
     
             DB::commit();
             flash()->success('Successfully saved the records :)');
@@ -313,8 +336,11 @@ class PurchaseOrderController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             \Log::error('Update request failed: ' . $e->getMessage());
-            flash()->error('Failed to update the purchase order.');
+            flash()->error('Failed to update the request order.');
             return redirect()->back();
         }
-    }    
+    }
+    
+    
+      
 }

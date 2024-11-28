@@ -134,9 +134,6 @@
                             <input class="form-control" style="min-width:80px" type="text" name="unit[]" readonly>
                         </td>
                         <td>
-                            <input class="form-control" style="min-width:120px" type="text" name="stock[]" value="0" readonly>
-                        </td>
-                        <td>
                             <input class="form-control" style="min-width:80px" type="text" name="qty[]" placeholder="0">
                         </td>
                         <td>
