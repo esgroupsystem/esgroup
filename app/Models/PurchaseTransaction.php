@@ -14,5 +14,6 @@ class PurchaseTransaction extends Model
         'request_id',
         'total_amount',
         'payment_terms',
+        'status_receiving'
     ];
 }

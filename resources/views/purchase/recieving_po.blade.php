@@ -43,7 +43,7 @@
                                     <td class="po_date">{{ date('j M Y (h:i A)', strtotime($item->date_received)) }}</td>
                                     <td id="receving">
                                         @if($item->status_receiving == 'For Delivery')
-                                            <span class="badge bg-inverse-warning">Waiting for delivery</span>
+                                            <span class="badge bg-inverse-warning">For Delivery</span>
                                         @elseif($item->status_receiving == 'Partial Delivery')
                                             <span class="badge bg-inverse-info">Partial Delivery</span>
                                         @elseif($item->status_receiving == 'Delivered')
@@ -71,7 +71,7 @@
             <div class="modal-dialog modal-dialog-centered modal-lg" role="document"> 
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Edit Job Order</h5>
+                        <h5 class="modal-title">Received Qty</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -127,44 +127,52 @@
         {{-- Edit/Update Modal --}}
         <script>
             $(document).ready(function () {
+
+                $(document).on('input', 'input[name="received_qty[]"]', function () {
+                    const row = $(this).closest('tr');
+                    const maxQty = parseInt(row.find('input[name="qty[]"]').val(), 10);
+                    const receivedQty = parseInt($(this).val(), 10);
+
+                    if (receivedQty > maxQty) {
+                        alert('Received quantity cannot exceed available quantity!');
+                        $(this).val(maxQty);
+                    }
+                    const remainingQty = maxQty - (receivedQty || 0);
+                    row.find('.remaining-qty').text(remainingQty >= 0 ? remainingQty : 0);
+                });
+
                 $('.btn-view').on('click', function () {
                     const purchaseId = $(this).data('id');
                     const productsTable = $('#tablePurchaseOrder tbody');
                     productsTable.empty();
-        
+
                     $.ajax({
                         url: `/fetch-purchase-order/${purchaseId}`,
                         method: 'GET',
                         success: function (response) {
                             if (response.purchaseOrders) {
-                                const purchaseOrders = response.purchaseOrders;
-                                purchaseOrders.forEach(order => {
+                                response.purchaseOrders.forEach(order => {
                                     order.items.forEach(item => {
-                                        const existingRow = productsTable.find(`tr input[value="${item.product_code}"]`);
-                                        if (existingRow.length === 0) {
-                                            const row = `
-                                                <tr>
-                                                    <td><input class="form-control" name="product_code[]" value="${item.product_code || ''}" readonly></td>
-                                                    <td><input class="form-control" name="product_name[]" value="${item.product_name || ''}" readonly></td>
-                                                    <td><input class="form-control" name="brand[]" value="${order.product_brand || ''}" readonly></td>
-                                                    <td><input class="form-control" name="unit[]" value="${order.product_unit || ''}" readonly></td>
-                                                    <td><input class="form-control" name="qty[]" value="${item.qty || ''}" readonly></td>
-                                                    <td><input class="form-control" name="received_qty[]" value="${item.received_qty || ''}"></td>
-                                                    <input type="hidden" name="product_id[]" value="${item.id}">
-                                                </tr>
-                                            `;
-                                            productsTable.append(row);
-                                        }
+                                        const row = `
+                                            <tr>
+                                                <td><input class="form-control" name="product_code[]" value="${item.product_code || ''}" readonly></td>
+                                                <td><input class="form-control" name="product_name[]" value="${item.product_name || ''}" readonly></td>
+                                                <td><input class="form-control" name="brand[]" value="${order.product_brand || ''}" readonly></td>
+                                                <td><input class="form-control" name="unit[]" value="${order.product_unit || ''}" readonly></td>
+                                                <td><input class="form-control" name="qty[]" value="${item.remaining_qty || '0'}" readonly></td>
+                                                <td><input class="form-control" name="received_qty[]" value="${item.received_qty || ''}"></td>
+                                                <input type="hidden" name="product_id[]" value="${item.id}">
+                                            </tr> `;
+                                        productsTable.append(row);
                                     });
                                 });
                             } else {
                                 alert('No related purchase orders found.');
                             }
                         },
-                        error: function (xhr, status, error) {
-                            console.error('AJAX error:', error);
+                        error: function () {
                             alert('Failed to fetch purchase order data. Please try again.');
-                        }
+                        },
                     });
                 });
             });

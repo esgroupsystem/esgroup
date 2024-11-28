@@ -80,17 +80,25 @@ class PurchaseOrderController extends Controller
     public function fetchPurchaseOrder($id)
     {
         $purchaseOrder = PurchaseOrder::where('po_number', $id)->first();
+    
+        if (!$purchaseOrder) {
+            return response()->json(['error' => 'Purchase order not found.'], 404);
+        }
+    
         $relatedOrders = PurchaseOrder::with('items')
             ->where('po_number', $purchaseOrder->po_number)
             ->get();
-
+    
         $uniqueOrders = $relatedOrders->map(function ($order) {
-            
-            $order->items = $order->items->unique('product_code');
+            $order->items = $order->items->unique('product_code')->map(function ($item) {
+                $item->remaining_qty = $item->qty - $item->qty_received; // Add remaining quantity
+                return $item;
+            });
             return $order;
         });
+    
         return response()->json(['purchaseOrders' => $uniqueOrders]);
-    }
+    }    
     
     // Generate New PO Number
     public function generatePoNumber()
@@ -259,11 +267,6 @@ class PurchaseOrderController extends Controller
                     'total_amount'      => $request->grand_total, 
                     'payment_terms'     => $request->payment_terms,  
                 ]);
-                // product_total_stocks::create([
-                //     'product_id' => $product->id,
-                //     'InQty'      => $request->qty[$key],
-                //     'OutQty'     => 0,
-                // ]);
     
             DB::commit();
             flash()->success('Successfully Purchase Order, please wait for delivery.');
@@ -291,20 +294,21 @@ class PurchaseOrderController extends Controller
             if (count($request->product_id) !== count($request->received_qty)) {
                 return redirect()->back()->withErrors('Mismatched product and quantity arrays.');
             }
-
+    
             foreach ($request->product_id as $index => $productId) {
-
                 $orderItem = PurchaseOrderItem::findOrFail($productId);
-                
-                if ($orderItem->qty < $request->received_qty[$index]) {
-                    return redirect()->back()->withErrors('Received quantity cannot be more than the ordered quantity.');
+                $newQty = $orderItem->qty_received + $request->received_qty[$index];
+    
+                if ($newQty > $orderItem->qty) {
+                    return redirect()->back()->withErrors('Received quantity cannot exceed the ordered quantity.');
                 }
-                $orderItem->qty_received = $request->received_qty[$index];
+    
+                $orderItem->qty_received = $newQty;
                 $orderItem->save();
             }
     
             DB::commit();
-            flash()->success('Successfully save the records :)');
+            flash()->success('Successfully saved the records :)');
             return redirect()->route('receiving.index');
         } catch (\Exception $e) {
             DB::rollback();
@@ -312,6 +316,5 @@ class PurchaseOrderController extends Controller
             flash()->error('Failed to update the purchase order.');
             return redirect()->back();
         }
-    }
-    
+    }    
 }

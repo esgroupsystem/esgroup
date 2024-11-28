@@ -1,1 +1,0 @@
-[2024-11-27 17:22:21] local.ERROR: Update request failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'received_qty' in 'field list' (Connection: mysql, SQL: update `purchase_order_items` set `received_qty` = 2, `purchase_order_items`.`updated_at` = 2024-11-27 17:22:21 where `id` = 14)  
