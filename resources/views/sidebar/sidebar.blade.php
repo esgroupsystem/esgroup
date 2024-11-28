@@ -41,11 +41,18 @@
                     *-->
                 <li class="menu-title"> <span>Request P/O</span> </li>
                     <li class="{{set_active(['purchase.index', 'receiving.index'])}} submenu">
-                    <a href="#" class="{{ set_active(['receiving.index', 'receiving.index']) ? 'noti-dot' : '' }}">
-                        <i class="la la-money"></i> <span>Purchase Order</span> <span class="menu-arrow"></span>
+                    <a href="#" class="{{ set_active(['receiving.index']) ? 'noti-dot' : '' }}">
+                        <i class="la la-money-bill-wave"></i> <span>Purchase Order</span> <span class="menu-arrow"></span>
                     </a>
                     <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">
                         <li><a class="{{set_active(['purchase.index'])}}" href="{{ route('purchase.index') }}">Purchasing Request</a></li>
+                    </ul>
+                </li>
+                <li class="{{set_active(['receiving.index'])}} submenu">
+                    <a href="#" class="{{ set_active(['receiving.index', 'receiving.index']) ? 'noti-dot' : '' }}">
+                        <i class="la la-truck"></i> <span>Receving</span> <span class="menu-arrow"></span>
+                    </a>
+                    <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">
                         <li><a class="{{set_active(['receiving.index'])}}" href="{{ route('receiving.index') }}">Receving Orders</a></li>
                     </ul>
                 </li>

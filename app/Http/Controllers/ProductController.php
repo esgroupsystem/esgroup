@@ -72,6 +72,7 @@ class ProductController extends Controller
             return redirect()->back();
         } catch (\Exception $e) {
             DB::rollback();
+            \Log::error('Update request failed: ' . $e->getMessage());
             flash()->error('Failed to add product :)');
             return redirect()->back();
         }

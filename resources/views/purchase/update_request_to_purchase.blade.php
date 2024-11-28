@@ -67,7 +67,6 @@
                                                 <th class="col-md-3">Product Name</th>
                                                 <th class="col-md-1">Brand</th>
                                                 <th class="col-md-1">Unit</th>
-                                                <th class="col-md-1">Stock</th>
                                                 <th class="col-md-1">Qty</th>
                                                 <th>Amount</th>
                                             </tr>
@@ -89,9 +88,6 @@
                                                     </td>
                                                     <td>
                                                         <input class="form-control" name="unit[]" value="{{ $item->product_unit }}" readonly>
-                                                    </td>
-                                                    <td>
-                                                        <input class="form-control" name="stock[]" value="{{ $item->product_stock ?? 0 }}" readonly>
                                                     </td>
                                                     <td>
                                                         <input class="form-control" name="qty[]" value="{{ $item->qty ?? 0 }}" readonly>

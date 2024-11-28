@@ -90,8 +90,9 @@ class PurchaseOrderController extends Controller
             ->get();
     
         $uniqueOrders = $relatedOrders->map(function ($order) {
+            $order->garageName = $order->garage_name;
             $order->items = $order->items->unique('product_code')->map(function ($item) {
-                $item->remaining_qty = $item->qty - $item->qty_received; // Add remaining quantity
+                $item->remaining_qty = $item->qty - $item->qty_received;
                 return $item;
             });
             return $order;
@@ -217,7 +218,7 @@ class PurchaseOrderController extends Controller
             }
             
             DB::commit();
-            flash()->success('Successfully submitted, please for conformation :)');
+            flash()->success('Successfully submitted, please for confirmation :)');
             return redirect()->route('purchase.index');
         }catch (\Exception $e) {
             DB::rollback();
@@ -269,7 +270,7 @@ class PurchaseOrderController extends Controller
                 ]);
     
             DB::commit();
-            flash()->success('Successfully Purchase Order, please wait for delivery.');
+            flash()->success('Successfully save purchase order, please wait for delivery.');
             return redirect()->route('purchase.index');
         } catch (\Exception $e) {
             DB::rollback();
@@ -284,24 +285,36 @@ class PurchaseOrderController extends Controller
     {
         DB::beginTransaction();
         try {
-            // Validate request data
             $validated = $request->validate([
                 'product_id' => 'required|array',
                 'product_id.*' => 'integer|exists:purchase_order_items,id',
                 'received_qty' => 'required|array',
-                'received_qty.*' => 'integer|min:0', // Ensure received_qty is non-negative
-                'purchase_id' => 'required|exists:purchase_transactions,purchase_id', // Validate purchase_id
+                'received_qty.*' => 'integer|min:0',
+                'purchase_id' => 'required|exists:purchase_transactions,purchase_id',
+                'garage_name' => 'required|in:Mirasol,VGC,Balintawak',
             ]);
     
-            // Check for mismatched arrays
             if (count($request->product_id) !== count($request->received_qty)) {
                 return redirect()->back()->withErrors('Mismatched product and quantity arrays.');
             }
     
             $allItemsFullyReceived = true;
+            $garageName = $request->input('garage_name');
     
-            // Update purchase order items
+            $tableMapping = [
+                'Mirasol'    => 'product_total_stocks',
+                'VGC'        => 'product_stock_v_g_c_s',
+                'Balintawak' => 'product_stock_balintawaks',
+            ];
+    
+            $tableName = $tableMapping[$garageName] ?? null;
+    
+            if (!$tableName) {
+                return redirect()->back()->withErrors('Invalid garage name.');
+            }
+    
             foreach ($request->product_id as $index => $productId) {
+
                 $orderItem = PurchaseOrderItem::findOrFail($productId);
                 $newQty = $orderItem->qty_received + $request->received_qty[$index];
     
@@ -312,21 +325,36 @@ class PurchaseOrderController extends Controller
                 $orderItem->qty_received = $newQty;
                 $orderItem->save();
     
-                // Check if the item is fully received
+                $product = Products::where('product_code', $orderItem->product_code)->first();
+    
+                if (!$product) {
+                    return redirect()->back()->withErrors('Product not found in the products table.');
+                }
+    
+                $existingRecord = DB::table($tableName)->where('product_id', $product->id)->first();
+                if ($existingRecord) {
+                    DB::table($tableName)
+                        ->where('product_id', $product->id)
+                        ->update([
+                            'InQty' => $existingRecord->InQty + $request->received_qty[$index],
+                        ]);
+                } else {
+                    DB::table($tableName)->insert([
+                        'product_id' => $product->id,
+                        'InQty' => $request->received_qty[$index],
+                        'OutQty' => 0,
+                    ]);
+                }
+
                 if ($newQty < $orderItem->qty) {
                     $allItemsFullyReceived = false;
                 }
             }
-    
-            // Attempt to fetch the PurchaseTransaction
+
             $purchaseTransaction = PurchaseTransaction::where('purchase_id', $request->purchase_id)->first();
-    
-            // If no PurchaseTransaction exists, return an error message
             if (!$purchaseTransaction) {
                 return redirect()->back()->withErrors('Purchase transaction not found.');
             }
-    
-            // Update the status of receiving
             $purchaseTransaction->status_receiving = $allItemsFullyReceived ? 'Delivered' : 'Partial Delivered';
             $purchaseTransaction->save();
     
@@ -335,12 +363,11 @@ class PurchaseOrderController extends Controller
             return redirect()->route('receiving.index');
         } catch (\Exception $e) {
             DB::rollback();
-            \Log::error('Update request failed: ' . $e->getMessage());
+            \Log::error('Failed to save received items', $e->getMessage());
             flash()->error('Failed to update the request order.');
             return redirect()->back();
         }
     }
-    
-    
+     
       
 }

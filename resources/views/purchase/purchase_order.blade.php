@@ -121,7 +121,7 @@
                                             <td id="item_code">{{ $item->request_id }}</td> 
                                             <td id="receving">
                                                 @if($item->status_receiving == 'For Delivery')
-                                                    <span class="badge bg-inverse-warning">Waiting for delivery</span>
+                                                    <span class="badge bg-inverse-warning">For Delivery</span>
                                                 @elseif($item->status_receiving == 'Partial Delivery')
                                                     <span class="badge bg-inverse-info">Partial Delivery</span>
                                                 @elseif($item->status_receiving == 'Delivered')

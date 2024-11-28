@@ -138,54 +138,56 @@
                 // Update status based on received_qty
                 function updateStatus() {
                     let allFullyReceived = true;
-
+        
                     $('#tablePurchaseOrder tbody tr').each(function () {
                         const row = $(this);
                         const qty = parseInt(row.find('input[name="qty[]"]').val(), 10);
                         let receivedQty = parseInt(row.find('input[name="received_qty[]"]').val(), 10) || 0;
-
+        
                         // Enforce the rule: received_qty cannot exceed qty
                         if (receivedQty > qty) {
                             receivedQty = qty;  // Reset to the maximum allowable value (qty)
-                            row.find('input[name="received_qty[]"]').val(receivedQty);  // Update the input field with the corrected value
+                            row.find('input[name="received_qty[]"]').val(receivedQty);  // Update the input field
                             alert('Received quantity cannot exceed the available quantity.');
                         }
-
+        
                         if (receivedQty < qty) {
                             allFullyReceived = false; // If any item is not fully received
                         }
                     });
-
+        
                     // Update status_receiving text
                     const status = allFullyReceived ? 'Delivered' : 'Partial Delivered';
-                    $('#status_receiving').text(status).removeClass().addClass('badge').addClass(
-                        allFullyReceived ? 'bg-inverse-success' : 'bg-inverse-info'
-                    );
+                    $('#status_receiving')
+                        .text(status)
+                        .removeClass()
+                        .addClass('badge')
+                        .addClass(allFullyReceived ? 'bg-inverse-success' : 'bg-inverse-info');
                 }
-
+        
                 // Listen for changes in received_qty inputs
                 $(document).on('input', 'input[name="received_qty[]"]', function () {
                     updateStatus(); // Recalculate status whenever received_qty is updated
                 });
-
+        
                 // Load purchase order items into the modal
                 $('.btn-view').on('click', function () {
                     const purchaseId = $(this).data('id');
                     const productsTable = $('#tablePurchaseOrder tbody');
-
+        
                     // Clear any previous data from the table
                     productsTable.empty();
-
+        
                     // Set the purchase_id in the hidden input
                     $('#purchase_id').val(purchaseId);
-
+        
                     $.ajax({
                         url: `/fetch-purchase-order/${purchaseId}`,
                         method: 'GET',
                         success: function (response) {
                             if (response.purchaseOrders) {
                                 let addedProductCodes = new Set(); // To track added product codes
-
+        
                                 response.purchaseOrders.forEach(order => {
                                     order.items.forEach(item => {
                                         if (!addedProductCodes.has(item.product_code)) {
@@ -199,13 +201,13 @@
                                                     <td><input class="form-control" name="qty[]" value="${item.remaining_qty || '0'}" readonly></td>
                                                     <td><input class="form-control" name="received_qty[]" value="${item.received_qty || '0'}" ${isRemainingZero ? 'readonly' : ''}></td>
                                                     <input type="hidden" name="product_id[]" value="${item.id}">
+                                                    <input type="hidden" name="garage_name" value="${order.garageName}">
                                                 </tr>`;
                                             productsTable.append(row);
                                             addedProductCodes.add(item.product_code); // Mark this product as added
                                         }
                                     });
-                                });
-
+                                });       
                                 // Initial status calculation
                                 updateStatus();
                             } else {
@@ -218,7 +220,7 @@
                     });
                 });
             });
-        </script>
+        </script>        
         
     @endsection
 @endsection

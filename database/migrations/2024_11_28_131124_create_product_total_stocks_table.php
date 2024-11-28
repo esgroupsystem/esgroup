@@ -13,17 +13,10 @@ return new class extends Migration
     {
         Schema::create('product_total_stocks', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('product_id');
+            $table->string('product_id');
             $table->integer('InQty');
             $table->integer('OutQty');
             $table->timestamps();
-            $table->index('product_id');
-
-            // Add the foreign key constraint inside the closure
-            $table->foreign('product_id')
-                  ->references('id')
-                  ->on('products')
-                  ->onDelete('cascade');
         });
     }
 
