@@ -71,12 +71,12 @@ class PartsOutController extends Controller
                 'product_units.unit_name',
                 'products.product_parts_details',
                 'products.product_serial',
+                'products.id',
             )
             ->leftJoin('product_brands', 'product_brands.id', '=', 'products.product_brand')
             ->leftJoin('product_units', 'product_units.id', '=', 'products.product_unit')
             ->where('products.product_code', $productCode)
             ->first();
-        
         if (!$product) {
             return response()->json(['success' => false, 'message' => 'Product not found for code: ' . $productCode]);
         }
@@ -100,4 +100,37 @@ class PartsOutController extends Controller
     
         return response()->json(['success' => true, 'product_codes' => $productCodes]);
     }
+
+    // Fetch total qty of each product and check what garage
+    public function getStockByGarage(Request $request)
+    {
+        $garageName = $request->input('garage_name');
+        $productId = $request->input('product_id');
+    
+        // Determine the table based on the garage name
+        $stock = null;
+        switch ($garageName) {
+            case 'Mirasol':
+                $stock = product_total_stocks::where('product_id', $productId)->first();
+                break;
+            case 'VGC':
+                $stock = ProductStockVGC::where('product_id', $productId)->first();
+                break;
+            case 'Balintawak':
+                $stock = ProductStockBalintawak::where('product_id', $productId)->first();
+                break;
+            default:
+                return response()->json(['success' => false, 'message' => 'Invalid garage name']);
+        }
+    
+        if ($stock) {
+            // If InQty or OutQty is null, use 0 as default
+            $stockQty = (($stock->InQty ?? 0) - ($stock->OutQty ?? 0)); // Calculate available stock
+            return response()->json(['success' => true, 'stockQty' => $stockQty]);
+        }
+    
+        return response()->json(['success' => false, 'message' => 'Stock not found for the selected product']);
+    }
+    
+
 }

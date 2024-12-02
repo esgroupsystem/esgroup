@@ -90,9 +90,9 @@ class ProductController extends Controller
                                ->orderBy('id', 'desc')
                                ->first();
         
-        $nextProductNumber = $lastProduct ? intval(substr($lastProduct->product_code, -5)) + 1 : 1;
+        $nextProductNumber = $lastProduct ? intval(substr($lastProduct->product_code, -3)) + 1 : 1;
         do {
-            $formattedCode = $categoryCode . '-' . str_pad($nextProductNumber, 5, '0', STR_PAD_LEFT);
+            $formattedCode = $categoryCode . '-' . str_pad($nextProductNumber, 3, '0', STR_PAD_LEFT);
             $existingProduct = Products::where('product_code', $formattedCode)->first();
     
             if ($existingProduct) {

@@ -384,9 +384,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
         Route::get('/get-latest-partout-id', 'getLatestPartOutID')->middleware('auth');
         Route::get('/get-product-parts', 'getProductsByCategory')->middleware('auth');
         Route::get('/get-product-parts-codes', 'getProductCodes')->middleware('auth');
-        Route::get('/get-mirasol-stock', 'getMirasolStock')->middleware('auth');
-        Route::get('/get-vgc-stock', 'getVGCStock')->middleware('auth');
-        Route::get('/get-balintawak-stock', 'getBalintawakStock')->middleware('auth');
+        Route::get('/get-stock-by-garage', 'getStockByGarage')->middleware('auth');
     });
 
 });

@@ -59,12 +59,11 @@
                             <div class="col-sm-6 col-md-4">
                                 <div class="form-group">
                                     <label>Kilometers <span class="text-danger">*</span></label>
-                                    <input class="form-control" type="number" name="kilometers" placeholder="Enter Kilometers" required>
+                                    <input class="form-control" type="number" name="kilometers" placeholder="Enter Kilometers">
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Products to Part-Out -->
                         <!-- Products to Part-Out -->
                         <div class="row">
                             <div class="col-md-12 col-sm-12">
@@ -77,9 +76,10 @@
                                                 <th>Serial</th>
                                                 <th>Product Name</th>
                                                 <th>Brand</th>
-                                                <th>Unit</th>
+                                                <th class="col-md-1">Unit</th>
                                                 <th>Details</th>
-                                                <th>Quantity</th>
+                                                <th class="col-md-1">Total Qty</th>
+                                                <th class="col-md-1">Quantity</th>
                                                 <th></th>
                                             </tr>
                                         </thead>
@@ -103,9 +103,11 @@
                                                 <td><input class="form-control" type="text" name="brand[]" readonly disabled></td>
                                                 <td><input class="form-control" type="text" name="unit[]" readonly disabled></td>
                                                 <td><input class="form-control" type="text" name="details[]" readonly disabled></td>
+                                                <td><input class="form-control" type="text" name="total_qty[]" readonly disabled></td>
+                                                <td hidden><input class="form-control" type="text" name="name_id[]" readonly></td>
                                                 <td><input class="form-control" type="number" name="quantity[]" placeholder="Enter Quantity" required disabled></td>
                                                 <td class="text-center">
-                                                    <a href="javascript:void(0)" class="text-success font-18 add-row" title="Add"><i class="fa fa-plus"></i></a>
+                                                    <a href="javascript:void(0)" class="text-success font-18 add-row" title="Add" id="addBtn"><i class="fa fa-plus"></i></a>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -113,7 +115,6 @@
                                 </div>
                             </div>
                         </div>
-
 
                         <!-- Submit Button -->
                         <div class="submit-section">
@@ -129,90 +130,137 @@
 
 @section('script')
     <script>
-            $(document).ready(function() {
-                // Disable the table fields initially
-                disableTableFields();
+        $(document).ready(function() {
+            // Disable the table fields initially
+            disableTableFields();
 
-                // Fetch and set Part-Out ID
-                $.getJSON('/get-latest-partout-id', function(data) {
+            // Fetch and set Part-Out ID
+            $.getJSON('/get-latest-partout-id', function(data) {
+                if (data.success) {
+                    $('#auto_partout_id').val(data.latest_id);
+                }
+            });
+
+            // Load product codes on category change
+            $(document).on('change', '.category-select', function() {
+                const row = $(this).closest('tr');
+                const categoryId = $(this).val();
+
+                $.getJSON('/get-product-parts-codes', { category: categoryId }, function(data) {
+                    const productCodeSelect = row.find('.product-code-select');
+                    productCodeSelect.empty().append('<option value="">Select Product Code</option>');
                     if (data.success) {
-                        $('#auto_partout_id').val(data.latest_id);
-                    }
-                });
-
-                // Load product codes on category change
-                $(document).on('change', '.category-select', function() {
-                    const row = $(this).closest('tr');
-                    const categoryId = $(this).val();
-
-                    $.getJSON('/get-product-parts-codes', { category: categoryId }, function(data) {
-                        const productCodeSelect = row.find('.product-code-select');
-                        productCodeSelect.empty().append('<option value="">Select Product Code</option>');
-                        if (data.success) {
-                            data.product_codes.forEach(function(code) {
-                                productCodeSelect.append(`<option value="${code.code}">${code.code}</option>`);
-                            });
-                        } else {
-                            alert(data.message || 'No product codes found for this category.');
-                        }
-                    });
-                });
-
-                // Load product details on product code change
-                $(document).on('change', '.product-code-select', function() {
-                    const row = $(this).closest('tr'); // Get the current row
-                    const productCode = $(this).val(); // Get the selected product code
-
-                    if (productCode) {
-                        $.getJSON('/get-product-parts', { product_code: productCode }, function(data) {
-                            if (data.success) {
-                                // Populate the fields with the fetched product details
-                                row.find('input[name="serial[]"]').val(data.product.product_serial);
-                                row.find('input[name="product_name[]"]').val(data.product.product_name);
-                                row.find('input[name="brand[]"]').val(data.product.brand_name);
-                                row.find('input[name="unit[]"]').val(data.product.unit_name);
-                                row.find('input[name="details[]"]').val(data.product.product_parts_details);
-                            } else {
-                                alert(data.message || "Product details not found!");
-                            }
+                        data.product_codes.forEach(function(code) {
+                            productCodeSelect.append(`<option value="${code.code}">${code.code}</option>`);
                         });
                     } else {
-                        // Clear the fields if no product code is selected
-                        row.find('input[name="serial[]"]').val('');
-                        row.find('input[name="product_name[]"]').val('');
-                        row.find('input[name="brand[]"]').val('');
-                        row.find('input[name="unit[]"]').val('');
-                        row.find('input[name="details[]"]').val('');
+                        alert(data.message || 'No product codes found for this category.');
                     }
                 });
-
-                // Add new row
-                $(document).on('click', '.add-row', function() {
-                    const newRow = $('#tablePartsOut tbody tr:first').clone();
-                    newRow.find('input, select').val('').prop('disabled', true); // Disable new row inputs
-                    $('#tablePartsOut tbody').append(newRow);
-                });
-
-                // Enable table when garage is selected
-                $('#garage').change(function() {
-                    if ($(this).val()) {
-                        enableTableFields();
-                    } else {
-                        disableTableFields();
-                    }
-                });
-
-                // Function to disable table fields
-                function disableTableFields() {
-                    $('#tablePartsOut tbody tr').find('input, select').prop('disabled', true);
-                }
-
-                // Function to enable table fields
-                function enableTableFields() {
-                    $('#tablePartsOut tbody tr').find('input, select').prop('disabled', false);
-                }
-                
             });
+
+            // Load product details on product code change
+            $(document).on('change', '.product-code-select', function() {
+                const row = $(this).closest('tr');
+                const productCode = $(this).val();
+                const garageName = $('#garage').val();
+
+                if (productCode && garageName) {
+                    $.getJSON('/get-product-parts', { product_code: productCode }, function(data) {
+                        if (data.success) {
+                            row.find('input[name="serial[]"]').val(data.product.product_serial);
+                            row.find('input[name="product_name[]"]').val(data.product.product_name);
+                            row.find('input[name="brand[]"]').val(data.product.brand_name);
+                            row.find('input[name="unit[]"]').val(data.product.unit_name);
+                            row.find('input[name="details[]"]').val(data.product.product_parts_details);
+                            row.find('input[name="name_id[]"]').val(data.product.id);
+
+                            // Fetch stock based on the garage name
+                            $.getJSON(`/get-stock-by-garage`, { garage_name: garageName, product_id: data.product.id }, function(stockData) {
+                                const stockQty = stockData.success && stockData.stockQty ? stockData.stockQty : 0;
+                                row.find('input[name="total_qty[]"]').val(stockQty);
+                            }).fail(function() {
+                                row.find('input[name="total_qty[]"]').val(0);
+                            });
+                        } else {
+                            alert(data.message || "Product details not found!");
+                        }
+                    });
+                } else {
+                    row.find('input, select').val(''); // Clear fields if no product code or garage
+                }
+            });
+
+            // Add validation to quantity input
+            $(document).on('input', 'input[name="quantity[]"]', function() {
+                const row = $(this).closest('tr');
+                const totalQty = parseFloat(row.find('input[name="total_qty[]"]').val()) || 0;
+                const inputQty = parseFloat($(this).val()) || 0;
+
+                if (inputQty > totalQty) {
+                    alert('Quantity cannot exceed the Total Quantity available.');
+                    $(this).val(0); // Reset quantity to 0
+                }
+            });
+
+            // Add new row
+            $(document).on('click', '.add-row', function() {
+                const garageName = $('#garage').val(); // Get the value of the garage field
+                const newRow = $('#tablePartsOut tbody tr:first').clone(); // Clone the first row
+
+                newRow.find('input, select').val(''); // Clear all input and select values
+                newRow.find('td:last').remove(); // Remove the last column to ensure no duplicate remove button
+
+                // Add the Remove button at the end of the new row
+                newRow.append(`
+                    <td>
+                        <a href="javascript:void(0)" class="text-danger font-18 remove" id="trashBIN" title="Remove"><i class="fa fa-trash-o"></i></a>
+                    </td>
+                `);
+
+                // Enable or disable the row fields based on the garage value
+                if (garageName) {
+                    newRow.find('input, select').prop('disabled', false); // Enable inputs
+                } else {
+                    newRow.find('input, select').prop('disabled', true); // Disable inputs
+                }
+
+                $('#tablePartsOut tbody').append(newRow); // Append the new row to the table body
+            });
+
+            // Remove row on clicking the remove button
+            $(document).on('click', '.remove', function() {
+                $(this).closest('tr').remove(); // Remove the row containing the clicked button
+            });
+
+            // Enable table and reset rows when garage is changed
+            $('#garage').change(function() {
+                const garageName = $(this).val();
+                if (garageName) {
+                    resetTableRows(); // Reset rows when garage changes
+                    enableTableFields(); // Enable all rows
+                } else {
+                    disableTableFields(); // Disable all rows if garage_name is empty
+                }
+            });
+
+            // Function to disable table fields
+            function disableTableFields() {
+                $('#tablePartsOut tbody tr').find('input, select').prop('disabled', true);
+            }
+
+            // Function to enable table fields
+            function enableTableFields() {
+                $('#tablePartsOut tbody tr').find('input, select').prop('disabled', false);
+            }
+
+            // Function to reset all table rows
+            function resetTableRows() {
+                $('#tablePartsOut tbody tr').each(function() {
+                    $(this).find('input, select').val(''); // Clear all inputs and selects
+                });
+            }
+        });
     </script>
 
 
