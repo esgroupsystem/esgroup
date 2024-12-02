@@ -45,7 +45,7 @@
                         <i class="la la-money-bill-wave"></i> <span>Purchase Order</span> <span class="menu-arrow"></span>
                     </a>
                     <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">
-                        <li><a class="{{set_active(['purchase.index'])}}" href="{{ route('purchase.index') }}">Purchasing Request</a></li>
+                        <li><a class="{{set_active(['purchase.index'])}}" href="{{ route('purchase.index') }}">Manage Request</a></li>
                     </ul>
                 </li>
                 <li class="{{set_active(['receiving.index'])}} submenu">
@@ -53,9 +53,18 @@
                         <i class="la la-truck"></i> <span>Receving</span> <span class="menu-arrow"></span>
                     </a>
                     <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">
-                        <li><a class="{{set_active(['receiving.index'])}}" href="{{ route('receiving.index') }}">Receving Orders</a></li>
+                        <li><a class="{{set_active(['receiving.index'])}}" href="{{ route('receiving.index') }}">Manage Orders</a></li>
                     </ul>
                 </li>
+                <li class="{{set_active(['receiving.index'])}} submenu">
+                    <a href="#" class="{{ set_active(['receiving.index']) ? 'noti-dot' : '' }}">
+                        <i class="la la-tools"></i> <span>Parts Out</span> <span class="menu-arrow"></span>
+                    </a>
+                    <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">
+                        <li><a class="{{set_active(['view.index'])}}" href="{{ route('view.index') }}">Manage Parts</a></li>
+                    </ul>
+                </li>
+                
                 <!--*
                     *
                     * IT DEPARTMENT LISTING
@@ -64,7 +73,7 @@
                 <li class="menu-title"> <span>IT</span> </li>
                     <li class="{{set_active(['form/joborders/page', 'form/joborders/save', 'form/joborders/update', 'form/joborders/delete'])}} submenu">
                     <a href="#" class="{{ set_active(['form/joborders/page', 'form/joborders/save', 'form/joborders/update', 'form/joborders/delete']) ? 'noti-dot' : '' }}">
-                    <i class="la la-bus"></i> <span>Bus Concern</span> <span class="menu-arrow"></span>
+                    <i class="la la-car-crash"></i> <span>Bus Concern</span> <span class="menu-arrow"></span>
                     </a>
                     <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">
                         <li><a class="{{set_active(['form/joborders/page'])}}" href="{{ route('form/joborders/page') }}">Job Orders</a></li>

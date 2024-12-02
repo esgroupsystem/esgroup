@@ -377,5 +377,16 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
         Route::get('/get-product-details', 'getProductDetails')->middleware('auth');
         Route::post('/saving/request', 'saveRequest')->middleware('auth')->name('save.request');
     });
+            // ---------------------- Parts Out information  -----------------------//
+    Route::controller(PartsOutController::class)->group(function () {
+        Route::get('/part-out/product/Index', 'mainIndex')->middleware('auth')->name('view.index');
+        Route::get('/create-partsout','createRequest')->middleware('auth')->name('create.parts');
+        Route::get('/get-latest-partout-id', 'getLatestPartOutID')->middleware('auth');
+        Route::get('/get-product-parts', 'getProductsByCategory')->middleware('auth');
+        Route::get('/get-product-parts-codes', 'getProductCodes')->middleware('auth');
+        Route::get('/get-mirasol-stock', 'getMirasolStock')->middleware('auth');
+        Route::get('/get-vgc-stock', 'getVGCStock')->middleware('auth');
+        Route::get('/get-balintawak-stock', 'getBalintawakStock')->middleware('auth');
+    });
 
 });
