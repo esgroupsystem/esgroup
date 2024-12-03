@@ -26,12 +26,15 @@ use Auth;
 
 class PartsOutController extends Controller
 {
-    public function mainIndex(Request $request){
-
-         $partsrecords = PartsOut::get();
-
-         return view('partsout.partsout', compact('partsrecords'));
+    public function mainIndex(Request $request)
+    {
+        $partsrecords = PartsOut::leftJoin('product_categories', 'parts_outs.product_category', '=', 'product_categories.id')
+            ->select('parts_outs.*', 'product_categories.category_name as category_name')
+            ->get();
+    
+        return view('partsout.partsout', compact('partsrecords'));
     }
+    
 
     public function createRequest(Request $request){
         
@@ -61,6 +64,7 @@ class PartsOutController extends Controller
         ]);
     }
 
+
     // Fetch data associate from that product code
     public function getProductsByCategory(Request $request)
     {
@@ -77,6 +81,7 @@ class PartsOutController extends Controller
             ->leftJoin('product_units', 'product_units.id', '=', 'products.product_unit')
             ->where('products.product_code', $productCode)
             ->first();
+
         if (!$product) {
             return response()->json(['success' => false, 'message' => 'Product not found for code: ' . $productCode]);
         }
@@ -87,6 +92,7 @@ class PartsOutController extends Controller
         ]);
     }
     
+
     // Fetch Product Code in select Category in view
     public function getProductCodes(Request $request){
         $categoryId = $request->input('category');
@@ -101,13 +107,13 @@ class PartsOutController extends Controller
         return response()->json(['success' => true, 'product_codes' => $productCodes]);
     }
 
+
     // Fetch total qty of each product and check what garage
     public function getStockByGarage(Request $request)
     {
         $garageName = $request->input('garage_name');
         $productId = $request->input('product_id');
     
-        // Determine the table based on the garage name
         $stock = null;
         switch ($garageName) {
             case 'Mirasol':
@@ -124,13 +130,113 @@ class PartsOutController extends Controller
         }
     
         if ($stock) {
-            // If InQty or OutQty is null, use 0 as default
-            $stockQty = (($stock->InQty ?? 0) - ($stock->OutQty ?? 0)); // Calculate available stock
+
+            $stockQty = (($stock->InQty ?? 0) - ($stock->OutQty ?? 0));
             return response()->json(['success' => true, 'stockQty' => $stockQty]);
         }
     
         return response()->json(['success' => false, 'message' => 'Stock not found for the selected product']);
     }
-    
 
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+    
+        // Search for products by name (modify as necessary)
+        $products = Products::where('product_name', 'like', '%' . $query . '%')->get();
+    
+        return response()->json([
+            'success' => true,
+            'products' => $products,
+        ]);
+    }
+
+    
+    // POST adding Parts-Out Transaction
+    public function saveParts(Request $request)
+    {
+        $request->validate([
+            'partout_id'      => 'required|string|max:255',
+            'bus_details'     => 'required|string|max:255',
+            'gar_name'        => 'required|string|max:255',
+            'kilometers'      => 'required|numeric|min:0',
+            'category_id'     => 'required|array',
+            'category_id.*'   => 'required|string|max:255',
+            'product_code'    => 'required|array',
+            'product_code.*'  => 'required|string|max:255',
+            'serial'          => 'required|array',
+            'serial.*'        => 'nullable|string|max:255',
+            'product_name'    => 'required|array',
+            'product_name.*'  => 'required|string|max:255',
+            'brand'           => 'required|array',
+            'brand.*'         => 'required|string|max:255',
+            'unit'            => 'required|array',
+            'unit.*'          => 'required|string|max:255',
+            'details'         => 'required|array',
+            'details.*'       => 'nullable|string|max:255',
+            'total_qty'       => 'required|array',
+            'total_qty.*'     => 'required|numeric|min:0',
+            'quantity'        => 'required|array',
+            'quantity.*'      => 'required|numeric|min:1',
+            'name_id'         => 'required|array',
+            'name_id.*'       => 'required|numeric',
+        ]);
+    
+        DB::beginTransaction();
+        try {
+            // Map the garage name to the corresponding model
+            $stockModels = [
+                'Mirasol' => \App\Models\product_total_stocks::class,
+                'VGC' => \App\Models\ProductStockVGC::class,
+                'Balintawak' => \App\Models\ProductStockBalintawak::class,
+            ];
+    
+            $garageName = $request->gar_name;
+    
+            if (!isset($stockModels[$garageName])) {
+                throw new \Exception('Invalid garage name.');
+            }
+    
+            $stockModel = $stockModels[$garageName];
+    
+            foreach ($request->product_code as $key => $productCode) {
+                // Create the PartOut record with default value handling
+                $partOut = PartsOut::create([
+                    'partsout_id'    => $request->partout_id,
+                    'product_category' => $request->category_id[$key],
+                    'product_code'  => $productCode,
+                    'product_serial' => $request->serial[$key] ?? null, // Set to null if not provided
+                    'product_name'  => $request->product_name[$key],
+                    'product_brand' => $request->brand[$key],
+                    'product_unit'  => $request->unit[$key],
+                    'product_details' => $request->details[$key] ?? null, // Set to null if not provided
+                    'product_outqty' => $request->quantity[$key],
+                    'bus_number'    => $request->bus_details ?? null, // Default to null if not provided
+                    'kilometers'    => $request->kilometers,
+                    'status'        => 'Done',
+                    'date_partsout' => Carbon::now(),
+                ]);
+    
+                // Update the stock in the corresponding model
+                $stockRecord = $stockModel::where('product_id', $request->name_id[$key])->first();
+    
+                if ($stockRecord) {
+                    $stockRecord->OutQty += $request->quantity[$key];
+                    $stockRecord->save();
+                } else {
+                    throw new \Exception('Stock record not found for product ID: ' . $request->name_id[$key]);
+                }
+            }
+    
+            DB::commit();
+            flash()->success('Successfully saved the Part Out request.');
+            return redirect()->route('view.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+            \Log::error('Part Out save failed: ' . $e->getMessage());
+            flash()->error('Failed to save the Part Out request. Please try again.');
+            return redirect()->back()->withInput();
+        }
+    }
+    
 }

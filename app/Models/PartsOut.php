@@ -10,7 +10,7 @@ class PartsOut extends Model
     use HasFactory;
 
     protected $fillable = [
-
+        'partsout_id',
         'product_category',
         'product_code',
         'product_name',
@@ -20,6 +20,7 @@ class PartsOut extends Model
         'product_details',
         'product_outqty',
         'date_partsout',
+        'bus_number',
         'kilometers',
         'status',
     ];

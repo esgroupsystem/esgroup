@@ -75,20 +75,22 @@
                                     <th>Unit</th>
                                     <th>Details</th>
                                     <th>Date Issue</th>
-                                    <th class="text-right">Action</th>
+                                    {{-- <th class="text-right">Action</th> --}}
                                 </tr>
                             </thead>
                             <tbody>
-                                {{-- @foreach ($estimates as $item )
+                                @foreach ($partsrecords as $item )
                                 <tr>
-                                    <td hidden class="ids">{{ $item->id }}</td>
-                                    <td hidden class="estimate_number">{{ $item->estimate_number }}</td>
-                                    <td><a href="{{ url('estimate/view/'.$item->estimate_number) }}">{{ $item->estimate_number }}</a></td>
-                                    <td>{{ $item->client }}</td>
-                                    <td>{{date('d F, Y',strtotime($item->estimate_date)) }}</td>
-                                    <td>{{date('d F, Y',strtotime($item->expiry_date)) }}</td>
-                                    <td>${{ $item->total }}</td>
-                                    <td><span class="badge bg-inverse-success">Accepted</span></td>
+                                    <td hidden>{{ $item->id }}</td>
+                                    <td>{{ $item->category_name }}</td>
+                                    <td>{{ $item->product_code }}</td>
+                                    <td>{{ $item->product_name }}</td>
+                                    <td>{{ $item->product_serial }}</td>
+                                    <td>{{ $item->product_brand }}</td>
+                                    <td>{{ $item->product_unit }}</td>
+                                    <td>{{ $item->product_details }}</td>
+                                    <td>{{ $item->date_partsout }}</td>
+                                    {{-- <td><span class="badge bg-inverse-success">Accepted</span></td>
                                     <td class="text-right">
                                         <div class="dropdown dropdown-action">
                                             <a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -99,9 +101,9 @@
                                                 <a class="dropdown-item delete_estimate" href="#" data-toggle="modal" data-target="#delete_estimate"><i class="fa fa-trash-o m-r-5"></i> Delete</a>
                                             </div>
                                         </div>
-                                    </td>
+                                    </td> --}}
                                 </tr>
-                                @endforeach --}}
+                                @endforeach
                             </tbody>
                         </table>
                     </div>

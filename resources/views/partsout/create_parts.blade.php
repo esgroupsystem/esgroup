@@ -20,7 +20,7 @@
 
             <div class="row">
                 <div class="col-sm-12">
-                    <form action="#" method="POST">
+                    <form action="{{ route('save.partsout') }}" method="POST">
                         @csrf
                         <!-- Part-Out ID -->
                         <div class="row">
@@ -30,8 +30,15 @@
                                     <input class="form-control" id="auto_partout_id" name="partout_id" readonly required>
                                 </div>
                             </div>
+                            <div class="col-md-2 float-right ml-auto">
+                                <div class="form-group position-relative">
+                                    <label for="product_search">Search Product Name:</label>
+                                    <input type="text" class="form-control" id="product_search" placeholder="Enter Product Name" />
+                                    <ul id="product-search-results" class="list-group"></ul>
+                                </div>
+                            </div>
                         </div>
-
+                        
                         <!-- Bus Details and Kilometers -->
                         <div class="row">
                             <div class="col-sm-6 col-md-4">
@@ -98,13 +105,13 @@
                                                         <option value="">Select Product Code</option>
                                                     </select>
                                                 </td>
+                                                <td hidden><input class="form-control" type="text" name="name_id[]" readonly></td>
                                                 <td><input class="form-control" type="text" name="serial[]" readonly disabled></td>
                                                 <td><input class="form-control" type="text" name="product_name[]" readonly disabled></td>
                                                 <td><input class="form-control" type="text" name="brand[]" readonly disabled></td>
                                                 <td><input class="form-control" type="text" name="unit[]" readonly disabled></td>
                                                 <td><input class="form-control" type="text" name="details[]" readonly disabled></td>
                                                 <td><input class="form-control" type="text" name="total_qty[]" readonly disabled></td>
-                                                <td hidden><input class="form-control" type="text" name="name_id[]" readonly></td>
                                                 <td><input class="form-control" type="number" name="quantity[]" placeholder="Enter Quantity" required disabled></td>
                                                 <td class="text-center">
                                                     <a href="javascript:void(0)" class="text-success font-18 add-row" title="Add" id="addBtn"><i class="fa fa-plus"></i></a>
@@ -262,6 +269,81 @@
             }
         });
     </script>
+    <script>
+        $(document).ready(function() {
+    // Handle the product search input
+    $('#product_search').on('keyup', function() {
+        const query = $(this).val();
+
+        if (query.length > 1) { // Only trigger search if more than 2 characters are typed
+            $.ajax({
+                url: '/search-products', // Endpoint to handle the search
+                method: 'GET',
+                data: { query: query },
+                success: function(data) {
+                    const resultsContainer = $('#product-search-results');
+                    resultsContainer.empty(); // Clear previous results
+                    
+                    if (data.success && data.products.length > 0) {
+                        data.products.forEach(function(product) {
+                            const resultItem = `
+                                <li class="list-group-item" 
+                                    data-id="${product.id}" 
+                                    data-code="${product.product_code}" 
+                                    data-name="${product.product_name}" 
+                                    data-serial="${product.product_serial}" 
+                                    data-brand="${product.product_brand}" 
+                                    data-unit="${product.product_unit}" 
+                                    data-details="${product.product_details}">
+                                    ${product.product_code} - (${product.product_name}) - ${product.product_parts_details}
+                                </li>`;
+                            resultsContainer.append(resultItem);
+                        });
+                        resultsContainer.show(); // Show the results dropdown
+                    } else {
+                        resultsContainer.hide(); // Hide if no results found
+                    }
+                },
+                error: function() {
+                    alert('Error fetching product data.');
+                }
+            });
+        } else {
+            $('#product-search-results').hide(); // Hide if query is too short
+        }
+    });
+
+    // Handle the click on a product result
+    $(document).on('click', '#product-search-results li', function() {
+        const selectedProduct = $(this);
+        
+        // Display the product details in a simple view or alert
+        const productDetails = `
+            <p><strong>Product Name:</strong> ${selectedProduct.data('name')}</p>
+            <p><strong>Serial:</strong> ${selectedProduct.data('serial')}</p>
+            <p><strong>Brand:</strong> ${selectedProduct.data('brand')}</p>
+            <p><strong>Unit:</strong> ${selectedProduct.data('unit')}</p>
+            <p><strong>Details:</strong> ${selectedProduct.data('details')}</p>
+        `;
+        
+        // Show the details in a modal or a dedicated area
+        $('#product-details').html(productDetails); // Assuming there's an element with id="product-details" to display this info.
+
+        // Hide the dropdown after selection
+        $('#product-search-results').hide();
+    });
+
+    // Hide dropdown if clicked outside
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#product_search').length) {
+            $('#product-search-results').hide();
+        }
+    });
+});
+        </script>
+
+
+
 
 
 @endsection

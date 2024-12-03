@@ -385,6 +385,8 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
         Route::get('/get-product-parts', 'getProductsByCategory')->middleware('auth');
         Route::get('/get-product-parts-codes', 'getProductCodes')->middleware('auth');
         Route::get('/get-stock-by-garage', 'getStockByGarage')->middleware('auth');
+        Route::get('/search-products', 'search');
+        Route::post('/saving-parts-outs', 'saveParts')->middleware('auth')->name('save.partsout');
     });
 
 });

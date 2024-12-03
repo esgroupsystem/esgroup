@@ -8761,3 +8761,29 @@ ul.comment-list li ul.children {
 .custom-modal-wide .modal-dialog {
 	max-width: 100%; /* You can adjust this to your desired width */
 }
+
+
+/** Parts- Out **/
+
+.form-group.position-relative {
+    position: relative;
+}
+
+#product-search-results {
+    display: none; 
+    position: absolute;
+    z-index: 999;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+    background-color: white;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    left: 0;
+    top: 100%;
+}
+
+#product-search-results .list-group-item {
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+}
