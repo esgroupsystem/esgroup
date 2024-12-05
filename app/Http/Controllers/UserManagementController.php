@@ -102,6 +102,9 @@ class UserManagementController extends Controller
             'Super Admin' => 'bg-inverse-warning',
             'Normal User' => 'bg-inverse-info',
             'Client'      => 'bg-inverse-success',
+            'HR' => 'bg-inverse-warning',
+            'IT' => 'bg-inverse-info',
+            'Safety Officer'      => 'bg-inverse-success',
             'Employee'    => 'bg-inverse-dark',
         ];
         
