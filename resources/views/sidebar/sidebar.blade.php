@@ -3,8 +3,6 @@
 <div class="sidebar" id="sidebar">
     <div class="sidebar-inner slimscroll">
         <div id="sidebar-menu" class="sidebar-menu">
-        @if (Auth::user()->role_name=='Admin')
-            @if (Auth::user()->role_name=='HR' || Auth::user()->role_name == 'Admin')
             <ul>
                 <li class="menu-title">
                     <span>Main</span>
@@ -19,12 +17,13 @@
                         <li><a class="{{set_active(['em/dashboard'])}}" href="{{ route('em/dashboard') }}">Employee Dashboard</a></li>
                     </ul>
                 </li>
-                @endif
                 <!--*
                     *
                     * AUTHENTICATION LISTING
                     *
                     *-->
+            @if (Auth::user()->role_name == 'Admin')
+
                 <li class="menu-title"> <span>Authentication</span> </li>
                     <li class="{{set_active(['search/user/list','userManagement','activity/log','activity/login/logout'])}} submenu">
                         <a href="#" class="{{ set_active(['search/user/list','userManagement','activity/log','activity/login/logout']) ? 'noti-dot' : '' }}">
@@ -34,11 +33,14 @@
                             <li><a class="{{set_active(['search/user/list','userManagement'])}}" href="{{ route('userManagement') }}">All User</a></li>
                         </ul>
                     </li>
+
+            @endif
                     <!--*
                     *
                     * PURCHASE ORDER LISTING
                     *
                     *-->
+            @if (Auth::user()->role_name=='Maintenance' || Auth::user()->role_name == 'Admin')       
                 <li class="menu-title"> <span>Request P/O</span> </li>
                     <li class="{{set_active(['purchase.index','mainIndex'])}} submenu">
                     <a href="#" class="{{ set_active(['purchase.index', 'mainIndex']) ? 'noti-dot' : '' }}">
@@ -72,12 +74,13 @@
                         <li><a class="{{set_active(['transfer.index'])}}" href="{{ route('transfer.index') }}">Transfer Records</a></li>
                     </ul>
                 </li>
-                
+            @endif
                 <!--*
                     *
                     * IT DEPARTMENT LISTING
                     *
                     *-->
+            @if (Auth::user()->role_name=='IT' || Auth::user()->role_name == 'Admin')        
                 <li class="menu-title"> <span>IT</span> </li>
                     <li class="{{set_active(['form/joborders/page', 'form/joborders/save', 'form/joborders/update', 'form/joborders/delete'])}} submenu">
                     <a href="#" class="{{ set_active(['form/joborders/page', 'form/joborders/save', 'form/joborders/update', 'form/joborders/delete']) ? 'noti-dot' : '' }}">
@@ -87,12 +90,13 @@
                         <li><a class="{{set_active(['form/joborders/page'])}}" href="{{ route('form/joborders/page') }}">Job Orders</a></li>
                     </ul>
                 </li>
+            @endif
                 <!--*
                     *
                     * ALL EMPLOYEE LISTING
                     *
                     *-->
-                @if (Auth::user()->role_name=='HR' || Auth::user()->role_name == 'Admin')
+            @if (Auth::user()->role_name=='HR' || Auth::user()->role_name == 'Admin')
                 <li class="menu-title"> <span>Employees</span> </li>
                 <li class="{{set_active(['all/employee/list','all/employee/list','all/employee/card','form/holidays/new','form/leaves/new',
                     'form/leavesemployee/new','form/leavesettings/page','attendance/page',
@@ -121,7 +125,6 @@
                         <li><a class="{{set_active(['form/overtime/page'])}}" href="{{ route('form/overtime/page') }}">Overtime</a></li>
                     </ul>
                 </li>
-                @endif
                 <!--*
                     *
                     *   HR DEPARTMENT LISTING
@@ -214,11 +217,13 @@
                         <li><a class="{{set_active(['page/aptitude/result'])}}" href="{{ route('page/aptitude/result') }}"> Aptitude Results </a></li>
                     </ul>
                 </li>
+            @endif    
                 <!--*
                     *
                     *   MAINTENANCE LISTING
                     *
                     *-->
+            @if (Auth::user()->role_name=='Maintenance' || Auth::user()->role_name == 'Admin')
                 <li class="menu-title"> <span>Maintenance</span> </li>
                     <li class="{{set_active(['category/list', 'form/saving', 'form/delete', 'brand/list', 
                                             'form/brand/saving', 'form/brand/update', 'form/brand/delete',
@@ -256,7 +261,7 @@
                     </ul>
                 </li>
             </ul>
-            @endif
+        @endif
         </div>
     </div>
 </div>
