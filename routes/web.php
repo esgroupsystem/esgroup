@@ -388,5 +388,16 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
         Route::get('/search-products', 'search');
         Route::post('/saving-parts-outs', 'saveParts')->middleware('auth')->name('save.partsout');
     });
+                // ---------------------- Stock Tranfers information  -----------------------//
+    Route::controller(StockTransferController::class)->group(function () {
+        Route::get('/stock-transfer/index', 'transferIndex')->middleware('auth')->name('transfer.index');
+        Route::get('/stock-transfer/create', 'createTransfer')->middleware('auth')->name('transfer.create');
+        Route::get('/get-latest-transfer-id', 'getLatestTransferID')->middleware('auth');
+        Route::get('/get-product-parts', 'getProductsByCategory')->middleware('auth');
+        Route::get('/get-product-parts-codes', 'getProductCodes')->middleware('auth');
+        Route::get('/get-stock-by-garage', 'getStockByGarage')->middleware('auth');
+        Route::get('/search-products', 'search');
+        Route::post('/stock-transfer/saving', 'saveTransfer')->middleware('auth')->name('transfer.saving');
+    });
 
 });

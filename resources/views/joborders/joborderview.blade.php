@@ -159,7 +159,7 @@
                                                             <!-- Show file name as clickable link -->
                                                             <a href="#" class="view-video" data-file-path="{{ asset('storage/' . $file->file_path) }}">
                                                                 {{ $file->file_name }} <p class="text-muted">(Click the link above to watch video)</p>
-                                                            </a>
+                                                            </a>    
                                                         @else
                                                             <img src="{{ asset('storage/' . $file->file_path) }}" alt="{{ $file->file_name }}" class="img-fluid" />
                                                         @endif
@@ -349,6 +349,22 @@
                     // Optional: Trigger search on a button click
                     $('.btn_search').on('click', function() {
                         table.draw();
+                    });
+                });
+            </script>
+
+            <script>
+                document.querySelectorAll('.view-video').forEach(function(link) {
+                    link.addEventListener('click', function(event) {
+                        event.preventDefault();  // Prevent the default link behavior
+                        const filePath = this.getAttribute('data-file-path');  // Get the file path from the data attribute
+                        const modal = new bootstrap.Modal(document.getElementById('videoModal'));  // Bootstrap modal
+                        const videoElement = document.getElementById('videoPreview');
+                        
+                        console.log('File Path: ', filePath);
+
+                        videoElement.src = filePath;  // Set the source of the video element
+                        modal.show();  // Show the modal
                     });
                 });
             </script>

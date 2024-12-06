@@ -64,6 +64,14 @@
                         <li><a class="{{set_active(['view.index'])}}" href="{{ route('view.index') }}">Manage Parts</a></li>
                     </ul>
                 </li>
+                <li class="{{set_active(['transfer.index'])}} submenu">
+                    <a href="#" class="{{ set_active(['transfer.index']) ? 'noti-dot' : '' }}">
+                        <i class="la la-retweet"></i> <span>Stock Transfers</span> <span class="menu-arrow"></span>
+                    </a>
+                    <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">
+                        <li><a class="{{set_active(['transfer.index'])}}" href="{{ route('transfer.index') }}">Transfer Records</a></li>
+                    </ul>
+                </li>
                 
                 <!--*
                     *
