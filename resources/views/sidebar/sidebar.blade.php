@@ -7,7 +7,7 @@
                 <li class="menu-title">
                     <span>Main</span>
                 </li>
-                <li class="{{set_active(['home','em/dashboard'])}} submenu">
+                <li class="{{set_active(['home','em/dashboard', 'stock/dashboard'])}} submenu">
                     <a href="#" class="{{ set_active(['home','em/dashboard']) ? 'noti-dot' : '' }}">
                         <i class="la la-dashboard"></i>
                         <span> Dashboard</span> <span class="menu-arrow"></span>
@@ -15,6 +15,7 @@
                     <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">
                         <li><a class="{{set_active(['home'])}}" href="{{ route('home') }}">Admin Dashboard</a></li>
                         <li><a class="{{set_active(['em/dashboard'])}}" href="{{ route('em/dashboard') }}">Employee Dashboard</a></li>
+                        <li><a class="{{set_active(['stock/dashboard'])}}" href="{{ route('stock/dashboard') }}">Stocks Dashboard</a></li>
                     </ul>
                 </li>
                 <!--*

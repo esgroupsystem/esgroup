@@ -14,4 +14,9 @@ class ProductCategory extends Model
         'category_status',
         'category_creator',
     ];
+
+    public function products()
+    {
+        return $this->hasMany(Products::class, 'product_category'); // Assuming 'category_id' is the foreign key
+    }
 }

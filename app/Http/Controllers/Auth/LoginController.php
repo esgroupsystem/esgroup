@@ -46,6 +46,11 @@ class LoginController extends Controller
 
                 $user->update(['last_login' => Carbon::now()->toDayDateTimeString()]);
                 
+                if ($user->role_name === 'Engineer') {
+                    flash()->success('Login successfully :)');
+                    return redirect()->intended('stock/dashboard');
+                }
+                
                 flash()->success('Login successfully :)');
                 return redirect()->intended('home');
             }
