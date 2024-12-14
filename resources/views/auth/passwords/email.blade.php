@@ -30,7 +30,7 @@
                                 <button class="btn btn-primary account-btn" type="submit">SEND</button>
                             </div>
                             <div class="account-footer">
-                                <p>Don't have an account yet? <a href="{{ route('login') }}">Login</a></p>
+                                {{-- <p>Don't have an account yet? <a href="{{ route('login') }}">Login</a></p> --}}
                             </div>
                         </form>
                         <!-- /Account Form -->

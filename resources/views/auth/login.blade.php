@@ -54,7 +54,7 @@
                                 <button class="btn btn-primary account-btn" type="submit">Login</button>
                             </div>
                             <div class="account-footer">
-                                <p>Don't have an account yet? <a href="{{ route('register') }}">Register</a></p>
+                                {{-- <p>Don't have an account yet? <a href="{{ route('register') }}">Register</a></p> --}}
                                  <p>Contact Administrator for Account Assistant.</p>    
                             </div>
                         </form>
