@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Auth;
 
 // ----------- Public Routes -------------- //
 Route::get('/', function () {
-    return view('auth.login');
+    return view('main.landing');
 });
 
 // --------- Authenticated Routes ---------- //
@@ -33,6 +33,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Auth'],function()
 {
     // -----------------------------login--------------------------------------//
     Route::controller(LoginController::class)->group(function () {
+        Route::get('/main-index', 'mainpages')->name('mainPages');
         Route::get('/login', 'login')->name('login');
         Route::post('/login', 'authenticate');
         Route::get('/logout', 'logout')->name('logout');

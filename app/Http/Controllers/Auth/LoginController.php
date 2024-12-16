@@ -22,6 +22,11 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except(['logout', 'locked', 'unlock']);
     }
+    /** Display the Main Pages */
+    public function mainpages()
+    {
+        return view('main.landing');
+    }
 
     /** Display the login page */
     public function login()
