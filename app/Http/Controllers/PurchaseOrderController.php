@@ -56,7 +56,7 @@ class PurchaseOrderController extends Controller
             ->select('purchase_orders.*', 'product_categories.category_name')
             ->first();
     
-            $products = PurchaseOrder::where('purchase_orders.request_id', $requestId)
+        $products = PurchaseOrder::where('purchase_orders.request_id', $requestId)
             ->leftJoin('product_categories', 'purchase_orders.product_category', '=', 'product_categories.id')
             ->leftJoin('purchase_order_items', 'purchase_orders.id', '=', 'purchase_order_items.purchase_order_id')
             ->select('purchase_orders.*', 'product_categories.category_name', 'purchase_order_items.qty')

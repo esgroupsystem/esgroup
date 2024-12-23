@@ -41,7 +41,7 @@
   <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
 
-      <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
+      <a href="{{ route('mainPages') }}" class="logo d-flex align-items-center me-auto me-xl-0">
         <!-- Uncomment the line below if you also wish to use an image logo -->
         <img src="{{ URL::to('assets/img/ESGroup-Logo.png') }}" alt="">
       </a>
@@ -228,7 +228,7 @@
               </div>
               <div class="experience-badge floating">
                 <h3>30+ <span>Years</span></h3>
-                <p>Of experience in business service</p>
+                <p>Of experience in transports service</p>
               </div>
             </div>
           </div>

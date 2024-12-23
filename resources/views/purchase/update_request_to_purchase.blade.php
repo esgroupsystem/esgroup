@@ -69,6 +69,7 @@
                                                 <th class="col-md-1">Unit</th>
                                                 <th class="col-md-1">Qty</th>
                                                 <th>Amount</th>
+                                                <th>Actions</th> <!-- New column for Remove button -->
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -94,6 +95,10 @@
                                                     </td>
                                                     <td>
                                                         <input class="form-control" name="amount[]" value="{{ $item->amount }}">
+                                                    </td>
+                                                    <td>
+                                                        <!-- Remove button -->
+                                                        <button type="button" class="btn btn-danger remove-row">Remove</button>
                                                     </td>
                                                     <input type="hidden" name="product_id[]" value="{{ $item->id }}">
                                                 </tr>
@@ -162,6 +167,7 @@
             const amountInputs = document.querySelectorAll('input[name="amount[]"]');
             const sumTotalInput = document.getElementById('sum_total');
             const grandTotalInput = document.getElementById('grand_total');
+            const removeButtons = document.querySelectorAll('.remove-row');
 
             function updateTotals() {
                 let totalAmount = 0;
@@ -177,6 +183,15 @@
             amountInputs.forEach(function (input) {
                 input.addEventListener('input', updateTotals);
             });
+
+            removeButtons.forEach(function (button) {
+                button.addEventListener('click', function (event) {
+                    const row = event.target.closest('tr');
+                    row.remove();  // Remove the row from the table
+                    updateTotals();  // Update the totals after removing a row
+                });
+            });
+
             // Initialize totals on page load
             updateTotals();
         });

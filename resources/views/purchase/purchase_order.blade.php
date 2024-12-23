@@ -80,8 +80,8 @@
                                                         <span class="badge bg-inverse-success">Done</span>
                                                     @elseif($item->status == 'Not Approved')
                                                         <span class="badge bg-inverse-danger">Cancelled</span>
-                                                    @elseif($item->status == 'Not all Approved')
-                                                        <span class="badge bg-inverse-info">Not all Approved</span>
+                                                    @elseif($item->status == 'Partial')
+                                                        <span class="badge bg-inverse-info">Partial</span>
                                                     @else
                                                         <span class="badge bg-inverse-info">Unknown</span>
                                                     @endif
