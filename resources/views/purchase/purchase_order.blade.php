@@ -71,15 +71,17 @@
                                     <tbody>
                                         @foreach ($poOrder as $item)
                                             <tr>
-                                                <td id="requestID"><a href="{{ route('update.index', ['requestId' => $item->request_id]) }}">{{ $item->request_id }}</a></td>
+                                                <td id="requestID">
+                                                    <a href="{{ route('update.index', ['requestId' => $item->request_id]) }}">
+                                                        {{ $item->request_id }}
+                                                    </a>
+                                                </td>
                                                 <td id="requestGarage">{{ $item->garage_name }}</td>
                                                 <td>
                                                     @if($item->status == 'Pending')
                                                         <span class="badge bg-inverse-warning">Pending</span>
                                                     @elseif($item->status == 'Done')
                                                         <span class="badge bg-inverse-success">Done</span>
-                                                    @elseif($item->status == 'Not Approved')
-                                                        <span class="badge bg-inverse-danger">Cancelled</span>
                                                     @elseif($item->status == 'Partial')
                                                         <span class="badge bg-inverse-info">Partial</span>
                                                     @else

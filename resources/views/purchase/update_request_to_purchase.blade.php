@@ -185,9 +185,9 @@
             });
 
             removeButtons.forEach(function (button) {
-                button.addEventListener('click', function (event) {
-                    const row = event.target.closest('tr');
-                    row.remove();  // Remove the row from the table
+            button.addEventListener('click', function (event) {
+                const row = event.target.closest('tr');
+                row.remove();  // Remove the row from the table
                     updateTotals();  // Update the totals after removing a row
                 });
             });

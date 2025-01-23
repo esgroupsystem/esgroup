@@ -24,14 +24,28 @@ class PurchaseOrderController extends Controller
     // Index for main
     public function mainIndex(Request $request)
     {
+        $poOrder = PurchaseOrder::get()->unique('request_id');
+    
+        foreach ($poOrder as $order) {
+            $statuses = PurchaseOrder::where('request_id', $order->request_id)->pluck('status');
+    
+            // Determine overall status
+            if ($statuses->every(fn($status) => $status == 'Pending')) {
+                $order->status = 'Pending';
+            } elseif ($statuses->contains('Pending')) {
+                $order->status = 'Partial';
+            } elseif ($statuses->every(fn($status) => $status == 'Done')) {
+                $order->status = 'Done';
+            } else {
+                $order->status = 'Unknown';
+            }
+        }
+    
         $requestOrder = PurchaseTransaction::get();
-        // $requestOrder = $requestOrder->unique('po_number');
-
-        $poOrder = PurchaseOrder::get();
-        $poOrder = $poOrder->unique('request_id');
     
         return view('purchase.purchase_order', compact('poOrder', 'requestOrder'));
     }
+    
 
     // View for Request
     public function purchaseIndex(Request $request){
@@ -56,7 +70,9 @@ class PurchaseOrderController extends Controller
             ->select('purchase_orders.*', 'product_categories.category_name')
             ->first();
     
+        // Filter products to show only those with "Pending" status
         $products = PurchaseOrder::where('purchase_orders.request_id', $requestId)
+            ->where('purchase_orders.status', 'Pending') // Only Pending
             ->leftJoin('product_categories', 'purchase_orders.product_category', '=', 'product_categories.id')
             ->leftJoin('purchase_order_items', 'purchase_orders.id', '=', 'purchase_order_items.purchase_order_id')
             ->select('purchase_orders.*', 'product_categories.category_name', 'purchase_order_items.qty')
@@ -67,6 +83,7 @@ class PurchaseOrderController extends Controller
     
         return view('purchase.update_request_to_purchase', compact('requestDetails', 'products', 'newPoNumber', 'supplier'));
     }
+    
 
     // Viewing for Receicing all products
     public function receivingIndex(Request $request)
@@ -234,7 +251,7 @@ class PurchaseOrderController extends Controller
         DB::beginTransaction();
         try {
 
-            PurchaseOrder::where('request_id', $request->request_id)->update([
+            PurchaseOrder::where('id', $request->product_id)->update([
                 'po_number'       => $request->po_number,
                 'product_supplier'=> $request->supp_name,
                 'payment_terms'   => $request->payment_terms,
