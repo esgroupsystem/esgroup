@@ -14,4 +14,9 @@ class ProductStockVGC extends Model
         'InQty',
         'OutQty',
     ];
+
+    public function product()
+    {
+        return $this->belongsTo(Products::class, 'product_id');
+    }
 }

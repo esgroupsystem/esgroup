@@ -75,6 +75,14 @@
                         <li><a class="{{set_active(['transfer.index'])}}" href="{{ route('transfer.index') }}">Transfer Records</a></li>
                     </ul>
                 </li>
+                <li class="{{set_active(['/stocks/Mirasol'])}} submenu">
+                    <a href="#" class="{{ set_active(['/stocks/Mirasol']) ? 'noti-dot' : '' }}">
+                        <i class="la la-chart-bar"></i> <span>Stock</span> <span class="menu-arrow"></span>
+                    </a>
+                    <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">
+                        <li><a class="{{set_active(['/stocks/Mirasol'])}}" href="{{ route('/stocks/Mirasol') }}">Stocks Garage</a></li>
+                    </ul>
+                </li>
             @endif
                 <!--*
                     *

@@ -378,6 +378,12 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
         Route::get('/get-product-codes', 'getProductCodes')->middleware('auth');
         Route::get('/get-product-details', 'getProductDetails')->middleware('auth');
         Route::post('/saving/request', 'saveRequest')->middleware('auth')->name('save.request');
+
+        /**Routes for reports summary */
+        Route::get('/stocks/Mirasol/', 'stockMirasol')->middleware('auth')->name('/stocks/Mirasol');
+        Route::get('/stocks/Balintawak/', 'stockBalintawak')->middleware('auth')->name('/stocks/Balintawak');
+        Route::get('/stocks/VGC/', 'stockVGC')->middleware('auth')->name('/stocks/VGC');
+
     });
             // ---------------------- Parts Out information  -----------------------//
     Route::controller(PartsOutController::class)->group(function () {

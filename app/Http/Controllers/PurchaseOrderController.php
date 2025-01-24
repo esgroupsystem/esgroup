@@ -21,6 +21,33 @@ use Auth;
 
 class PurchaseOrderController extends Controller
 {
+        /**
+     * FUNCTION FOR STOCKS
+     */
+
+     public function stockMirasol(Request $request)
+     {
+        $categories = ProductCategory::with(['products.productTotalStocks'])->get();
+
+        return view('purchase.stockmirasol', compact('categories'));
+     }
+      
+    public function stockBalintawak(Request $request)
+    {
+        $categories = ProductCategory::with(['products.productStockBalintawak'])->get();
+        return view('purchase.stockbalintawak', compact('categories'));
+    }
+
+    public function stockVGC(Request $request)
+    {
+        $categories = ProductCategory::with(['products.productStockVgc'])->get();
+        return view('purchase.stockVGC', compact('categories'));
+    }
+
+
+    /**
+     * END OF ALL STOCKS
+     */
     // Index for main
     public function mainIndex(Request $request)
     {
@@ -85,7 +112,7 @@ class PurchaseOrderController extends Controller
     }
     
 
-    // Viewing for Receicing all products
+    // Viewing for Receiving all products
     public function receivingIndex(Request $request)
     {
         $purchaseReceived = PurchaseTransaction::get();
@@ -385,6 +412,5 @@ class PurchaseOrderController extends Controller
             return redirect()->back();
         }
     }
-     
-      
+
 }
