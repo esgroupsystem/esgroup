@@ -384,6 +384,8 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
         Route::get('/stocks/Balintawak/', 'stockBalintawak')->middleware('auth')->name('/stocks/Balintawak');
         Route::get('/stocks/VGC/', 'stockVGC')->middleware('auth')->name('/stocks/VGC');
 
+        /**RECEIPT FORMAT ALL */
+        Route::get('/receipt/{po_number}', 'receipt')->middleware('auth')->name('receipt');
     });
             // ---------------------- Parts Out information  -----------------------//
     Route::controller(PartsOutController::class)->group(function () {

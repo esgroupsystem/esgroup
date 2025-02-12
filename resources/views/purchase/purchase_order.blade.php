@@ -99,6 +99,8 @@
                         </div>
                     </div>
                 </div>
+
+                
                 <div class="col-md-6 d-flex">
                     <div class="card card-table flex-fill">
                         <div class="card-header">
@@ -134,10 +136,10 @@
                                             </td>
                                             <td id="terms">{{ $item->payment_terms }} days</td>
                                             <td id="total">{{ $item->total_amount }}</td> 
+                                            <td><a href="{{ route('receipt', ['po_number' => $item->purchase_id]) }}">{{ $item->purchase_id }}</a></td>
                                         </tr>
                                         @endforeach
                                     </tbody>
-                                    
                                 </table>
                             </div>
                         </div>

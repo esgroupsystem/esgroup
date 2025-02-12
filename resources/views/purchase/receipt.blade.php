@@ -1,4 +1,3 @@
-{{-- resources/views/purchase/receipt.blade.php --}}
 @extends('layouts.master')
 
 @section('content')
@@ -10,7 +9,7 @@
                         <h3 class="page-title">Purchase Order Details</h3>
                         <ul class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('purchase.list') }}">Purchase Orders</a></li>
+                            <li class="breadcrumb-item"><a>Purchase Orders</a></li>
                             <li class="breadcrumb-item active">Receipt</li>
                         </ul>
                     </div>
@@ -25,12 +24,12 @@
                                 <div class="row">
                                     <div class="col-lg-6">
                                         <div class="invoice-logo">
-                                            <img width="120" src="{{ asset('assets/img/gg.png') }}" alt="Invoice logo">
+                                            <img width="500" src="{{ asset('assets/img/ESGroup-Logo.png') }}" alt="Invoice logo">
                                         </div>
                                     </div>
                                     <div class="col-lg-6 text-right">
                                         <ul class="list-unstyled">
-                                            <li>ES Group</li>
+                                            <li><strong>ES Group</strong></li>
                                             <li>#14 Street Mirasol</li>
                                             <li>Brgy. San Roque, Murphy</li>
                                             <li>Cubao, Quezon City</li>
@@ -38,49 +37,57 @@
                                     </div>
                                 </div>
 
-                                <div class="invoice-details mt25">
-                                    <div class="well">
-                                        <ul class="list-unstyled">
-                                            <li><strong>Transaction Request ID:</strong> {{ $receipt->first()->transaction_id ?? 'N/A' }}</li>
-                                            <li><strong>Request Date:</strong> {{ \Carbon\Carbon::parse($receipt->first()->request_date ?? now())->format('l, F jS, Y') }}</li>
-                                            <li><strong>Requestor:</strong> {{ $receipt->first()->requestor_id ?? 'N/A' }}</li>
-                                            <li><strong>Garage:</strong> {{ $receipt->first()->garage_id ?? 'N/A' }}</li>
-                                            <li><strong>Status:</strong> <span class="label label-danger">UNPAID</span></li>
-                                        </ul>
+                                @if ($purchaseOrder)
+                                    <div class="invoice-details mt25">
+                                        <div class="well">
+                                            <ul class="list-unstyled">
+                                                <li><strong>PO Number:</strong> {{ $purchaseOrder->po_number }}</li>
+                                                <li><strong>Transaction Request ID:</strong> {{ $purchaseOrder->request_id }}</li>
+                                                <li><strong>Request Date:</strong> {{ \Carbon\Carbon::parse($purchaseOrder->created_at)->format('l, F jS, Y') }}</li>
+                                                <li><strong>Garage:</strong> {{ $purchaseOrder->garage_name }}</li>
+                                                <li><strong>Status:</strong> <span class="label label-danger">UNPAID</span></li>
+                                            </ul>
+                                        </div>
                                     </div>
-                                </div>
+                                @endif
 
                                 <div class="invoice-items">
                                     <div class="table-responsive">
                                         <table class="table table-bordered">
                                             <thead>
                                                 <tr>
+                                                    <th>Product Code</th>
                                                     <th>Description</th>
                                                     <th class="text-center">Qty</th>
+                                                    <th class="text-center">Unit Price</th>
                                                     <th class="text-center">Total</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 @foreach ($receipt as $order)
                                                     <tr>
-                                                        <td>PO Number: {{ $order->po_no }}</td>
-                                                        <td class="text-center">{{ $order->total_qty }}</td>
-                                                        <td class="text-center">{{ $order->total_amount }} USD</td>
+                                                        <td>{{ $order->product_code }}</td>
+                                                        <td>{{ $order->product_name }}</td>
+                                                        <td class="text-center">{{ $order->qty }}</td>
+                                                        <td class="text-center">
+                                                            {{ $order->qty > 0 ? number_format($order->amount / $order->qty, 2) : '0.00' }} PHP
+                                                        </td>
+                                                        <td class="text-center">{{ number_format($order->amount, 2) }} PHP</td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>
                                             <tfoot>
+                                                @php
+                                                    $subtotal = $receipt->sum(fn($order) => $order->amount);
+                                                    $total = $subtotal * 1.2; // Assuming a 20% tax or fee
+                                                @endphp
                                                 <tr>
-                                                    <th colspan="2" class="text-right">Sub Total:</th>
-                                                    <th class="text-center">${{ $receipt->sum('total_amount') }} USD</th>
+                                                    <th colspan="4" class="text-right">Sub Total:</th>
+                                                    <th class="text-center">{{ number_format($subtotal, 2) }} PHP</th>
                                                 </tr>
                                                 <tr>
-                                                    <th colspan="2" class="text-right">20% VAT:</th>
-                                                    <th class="text-center">${{ $receipt->sum('total_amount') * 0.2 }} USD</th>
-                                                </tr>
-                                                <tr>
-                                                    <th colspan="2" class="text-right">Total:</th>
-                                                    <th class="text-center">${{ $receipt->sum('total_amount') * 1.2 }} USD</th>
+                                                    <th colspan="4" class="text-right">Total (with tax):</th>
+                                                    <th class="text-center">{{ number_format($total, 2) }} PHP</th>
                                                 </tr>
                                             </tfoot>
                                         </table>
