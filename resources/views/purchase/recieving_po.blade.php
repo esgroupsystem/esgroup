@@ -174,8 +174,6 @@
                 // Load purchase order items into the modal
                 $('.btn-view').on('click', function () {
                     const purchaseId = $(this).data('id');
-                    console.log('Selected Purchase ID:', purchaseId);
-
                     const productsTable = $('#tablePurchaseOrder tbody');
                     productsTable.empty(); // Clear previous items
 
@@ -185,8 +183,6 @@
                         url: `/fetch-purchase-order/${purchaseId}`,
                         method: 'GET',
                         success: function (response) {
-                            console.log('Response:', response);
-
                             if (response.purchaseOrders) {
                                 response.purchaseOrders.forEach(po => {
                                     $('#status_receiving').text(po.status_receiving);
