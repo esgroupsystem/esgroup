@@ -15,6 +15,7 @@ class PurchaseOrderItem extends Model
         'product_code',
         'product_name',
         'qty',
+        'qty_recieved',
         'amount',
         'total_amount',
     ];

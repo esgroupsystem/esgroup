@@ -82,6 +82,7 @@
                             <input type="hidden" name="id" id="e_id">
                             <!-- Hidden purchase_id input -->
                             <input type="hidden" name="purchase_id" id="purchase_id">
+                            <input type="hidden" name="garage_name" id="garage_name">
 
                             <!-- Status Display -->
                             <div class="status-section mb-3">
@@ -115,7 +116,7 @@
         </div>
         <!-- /Edit Modal -->
     </div>
-    <!-- /Page Wrapper -->
+<!-- /Page Wrapper -->
  
     @section('script')
     
@@ -173,45 +174,45 @@
                 // Load purchase order items into the modal
                 $('.btn-view').on('click', function () {
                     const purchaseId = $(this).data('id');
+                    console.log('Selected Purchase ID:', purchaseId);
+
                     const productsTable = $('#tablePurchaseOrder tbody');
-        
-                    // Clear any previous data from the table
-                    productsTable.empty();
-        
-                    // Set the purchase_id in the hidden input
+                    productsTable.empty(); // Clear previous items
+
                     $('#purchase_id').val(purchaseId);
-        
+
                     $.ajax({
                         url: `/fetch-purchase-order/${purchaseId}`,
                         method: 'GET',
                         success: function (response) {
+                            console.log('Response:', response);
+
                             if (response.purchaseOrders) {
-                                let addedProductCodes = new Set(); // To track added product codes
-        
-                                response.purchaseOrders.forEach(order => {
-                                    order.items.forEach(item => {
-                                        if (!addedProductCodes.has(item.product_code)) {
-                                            const isRemainingZero = item.remaining_qty === 0; // Check if remaining_qty is 0
-                                            const row = `
-                                                <tr>
-                                                    <td><input class="form-control" name="product_code[]" value="${item.product_code || ''}" readonly></td>
-                                                    <td><input class="form-control" name="product_name[]" value="${item.product_name || ''}" readonly></td>
-                                                    <td><input class="form-control" name="brand[]" value="${order.product_brand || ''}" readonly></td>
-                                                    <td><input class="form-control" name="unit[]" value="${order.product_unit || ''}" readonly></td>
-                                                    <td><input class="form-control" name="qty[]" value="${item.remaining_qty || '0'}" readonly></td>
-                                                    <td><input class="form-control" name="received_qty[]" value="${item.received_qty || '0'}" ${isRemainingZero ? 'readonly' : ''}></td>
-                                                    <input type="hidden" name="product_id[]" value="${item.id}">
-                                                    <input type="hidden" name="garage_name" value="${order.garageName}">
-                                                </tr>`;
-                                            productsTable.append(row);
-                                            addedProductCodes.add(item.product_code); // Mark this product as added
-                                        }
+                                response.purchaseOrders.forEach(po => {
+                                    $('#status_receiving').text(po.status_receiving);
+
+                                    // Set the hidden input for garage_name
+                                    $('#garage_name').val(po.garage_name); 
+
+                                    po.items.forEach(item => {
+                                        const remainingQty = Math.max(item.qty - item.qty_received, 0); // Ensure no negative values
+                                        const disabledAttr = remainingQty === 0 ? 'disabled' : ''; 
+
+                                        const row = `
+                                            <tr>
+                                                <td hidden><input type="hidden" name="product_id[]" value="${item.id}"></td>
+                                                <td><input class="form-control" name="product_code[]" value="${item.product_code}" readonly></td>
+                                                <td><input class="form-control" name="product_name[]" value="${item.product_name}" readonly></td>
+                                                <td><input class="form-control" name="brand[]" value="${po.product_brand}" readonly></td>
+                                                <td><input class="form-control" name="unit[]" value="${po.product_unit}" readonly></td>
+                                                <td><input class="form-control" name="qty[]" value="${remainingQty}" readonly></td> <!-- Updated -->
+                                                <td><input class="form-control" name="received_qty[]" value="0" min="0" max="${remainingQty}"></td>
+                                            </tr>`;
+                                        productsTable.append(row);
                                     });
-                                });       
-                                // Initial status calculation
-                                updateStatus();
+                                });
                             } else {
-                                alert('No related purchase orders found.');
+                                alert('No data found for this Purchase Order.');
                             }
                         },
                         error: function () {

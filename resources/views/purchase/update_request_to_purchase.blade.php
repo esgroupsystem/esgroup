@@ -163,39 +163,53 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-
-            const amountInputs = document.querySelectorAll('input[name="amount[]"]');
-            const sumTotalInput = document.getElementById('sum_total');
-            const grandTotalInput = document.getElementById('grand_total');
-            const removeButtons = document.querySelectorAll('.remove-row');
-
-            function updateTotals() {
-                let totalAmount = 0;
-
-                amountInputs.forEach(function (input) {
-                    totalAmount += parseFloat(input.value) || 0;
+            const removedItemsInput = document.createElement('input');
+            removedItemsInput.type = 'hidden';
+            removedItemsInput.name = 'removed_items';
+            removedItemsInput.value = ''; // Store removed product IDs as a comma-separated string
+            document.querySelector('form').appendChild(removedItemsInput);
+    
+            // Attach event listeners to remove buttons
+            document.querySelectorAll('.remove-row').forEach(button => {
+                button.addEventListener('click', function () {
+                    const row = button.closest('tr');
+                    const productIdInput = row.querySelector('input[name="product_id[]"]');
+    
+                    if (productIdInput) {
+                        let removedItems = removedItemsInput.value ? removedItemsInput.value.split(',') : [];
+                        removedItems.push(productIdInput.value);
+                        removedItemsInput.value = removedItems.join(',');
+                    }
+    
+                    row.remove(); // Remove the row from the table
+                    updateTotals(); // Update totals after removing a row
                 });
-
-                sumTotalInput.value = totalAmount.toFixed(2);
-                grandTotalInput.value = '₱ ' + totalAmount.toFixed(2);
-            }
-
-            amountInputs.forEach(function (input) {
+            });
+    
+            // Attach event listeners to quantity and amount fields to update totals automatically
+            document.querySelectorAll('input[name="qty[]"], input[name="amount[]"]').forEach(input => {
                 input.addEventListener('input', updateTotals);
             });
-
-            removeButtons.forEach(function (button) {
-            button.addEventListener('click', function (event) {
-                const row = event.target.closest('tr');
-                row.remove();  // Remove the row from the table
-                    updateTotals();  // Update the totals after removing a row
+    
+            // Function to update totals
+            function updateTotals() {
+                let total = 0;
+    
+                // Loop through all remaining rows and calculate the total
+                document.querySelectorAll('#tablePurchaseOrder tbody tr').forEach(row => {
+                    let qty = parseFloat(row.querySelector('input[name="qty[]"]').value) || 0;
+                    let amount = parseFloat(row.querySelector('input[name="amount[]"]').value) || 0;
+                    total += qty * amount;
                 });
-            });
-
-            // Initialize totals on page load
-            updateTotals();
+    
+                // Update Total and Grand Total fields
+                document.getElementById('sum_total').value = total.toFixed(2);
+                document.getElementById('grand_total').value = `₱ ${total.toFixed(2)}`;
+            }
         });
-    </script>    
+    </script>
+    
+     
 
     @endsection
 @endsection

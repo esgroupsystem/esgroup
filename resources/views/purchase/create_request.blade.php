@@ -102,11 +102,12 @@
     </div>
     <!-- /Page Wrapper -->
  
-@section('script')
+    @section('script')
     <script>
         $(document).ready(function () {
             let rowIdx = 1;
-
+            let selectedProductCodes = []; // Array to track selected product codes
+    
             // Function to add a new row
             function addRow(poNumber) {
                 const newRow = `
@@ -117,12 +118,12 @@
                                 @foreach ($category as $item)
                                     <option value="{{ $item->id }}">{{ $item->category_name }}</option>
                                 @endforeach
-                            </select>                                                  
+                            </select>
                         </td>
                         <td>
                             <select class="form-control product-code-select" style="min-width:150px" name="product_code[]">
                                 <option value="">Selection Area</option>
-                            </select>                                                  
+                            </select>
                         </td>
                         <td>
                             <input class="form-control" style="min-width:100px" type="text" name="product_name[]" readonly>
@@ -140,31 +141,36 @@
                             <a href="javascript:void(0)" class="text-danger font-18 remove" id="trashBIN" title="Remove"><i class="fa fa-trash-o"></i></a>
                         </td>
                     </tr>`;
-
+    
                 // Append the new row to the table
                 $("#tablePurchaseOrder tbody").append(newRow);
-                rowIdx++;  // Increment row index
+                rowIdx++; // Increment row index
             }
-
+    
             // Event listener for adding a new row
             $(document).on('click', '#addBtn', function () {
-                
                 $('#auto_po_id').val("");
                 addRow();
             });
-
+    
             // Event listener for removing a row
             $(document).on('click', '.remove', function () {
-                $(this).closest('tr').remove();
+                const $row = $(this).closest('tr');
+                const removedProductCode = $row.find('.product-code-select').val();
+    
+                // Remove the product code from the selectedProductCodes array
+                selectedProductCodes = selectedProductCodes.filter(code => code !== removedProductCode);
+    
+                $row.remove();
                 rowIdx--; // Decrement row index
             });
-
+    
             // Handle category selection change
             $(document).on('change', '.category-select', function () {
                 const selectedCategory = $(this).val();
                 const $productCodeDropdown = $(this).closest('tr').find('.product-code-select');
                 $productCodeDropdown.empty().append('<option value="">Select Product Code</option>');
-
+    
                 if (selectedCategory) {
                     $.ajax({
                         url: '/get-product-codes',
@@ -173,9 +179,12 @@
                         success: function (response) {
                             if (response.success) {
                                 response.product_codes.forEach(function (productCode) {
-                                    $productCodeDropdown.append(
-                                        `<option value="${productCode.code}">${productCode.code}</option>`
-                                    );
+                                    // Only add options that are not already selected
+                                    if (!selectedProductCodes.includes(productCode.code)) {
+                                        $productCodeDropdown.append(
+                                            `<option value="${productCode.code}">${productCode.code}</option>`
+                                        );
+                                    }
                                 });
                             } else {
                                 alert('No product codes found for this category.');
@@ -187,7 +196,7 @@
                     });
                 }
             });
-
+    
             // Handle product code selection change
             $(document).on('change', '.product-code-select', function () {
                 const selectedProductCode = $(this).val();
@@ -195,8 +204,18 @@
                 const $productNameField = $row.find('input[name="product_name[]"]');
                 const $brandField = $row.find('input[name="brand[]"]');
                 const $unitField = $row.find('input[name="unit[]"]');
-
+    
                 if (selectedProductCode) {
+                    // Check if this product code is already selected
+                    if (selectedProductCodes.includes(selectedProductCode)) {
+                        alert('This Product Code is already selected. Please choose a different one.');
+                        $(this).val(''); // Reset the selection
+                        return;
+                    }
+    
+                    // Add the product code to the selectedProductCodes array
+                    selectedProductCodes.push(selectedProductCode);
+    
                     $.ajax({
                         url: '/get-product-details',
                         type: 'GET',
@@ -217,12 +236,20 @@
                     });
                 } else {
                     // Clear the fields if no product is selected
+                    const previousProductCode = $(this).data('previous-code');
+                    if (previousProductCode) {
+                        selectedProductCodes = selectedProductCodes.filter(code => code !== previousProductCode);
+                    }
+                    $(this).data('previous-code', ''); // Reset tracking
                     $productNameField.val('');
                     $brandField.val('');
                     $unitField.val('');
                 }
+    
+                // Track the previously selected code
+                $(this).data('previous-code', selectedProductCode);
             });
-
+    
             // Fetch the latest REQUEST number and set the input field when the page loads
             function fetchLatestRequestNumber(callback) {
                 $.ajax({
@@ -240,13 +267,13 @@
                     }
                 });
             }
-
+    
             // On page load, fetch and set the next Request ID
             fetchLatestRequestNumber(function (latestRequestId) {
                 $('#auto_request_id').val(latestRequestId);
             });
         });
     </script>
-     
     @endsection
+    
 @endsection

@@ -123,27 +123,26 @@ class PurchaseOrderController extends Controller
     // Retrieve the PO
     public function fetchPurchaseOrder($id)
     {
-        $purchaseOrder = PurchaseOrder::where('po_number', $id)->first();
+        // Retrieve purchase orders and their items
+        $purchaseOrders = PurchaseOrder::where('po_number', $id)
+            ->with(['items' => function ($query) {
+                $query->select('id', 'purchase_order_id', 'product_code', 'product_name', 'qty', 'qty_received');
+            }])
+            ->get();
     
-        if (!$purchaseOrder) {
+        if ($purchaseOrders->isEmpty()) {
             return response()->json(['error' => 'Purchase order not found.'], 404);
         }
     
-        $relatedOrders = PurchaseOrder::with('items')
-            ->where('po_number', $purchaseOrder->po_number)
-            ->get();
+        // Compute remaining qty before sending response
+        foreach ($purchaseOrders as $po) {
+            foreach ($po->items as $item) {
+                $item->remaining_qty = max($item->qty - $item->qty_received, 0); // Prevent negative values
+            }
+        }
     
-        $uniqueOrders = $relatedOrders->map(function ($order) {
-            $order->garageName = $order->garage_name;
-            $order->items = $order->items->unique('product_code')->map(function ($item) {
-                $item->remaining_qty = $item->qty - $item->qty_received;
-                return $item;
-            });
-            return $order;
-        });
-    
-        return response()->json(['purchaseOrders' => $uniqueOrders]);
-    }    
+        return response()->json(['purchaseOrders' => $purchaseOrders]);
+    }
     
     // Generate New PO Number
     public function generatePoNumber()
@@ -277,44 +276,61 @@ class PurchaseOrderController extends Controller
     {
         DB::beginTransaction();
         try {
+            // Get removed items from request
+            $removedProductIds = $request->removed_items ? explode(',', $request->removed_items) : [];
 
-            PurchaseOrder::where('id', $request->product_id)->update([
-                'po_number'       => $request->po_number,
-                'product_supplier'=> $request->supp_name,
-                'payment_terms'   => $request->payment_terms,
-                'remarks'         => $request->remarks,
-                'status'          => 'Done',
-                'purchase_date'   => now()->toDateString(),
-            ]);
-    
-            foreach ($request->product_code as $key => $productCode) {
+            // Loop through displayed items and update them
+            foreach ($request->product_id as $key => $productId) {
 
-                $product = Products::where('product_code', $productCode)->first();
-
-                if (!$product) {
-                    flash()->success('No products save in this IDs.');
+                // Skip removed items
+                if (in_array($productId, $removedProductIds)) {
                     continue;
                 }
-                
+
+                // Update purchase order details for each item
+                PurchaseOrder::where('id', $productId)->update([
+                    'po_number'        => $request->po_number,
+                    'product_supplier' => $request->supp_name,
+                    'payment_terms'    => $request->payment_terms,
+                    'remarks'          => $request->remarks,
+                    'status'           => 'Done',
+                    'purchase_date'    => now()->toDateString(),
+                ]);
+
+                $productCode = $request->product_code[$key];
                 $itemTotal = $request->qty[$key] * $request->amount[$key];
 
-                $updateCount = PurchaseOrderItem::where('request_id', $request->request_id)
-                        ->where('product_code', $productCode)
-                        ->update([
-                            'amount'       => $request->amount[$key],
-                            'total_amount' => $itemTotal,
-                        ]);   
-                    }
+                // Ensure the product exists before updating
+                $product = Products::where('product_code', $productCode)->first();
+                if (!$product) {
+                    flash()->error("Product not found: $productCode");
+                    continue;
+                }
 
-                PurchaseTransaction::create([
-                    'purchase_id'       => $request->po_number,
-                    'request_id'        => $request->request_id,
-                    'total_amount'      => $request->grand_total, 
-                    'payment_terms'     => $request->payment_terms,  
-                ]);
-    
+                // Update purchase order items
+                PurchaseOrderItem::where('request_id', $request->request_id)
+                    ->where('product_code', $productCode)
+                    ->update([
+                        'amount'       => $request->amount[$key],
+                        'total_amount' => $itemTotal,
+                    ]);
+            }
+
+            // Remove deleted products from the order
+            if (!empty($removedProductIds)) {
+                PurchaseOrderItem::whereIn('id', $removedProductIds)->delete();
+            }
+
+            // Create purchase transaction
+            PurchaseTransaction::create([
+                'purchase_id'   => $request->po_number,
+                'request_id'    => $request->request_id,
+                'total_amount'  => $request->grand_total,
+                'payment_terms' => $request->payment_terms,
+            ]);
+
             DB::commit();
-            flash()->success('Successfully save purchase order, please wait for delivery.');
+            flash()->success('Successfully saved purchase order, please wait for delivery.');
             return redirect()->route('purchase.index');
         } catch (\Exception $e) {
             DB::rollback();
@@ -322,7 +338,7 @@ class PurchaseOrderController extends Controller
             flash()->error('Failed to update the purchase order.');
             return redirect()->back();
         }
-    }    
+    }      
 
     // Function for receiving a items
     public function saveReceived(Request $request)
@@ -407,7 +423,7 @@ class PurchaseOrderController extends Controller
             return redirect()->route('receiving.index');
         } catch (\Exception $e) {
             DB::rollback();
-            \Log::error('Failed to save received items', $e->getMessage());
+            \Log::error('Failed to save received items', ['error' => $e->getMessage()]);
             flash()->error('Failed to update the request order.');
             return redirect()->back();
         }
