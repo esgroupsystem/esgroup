@@ -26,22 +26,17 @@ class PurchaseOrderController extends Controller
      */
     public function receipt($po_number)
     {
-        // Fetch all purchase orders with the given po_number
         $purchaseOrders = PurchaseOrder::where('po_number', $po_number)->get();
-    
-        // Extract all purchase_order_ids from the fetched purchase orders
         $purchaseOrderIds = $purchaseOrders->pluck('id');
-    
-        // Fetch all purchase order items that belong to any of the found purchase orders
         $receipt = PurchaseOrderItem::whereIn('purchase_order_id', $purchaseOrderIds)->get();
-    
-        // Use only the first purchase order for details
         $purchaseOrder = $purchaseOrders->first();
     
-        return view('purchase.receipt', compact('purchaseOrder', 'receipt'));
+        // Fetch supplier information
+        $supplier = Supplier::find($purchaseOrder->product_supplier);
+    
+        return view('purchase.receipt', compact('purchaseOrder', 'receipt', 'supplier'));
     }
         
-
     public function stockMirasol(Request $request)
     {
     $categories = ProductCategory::with(['products.productTotalStocks'])->get();

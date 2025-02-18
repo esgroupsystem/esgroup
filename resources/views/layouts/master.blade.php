@@ -64,7 +64,7 @@
 			<!-- Logo -->
 			<div class="header-left">
 				<a href="{{ route('home') }}" class="logo">
-					<img src="{{ URL::to('/assets/images/'. Auth::user()->avatar) }}" width="40" height="40" alt="">
+					<img src="{{ URL::to('/assets/images/esgrou-logo.png') }}" width="200px" height="40px" alt="">
 				</a>
 			</div>
 			<!-- /Logo -->
