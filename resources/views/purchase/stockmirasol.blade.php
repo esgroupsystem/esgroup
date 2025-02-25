@@ -47,7 +47,10 @@
                                 <tbody>
                                     @foreach ($category->products as $key => $product)
                                         @php
-                                            $totalStock = $product->productTotalStocks->sum('InQty');
+                                        
+                                            $totalStock = $product->productTotalStocks->sum(function ($stock) {
+                                                return $stock->InQty - $stock->OutQty;
+                                            });
                                             $stockClass = '';
 
                                             // Assign class based on stock quantity
