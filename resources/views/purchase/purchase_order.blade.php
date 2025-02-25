@@ -136,7 +136,11 @@
                                             </td>
                                             <td id="terms">{{ $item->payment_terms }} days</td>
                                             <td id="total">{{ $item->total_amount }}</td> 
-                                            <td><a href="{{ route('receipt', ['po_number' => $item->purchase_id]) }}">{{ $item->purchase_id }}</a></td>
+                                            <td>
+                                                <a href="{{ route('receipt', ['po_number' => $item->purchase_id]) }}" target="_blank">
+                                                    <i class="fa fa-print"></i>
+                                                </a>
+                                            </td>
                                         </tr>
                                         @endforeach
                                     </tbody>

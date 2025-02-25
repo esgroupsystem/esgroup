@@ -8579,6 +8579,9 @@ ul.comment-list li ul.children {
 /* css custom  */
 .user-profile {
 	padding: 3px;
+	width: 100%;
+    height: 100%;
+	/* object-fit: cover; */
 	border-radius: 50%;
 	background: linear-gradient(to right, #f43b48 0%, #453a94 100%);
 }
