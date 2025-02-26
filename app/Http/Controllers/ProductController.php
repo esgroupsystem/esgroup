@@ -175,7 +175,7 @@ class ProductController extends Controller
         try {
             ProductCategory::create([
                 'category_name'                  => $request->category_name,
-                'category_name'                  => $request->category_code,
+                'category_code'                  => $request->category_code,
                 'category_status'                => 'Active',
                 'category_creator'               => $request->user()->name,
             ]);

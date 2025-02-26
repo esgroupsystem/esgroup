@@ -10,8 +10,8 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <img width="400" src="{{ asset('assets/img/ESGroup-Logo.png') }}" alt="Company Logo">
-                                    <h5 class="mt-2">EARTHSTAR EXPRESS INC.</h5>
-                                    <p>Inside Valenzuela Gateway Complex<br> Paso De Blas Valenzuela City<br>
+                                    <h5 class="mt-2">ES TRANSPORT INC.</h5>
+                                    <p>#14 Mirasol, San Roque Cubao<br> Quezon City, Metro Manila<br>
                                         <a href="www.estransport.ph">www.estransport.ph</a><br>
                                         <strong>Email:</strong> espurchasingdept@gmail.com<br>
                                         <strong>Tel:</strong> 8421-0728 | <strong>Fax:</strong> 8421-0725</p>

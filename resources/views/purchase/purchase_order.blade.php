@@ -97,6 +97,9 @@
                                 </table>
                             </div>
                         </div>
+                        <div class="card-footer">
+                            <div id="paginationRequestOrder" class="pagination"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -126,8 +129,8 @@
                                             <td id="receving">
                                                 @if($item->status_receiving == 'For Delivery')
                                                     <span class="badge bg-inverse-warning">For Delivery</span>
-                                                @elseif($item->status_receiving == 'Partial Delivery')
-                                                    <span class="badge bg-inverse-info">Partial Delivery</span>
+                                                @elseif($item->status_receiving == 'Partial Delivered')
+                                                    <span class="badge bg-inverse-info">Partial Delivered</span>
                                                 @elseif($item->status_receiving == 'Delivered')
                                                     <span class="badge bg-inverse-success">Delivered</span>
                                                 @else
@@ -184,66 +187,179 @@
     @section('script')
 
     <script>
-        $(document).ready(function() {
-            // Initialize DataTable
-            var table = $('#requestOrderTable').DataTable({
-                pageLength: 5,
-                processing: true,
-                serverSide: false,
-                ordering: true,
-                dom: 't<"bottom"p>',
-                order: [[2, 'desc']],
-                columnDefs: [
-                    {
-                        "targets": 2,
-                        "orderDataType": "dom-status" 
-                    }
-                ]
-            });
-            $.fn.dataTable.ext.order['dom-status'] = function(settings, colIdx) {
-                return this.api()
-                    .column(colIdx, { order: 'index' })
-                    .nodes()
-                    .map(function(td) {
-                        const statusText = $(td).text().trim();
-                        switch (statusText) {
-                            case 'Pending': return 1;
-                            case 'Done': return 2;
-                            case 'Not Approved': return 3;
-                            case 'Not all Approved': return 4;
-                            default: return 5;
-                        }
-                    });
-            };
-            function disableDoneRows() {
-                $('#requestOrderTable tbody tr').each(function() {
-                    var status = $(this).find('td:eq(2)').text().trim();
-    
-                    if (status === 'Done') {
-                        $(this).find('td:eq(0) a').removeAttr('href'); 
-                        $(this).addClass('disabled-row');  
-                    }
-                });
-            }
-            table.on('draw', function() {
-                disableDoneRows();
-            });
+        document.addEventListener("DOMContentLoaded", function () {
+            let table = document.getElementById("requestOrderTable").getElementsByTagName("tbody")[0];
+            let rows = table.getElementsByTagName("tr");
+            let rowsPerPage = 10; // Adjust as needed
+            let currentPage = 1;
+            let totalPages = Math.ceil(rows.length / rowsPerPage);
+            let paginationContainer = document.getElementById("paginationRequestOrder");
 
-            disableDoneRows();
+            function showPage(page) {
+                let start = (page - 1) * rowsPerPage;
+                let end = start + rowsPerPage;
+
+                for (let i = 0; i < rows.length; i++) {
+                    rows[i].style.display = i >= start && i < end ? "" : "none";
+                }
+                disableDoneRows(); // Apply disabling function after pagination update
+                updatePaginationButtons();
+            }
+
+            function updatePaginationButtons() {
+                paginationContainer.innerHTML = "";
+
+                let prevButton = document.createElement("button");
+                prevButton.innerText = "Previous";
+                prevButton.disabled = currentPage === 1;
+                prevButton.onclick = function () {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        showPage(currentPage);
+                    }
+                };
+                paginationContainer.appendChild(prevButton);
+
+                for (let i = 1; i <= totalPages; i++) {
+                    let pageButton = document.createElement("button");
+                    pageButton.innerText = i;
+                    pageButton.className = i === currentPage ? "active" : "";
+                    pageButton.onclick = function () {
+                        currentPage = i;
+                        showPage(currentPage);
+                    };
+                    paginationContainer.appendChild(pageButton);
+                }
+
+                let nextButton = document.createElement("button");
+                nextButton.innerText = "Next";
+                nextButton.disabled = currentPage === totalPages;
+                nextButton.onclick = function () {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        showPage(currentPage);
+                    }
+                };
+                paginationContainer.appendChild(nextButton);
+            }
+
+            function disableDoneRows() {
+                for (let i = 0; i < rows.length; i++) {
+                    let status = rows[i].getElementsByTagName("td")[2].innerText.trim(); // Adjust column index if needed
+
+                    if (status === "Done") {
+                        let link = rows[i].getElementsByTagName("td")[0].querySelector("a");
+                        if (link) {
+                            link.removeAttribute("href"); // Remove link if present
+                        }
+                        rows[i].classList.add("disabled-row"); // Apply CSS class
+                    }
+                }
+            }
+
+            showPage(currentPage); // Initialize pagination
         });
     </script>
 
     <script>
-        $(document).ready(function() {
-            const table = $('#purchaseOrderTable').DataTable({
-                pageLength: 5,
-                processing: true,
-                serverSide: false,
-                ordering: true,
-                dom: 't<"bottom"p>',
-            });
+        document.addEventListener("DOMContentLoaded", function () {
+            let table = document.getElementById("purchaseOrderTable").getElementsByTagName("tbody")[0];
+            let rows = Array.from(table.getElementsByTagName("tr"));
+            let rowsPerPage = 10; // Change as needed
+            let currentPage = 1;
+            let paginationContainer = document.getElementById("paginationPurchase");
+
+            // Define sorting order (lower index = higher priority)
+            let statusOrder = {
+                "for delivery": 1,
+                "partial delivered": 2,
+                "delivered": 3
+            };
+
+            function sortTable() {
+                rows.sort((a, b) => {
+                    let statusA = a.cells[2].textContent.trim().toLowerCase();
+                    let statusB = b.cells[2].textContent.trim().toLowerCase();
+                    return (statusOrder[statusA] || 4) - (statusOrder[statusB] || 4);
+                });
+
+                // Re-append rows in sorted order
+                rows.forEach(row => table.appendChild(row));
+            }
+
+            function showPage(page) {
+                let start = (page - 1) * rowsPerPage;
+                let end = start + rowsPerPage;
+
+                rows.forEach((row, index) => {
+                    row.style.display = index >= start && index < end ? "" : "none";
+                });
+
+                updatePaginationButtons();
+            }
+
+            function updatePaginationButtons() {
+                let totalPages = Math.ceil(rows.length / rowsPerPage);
+                paginationContainer.innerHTML = "";
+
+                let prevButton = document.createElement("button");
+                prevButton.innerText = "Previous";
+                prevButton.disabled = currentPage === 1;
+                prevButton.onclick = function () {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        showPage(currentPage);
+                    }
+                };
+                paginationContainer.appendChild(prevButton);
+
+                for (let i = 1; i <= totalPages; i++) {
+                    let pageButton = document.createElement("button");
+                    pageButton.innerText = i;
+                    pageButton.className = i === currentPage ? "active" : "";
+                    pageButton.onclick = function () {
+                        currentPage = i;
+                        showPage(currentPage);
+                    };
+                    paginationContainer.appendChild(pageButton);
+                }
+
+                let nextButton = document.createElement("button");
+                nextButton.innerText = "Next";
+                nextButton.disabled = currentPage === totalPages;
+                nextButton.onclick = function () {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        showPage(currentPage);
+                    }
+                };
+                paginationContainer.appendChild(nextButton);
+            }
+
+            // Sort table first, then apply pagination
+            sortTable();
+            showPage(currentPage);
         });
     </script>
+        
+        <style>
+        .pagination button {
+            margin: 5px;
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            background-color: white;
+            cursor: pointer;
+        }
+        .pagination button.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .pagination button:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
+        }
+        </style>
     
     @endsection
 @endsection

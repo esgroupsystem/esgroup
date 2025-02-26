@@ -39,9 +39,9 @@ class PurchaseOrderController extends Controller
         
     public function stockMirasol(Request $request)
     {
-    $categories = ProductCategory::with(['products.productTotalStocks'])->get();
+        $categories = ProductCategory::with(['products.productTotalStocks'])->get();
 
-    return view('purchase.stockmirasol', compact('categories'));
+        return view('purchase.stockmirasol', compact('categories'));
     }
       
     public function stockBalintawak(Request $request)
@@ -79,6 +79,11 @@ class PurchaseOrderController extends Controller
                 $order->status = 'Unknown';
             }
         }
+    
+        // **Apply Sorting**
+        $poOrder = $poOrder->sortBy(function ($item) {
+            return array_search($item->status, ['Pending', 'Partial', 'Done']);
+        });
     
         $requestOrder = PurchaseTransaction::get();
     

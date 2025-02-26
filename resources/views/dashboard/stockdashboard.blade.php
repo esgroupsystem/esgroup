@@ -26,9 +26,9 @@
                         <li class="nav-item">
                             <a class="nav-link {{ $tab == 'balintawak' ? 'active' : '' }}" href="{{ route('stock/dashboard', ['tab' => 'balintawak']) }}">Balintawak</a>
                         </li>
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a class="nav-link {{ $tab == 'vgc' ? 'active' : '' }}" href="{{ route('stock/dashboard', ['tab' => 'vgc']) }}">VGC</a>
-                        </li>
+                        </li> --}}
                     </ul>
                 </div>
             </div>

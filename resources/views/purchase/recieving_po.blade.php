@@ -29,7 +29,6 @@
                                     <th hidden>ID</th>
                                     <th>Purchase Order Number</th>
                                     <th>Request ID</th>
-                                    <th>Date Received</th>
                                     <th>Status</th>
                                     <th class="text-right">Action</th>
                                 </tr>
@@ -40,7 +39,6 @@
                                     <td hidden class="id">{{ $item->id }}</td>
                                     <td class="p_id">{{ $item->purchase_id }}</td>
                                     <td class="request_id">{{ $item->request_id }}</td>
-                                    <td class="po_date">{{ date('j M Y (h:i A)', strtotime($item->date_received)) }}</td>
                                     <td id="receiving">
                                         @if($item->status_receiving == 'For Delivery')
                                             <span class="badge bg-inverse-warning">For Delivery</span>
@@ -62,7 +60,6 @@
                     </div>
                 </div>
             </div>
-            
         </div>
         <!-- /Page Content -->    
 
@@ -123,12 +120,33 @@
         {{-- Pagination for the purchase list --}}
         <script>
             $(document).ready(function() {
+                // Define custom sorting order
+                let statusOrder = {
+                    "For Delivery": 1,
+                    "Partial Delivered": 2,
+                    "Delivered": 3
+                };
+
+                // Extend DataTables sorting method
+                $.fn.dataTable.ext.type.order["status-sort-pre"] = function(data) {
+                    // Extract the status text from the <span> element
+                    let statusText = $(data).text().trim();
+                    return statusOrder[statusText] || 99; // Default to 99 for unknown statuses
+                };
+
                 $('#purchaseList').DataTable({
-                    pageLength: 5,
+                    pageLength: 20,
                     processing: true,
                     serverSide: false,
                     ordering: true,
                     dom: 't<"bottom"p>',
+                    columnDefs: [
+                        {
+                            targets: 3, // The "Status" column index
+                            type: "status-sort" // Use custom sorting
+                        }
+                    ],
+                    order: [[3, "asc"]] // Sort by status column in ascending order
                 });
             });
         </script>
