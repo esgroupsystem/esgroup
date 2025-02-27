@@ -88,14 +88,22 @@ class PurchaseOrderController extends Controller
     {
         $poOrder = PurchaseOrder::get()->unique('request_id');
     
+        $pendingCount = 0;
+        $partialCount = 0;
+    
+        // **Fix the Counting Logic for Waiting for Delivery and Partial Received**
+        $waitingDeliveryCount = PurchaseTransaction::where('status_receiving', 'For Delivery')->count();
+        $partialReceivedCount = PurchaseTransaction::where('status_receiving', 'Partial Delivered')->count();
+    
         foreach ($poOrder as $order) {
             $statuses = PurchaseOrder::where('request_id', $order->request_id)->pluck('status');
     
-            // Determine overall status
             if ($statuses->every(fn($status) => $status == 'Pending')) {
                 $order->status = 'Pending';
+                $pendingCount++;
             } elseif ($statuses->contains('Pending')) {
                 $order->status = 'Partial';
+                $partialCount++;
             } elseif ($statuses->every(fn($status) => $status == 'Done')) {
                 $order->status = 'Done';
             } else {
@@ -103,17 +111,18 @@ class PurchaseOrderController extends Controller
             }
         }
     
-        // **Apply Sorting**
         $poOrder = $poOrder->sortBy(function ($item) {
             return array_search($item->status, ['Pending', 'Partial', 'Done']);
         });
     
         $requestOrder = PurchaseTransaction::get();
     
-        return view('purchase.purchase_order', compact('poOrder', 'requestOrder'));
+        return view('purchase.purchase_order', compact(
+            'poOrder', 'requestOrder', 'pendingCount', 'partialCount', 'waitingDeliveryCount', 'partialReceivedCount'
+        ));
     }
     
-
+    
     // View for Request
     public function purchaseIndex(Request $request){
 

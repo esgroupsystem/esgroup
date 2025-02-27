@@ -26,25 +26,25 @@
                 <div class="col-md-3">
                     <div class="stats-info pending">
                         <h6>Pending</h6>
-                        <h4>0</h4>
+                        <h4>{{ $pendingCount }}</h4>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stats-info not-approved">
-                        <h6>Not Approved</h6>
-                        <h4>0</h4>
+                        <h6>Partial Request</h6>
+                        <h4>{{ $partialCount }}</h4>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stats-info waiting-delivery">
                         <h6>Waiting for Delivery</h6>
-                        <h4>0</h4>
+                        <h4>{{ $waitingDeliveryCount }}</h4>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stats-info partial-received">
                         <h6>Partial Received</h6>
-                        <h4>0</h4>
+                        <h4>{{ $partialReceivedCount }}</h4>
                     </div>
                 </div>
             </div>
@@ -140,7 +140,7 @@
                                             <td id="terms">{{ $item->payment_terms }} days</td>
                                             <td id="total">{{ $item->total_amount }}</td> 
                                             <td>
-                                                <a href="{{ route('receipt', ['po_number' => $item->purchase_id]) }}" target="_blank">
+                                                <a href="{{ route('receipt', ['po_number' => $item->purchase_id]) }}">
                                                     <i class="fa fa-print"></i>
                                                 </a>
                                             </td>
