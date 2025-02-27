@@ -25,22 +25,19 @@ class SupplierController extends Controller
        ]);
 
        DB::beginTransaction();
-       try{
+        try{
+            Supplier::create([
+            'supplier_name'        => $request->supplier_name,
+            'supplier_status'      => 'Active',
+            ]);
 
-           Supplier::create([
-           'supplier_name'        => $request->supplier_name,
-           'supplier_status'      => 'Active',
-
-           ]);
-
-           DB::commit();
-           flash()->success('Created new supplier successfully :)');
-           return redirect()->back();
-       } catch ( \Exception $e ){
-           DB::rollback();
-           flash()->error('Failed to add supplier :(');
-           return redirect()->back();
+            DB::commit();
+            flash()->success('Created new supplier successfully :)');
+            return redirect()->back();
+        } catch ( \Exception $e ){
+            DB::rollback();
+            flash()->error('Failed to add supplier :(');
+            return redirect()->back();
        }
-
    }
 }

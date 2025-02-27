@@ -280,7 +280,7 @@ class UserManagementController extends Controller
             'department'=> 'required|string|max:255',
             'status'    => 'required|string|max:255',
             'image'     => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'password'  => 'required|string|min:8|confirmed',
+            'password'  => 'required|string|min:5|confirmed',
             'password_confirmation' => 'required',
         ]);
 

@@ -39,14 +39,37 @@ class PurchaseOrderController extends Controller
         
     public function stockMirasol(Request $request)
     {
-        $categories = ProductCategory::with(['products.productTotalStocks'])->get();
-
+        $categories = ProductCategory::with([
+            'products' => function ($query) {
+                $query->leftJoin('product_brands', 'products.product_brand', '=', 'product_brands.id')
+                      ->leftJoin('product_units', 'products.product_unit', '=', 'product_units.id')
+                      ->select(
+                          'products.*',
+                          'product_brands.brand_name as brand_name',
+                          'product_units.unit_name as unit_name'
+                      )
+                      ->with('productTotalStocks'); // Keep the relationship for stock calculations
+            }
+        ])->get();
+    
         return view('purchase.stockmirasol', compact('categories'));
     }
-      
+    
     public function stockBalintawak(Request $request)
     {
-        $categories = ProductCategory::with(['products.productStockBalintawak'])->get();
+        $categories = ProductCategory::with([
+            'products' => function ($query) {
+                $query->leftJoin('product_brands', 'products.product_brand', '=', 'product_brands.id')
+                      ->leftJoin('product_units', 'products.product_unit', '=', 'product_units.id')
+                      ->select(
+                          'products.*',
+                          'product_brands.brand_name as brand_name',
+                          'product_units.unit_name as unit_name'
+                      )
+                      ->with('productStockBalintawak'); // Keep the relationship for stock calculations
+            }
+        ])->get();
+        
         return view('purchase.stockbalintawak', compact('categories'));
     }
 

@@ -7,13 +7,17 @@
         <!-- Page Header -->
         <div class="page-header">
             <div class="row">
-                <div class="col-sm-12">
+                <div class="col-sm-6">
                     <h3 class="page-title">Balintawak Stocks</h3>
                     <ul class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{route('home')}}">Dashboard</a></li>
                         <li class="breadcrumb-item">Balintawak</li>
                         <li class="breadcrumb-item">Stocks</li>
                     </ul>
+                </div>
+                <div class="col-sm-6 text-right">
+                    <input type="text" id="searchParts" class="form-control" placeholder="Search all parts...">
+                    <button type="button" class="btn btn-primary mt-2" data-toggle="modal" data-target="#categoryModal">Choose Category</button>
                 </div>
             </div>
         </div>
@@ -27,15 +31,15 @@
         </div>
 
         @foreach ($categories as $category)
-        <div class="row">
+        <div class="row category-card" data-category="{{ Str::slug($category->category_name) }}">
             <div class="col-md-12">
                 <div class="card card-table">
-                    <div class="card-header" style="background-color: #add8e6; color: #333;">
+                    <div class="card-header" style="background-color:  #030155; color: #ffffff;">
                         <h3 class="card-title mb-0" style="text-transform: uppercase; font-weight: bold;">{{ $category->category_name }}</h3>
                     </div>                                    
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-nowrap custom-table mb-0">
+                            <table class="table table-nowrap custom-table mb-0 product-table">
                                 <thead>
                                     <tr>
                                         <th>#</th>
@@ -47,31 +51,19 @@
                                 <tbody>
                                     @foreach ($category->products as $key => $product)
                                         @php
-                                        
-                                            $totalStock = $product->productStockBalintawak->sum(function ($stock) {
-                                                return $stock->InQty - $stock->OutQty;
-                                            });
-                                            $stockClass = '';
-
-                                            // Assign class based on stock quantity
-                                            if ($totalStock <= 2) {
-                                                $stockClass = 'bg-danger text-white'; // Red for stock <= 2
-                                            } elseif ($totalStock > 2 && $totalStock < 5) {
-                                                $stockClass = 'bg-warning text-dark'; // Yellow for stock 3-5
-                                            } else {
-                                                $stockClass = 'bg-success text-white'; // Green for stock > 5
-                                            }
+                                            $totalStock = $product->productStockBalintawak->sum(fn($stock) => $stock->InQty - $stock->OutQty);
+                                            $stockClass = $totalStock <= 2 ? 'bg-danger text-white' : ($totalStock < 5 ? 'bg-warning text-dark' : 'bg-success text-white');
                                         @endphp
                                         <tr>
                                             <td>{{ $key + 1 }}</td>
                                             <td>{{ $product->product_code }}</td>
-                                            <td>{{ $product->product_name }}</td>
-                                            <td class="{{ $stockClass }}">{{ $totalStock }}</td> <!-- Apply class here -->
+                                            <td>{{ "({$product->product_serial}) {$product->product_name} - {$product->brand_name} - {$product->unit_name} - {$product->product_parts_details}" }}</td>
+                                            <td><span class="stock-cell {{ $stockClass }}">{{ $totalStock }}</span></td>
                                         </tr>
                                     @endforeach
                                     @if ($category->products->isEmpty())
                                         <tr>
-                                            <td colspan="5" class="text-center">No products found</td>
+                                            <td colspan="4" class="text-center">No products found</td>
                                         </tr>
                                     @endif
                                 </tbody>
@@ -81,14 +73,95 @@
                 </div>
             </div>
         </div>
-    @endforeach
-    
-
-    
-    
-        <!-- /Content End -->
+        @endforeach
     </div>
-    <!-- /Page Content -->
 </div>
-<!-- /Page Wrapper -->
+
+<!-- Category Modal -->
+<div class="modal fade" id="categoryModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Choose a Category</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group">
+                    @foreach($categories as $category)
+                        <li class="list-group-item category-option" data-category="{{ Str::slug($category->category_name) }}">{{ $category->category_name }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section('script')
+
+<style>
+    .product-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .product-table th, .product-table td {
+        text-align: center;
+        vertical-align: middle;
+        padding: 10px;
+        border: 1px solid #ddd;
+    }
+
+    .product-table tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    .product-table th {
+        background-color: #013579
+;
+        color: white;
+    }
+
+    .stock-cell {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 5px;
+        min-width: 40px;
+    }
+
+    .stock-low {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .stock-medium {
+        background-color: #ffc107;
+        color: black;
+    }
+
+    .stock-high {
+        background-color: #28a745;
+        color: white;
+    }
+</style>
+
+<script>
+    $(document).ready(function() {
+        // Live Search Functionality
+        $('#searchParts').on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $(".product-table tbody tr").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            });
+        });
+
+        // Category Filter Modal
+        $('.category-option').on('click', function() {
+            var category = $(this).data('category');
+            $('.category-card').hide();
+            $('.category-card[data-category="' + category + '"]').show();
+            $('#categoryModal').modal('hide');
+        });
+    });
+</script>
+@endsection
 @endsection

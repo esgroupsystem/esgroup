@@ -56,23 +56,40 @@ class HomeController extends Controller
         return view('dashboard.emdashboard',compact('todayDate'));
     }
 
-    public function stockDashboard(Request $request)
+    public function stockMirasol(Request $request)
     {
-        $tab = $request->get('tab', 'mirasol'); // Default to 'mirasol'
+        $categories = ProductCategory::with([
+            'products' => function ($query) {
+                $query->leftJoin('product_brands', 'products.product_brand', '=', 'product_brands.id')
+                      ->leftJoin('product_units', 'products.product_unit', '=', 'product_units.id')
+                      ->select(
+                          'products.*',
+                          'product_brands.brand_name as brand_name',
+                          'product_units.unit_name as unit_name'
+                      )
+                      ->with('productTotalStocks');
+            }
+        ])->get();
     
-        // Fetch stocks based on tab
-        $stocks = collect();
-        if ($tab === 'mirasol') {
-            $stocks = ProductCategory::with(['products.productTotalStocks'])->get();
-        } elseif ($tab === 'balintawak') {
-            $stocks = ProductCategory::with(['products.productStockBalintawak'])->get();
-        } elseif ($tab === 'vgc') {
-            $stocks = ProductCategory::with(['products.productStockVgc'])->get();
-        }
+        return view('purchase.stockmirasol', compact('categories'));
+    }
     
-        $todayDate = Carbon::now()->toDayDateTimeString(); // Current date
-    
-        return view('dashboard.stockdashboard', compact('stocks', 'todayDate', 'tab'));
+    public function stockBalintawak(Request $request)
+    {
+        $categories = ProductCategory::with([
+            'products' => function ($query) {
+                $query->leftJoin('product_brands', 'products.product_brand', '=', 'product_brands.id')
+                      ->leftJoin('product_units', 'products.product_unit', '=', 'product_units.id')
+                      ->select(
+                          'products.*',
+                          'product_brands.brand_name as brand_name',
+                          'product_units.unit_name as unit_name'
+                      )
+                      ->with('productStockBalintawak');
+            }
+        ])->get();
+        
+        return view('purchase.stockbalintawak', compact('categories'));
     }
     
 
