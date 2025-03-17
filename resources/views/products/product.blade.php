@@ -147,7 +147,7 @@
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <label class="col-form-label">Details <span class="text-danger">*</span></label>
-                                    <textarea class="form-control" type="text" id="p_details" name="product_details" rows="3" readonly required></textarea>
+                                    <textarea class="form-control" type="text" id="p_details" name="product_details" rows="3" readonly></textarea>
                                 </div>
                                 <div class="submit-section">
                                     <button type="submit" class="btn btn-primary submit-btn" id="submit-btn" disabled>Save</button>
