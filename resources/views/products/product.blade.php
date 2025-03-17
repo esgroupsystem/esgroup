@@ -119,13 +119,13 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Serial Number <span class="text-danger">*</span></label>
-                                    <input class="form-control" type="text" id="p_serial" name="product_serial" readonly required>
+                                    <input class="form-control" type="text" id="p_serial" name="product_serial" readonly>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Brand <span class="text-danger">*</span></label>
-                                    <select class="select form-control" style="width: 100%;" tabindex="-1" aria-hidden="true" id="p_brand" name="product_brand" disabled required>
+                                    <select class="select form-control" style="width: 100%;" tabindex="-1" aria-hidden="true" id="p_brand" name="product_brand" disabled>
                                         <option value="">-- Select --</option>
                                         @foreach ($brand as $key=>$items)
                                             <option value="{{ $items->id }}">{{ $items->brand_name }}</option>

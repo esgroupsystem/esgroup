@@ -46,10 +46,10 @@ class ProductController extends Controller
     {
         $request->validate([
             'product_code'     => 'required|string|max:255',
-            'product_serial'   => 'required|string|max:255',	
+            // 'product_serial'   => 'required|string|max:255',	
             'product_name'	   => 'required|string|max:255',
             'product_category' => 'required|integer',
-            'product_brand'    => 'required|integer',
+            // 'product_brand'    => 'required|integer',
             'product_unit'     => 'required|integer',
         ]);
         

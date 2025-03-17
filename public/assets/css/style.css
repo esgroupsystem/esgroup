@@ -8612,9 +8612,13 @@ ul.comment-list li ul.children {
 /*---- Customize for submit button ---*/
 
 .submit-section {
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	text-align: center;
 	margin-top: 40px;
 }
+
 .submit-btn1 {
     position: relative;
     z-index: 1;
