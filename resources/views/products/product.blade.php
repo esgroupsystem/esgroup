@@ -29,10 +29,10 @@
                                 <tr>
                                     <th hidden>ID</th> 
                                     <th>No</th>
+                                    <th>Category</th>
                                     <th>Product Code</th>
                                     <th>Product Name</th>
-                                    <th>Category</th>
-                                    <th>Brand</th>
+                                    <th>Serial</th>
                                     <th>Unit</th>
                                     <th>Details</th>
                                     <th>Status</th>
@@ -44,10 +44,10 @@
                                     <tr>
                                         <td hidden class="id">{{ $items->id }}</td>
                                         <td>{{ ++$key }}</td>
+                                        <td class="product_category">{{ $items->category_name ?? 'Category not found' }}</td>
                                         <td class="product_code">{{ $items->product_code }}</td>
                                         <td class="product_name">{{ $items->product_name ?? 'Product Name not found' }}</td>
-                                        <td class="product_category">{{ $items->category_name ?? 'Category not found' }}</td>
-                                        <td class="product_brand">{{ $items->brand_name ?? 'Brand not found' }}</td>
+                                        <td class="product_brand">{{ $items->product_serial ?? 'Serial not found' }}</td>
                                         <td class="product_unit">{{ $items->unit_name ?? 'Unit not found' }}</td>
                                         <td class="product_details">{{ $items->product_parts_details ?? 'No Details' }}</td>
                                         <td class="product_status">
