@@ -36,7 +36,7 @@
                                     <th>Unit</th>
                                     <th>Details</th>
                                     {{-- <th>Status</th> --}}
-                                    {{-- <th>Action</th> --}}
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -60,7 +60,7 @@
                                                 {{$items->product_status}}
                                             </span>
                                         </td> --}}
-                                        {{-- <td>
+                                        <td>
                                             <div class="dropdown dropdown-action">
                                                 <a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="material-icons">more_vert</i></a>
                                                 <div class="dropdown-menu dropdown-menu-right">
@@ -68,7 +68,7 @@
                                                     <a class="dropdown-item productDelete" href="#" data-toggle="modal" data-target="#delete_product"><i class="fa fa-trash-o m-r-5"></i> Delete</a>
                                                 </div>
                                             </div>
-                                        </td> --}}
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
