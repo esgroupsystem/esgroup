@@ -36,7 +36,7 @@
                 <div class="card card-table">
                     <div class="card-header" style="background-color: #030155; color: #ffffff;">
                         <h3 class="card-title mb-0" style="text-transform: uppercase; font-weight: bold;">{{ $category->category_name }}</h3>
-                    </div>                                    
+                    </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-bordered product-table">
@@ -48,16 +48,22 @@
                                         <th>Stock</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody class="product-list">
                                     @foreach ($category->products as $key => $product)
                                         @php
                                             $totalStock = $product->productTotalStocks->sum(fn($stock) => $stock->InQty - $stock->OutQty);
                                             $stockClass = $totalStock <= 2 ? 'stock-low' : ($totalStock < 5 ? 'stock-medium' : 'stock-high');
                                         @endphp
-                                        <tr>
+                                        <tr class="product-item">
                                             <td>{{ $key + 1 }}</td>
                                             <td>{{ $product->product_code }}</td>
-                                            <td>{{ "({$product->product_serial}) {$product->product_name} - {$product->brand_name} - {$product->unit_name} - {$product->product_parts_details}" }}</td>
+                                            <td>
+                                                {!! $product->product_serial 
+                                                    ? "<span style='color:red;'>({$product->product_serial})</span>" 
+                                                    : "" !!}
+                                                {{ " {$product->product_name} " }}
+                                                <span style="color:blue;">{{ $product->product_parts_details }}</span>
+                                            </td>
                                             <td><span class="stock-cell {{ $stockClass }}">{{ $totalStock }}</span></td>
                                         </tr>
                                     @endforeach
@@ -68,13 +74,20 @@
                                     @endif
                                 </tbody>
                             </table>
-                                                      
+    
+                            <!-- Pagination controls for the category -->
+                            <div class="pagination-container">
+                                <button class="prev-page btn btn-secondary" data-category="{{ Str::slug($category->category_name) }}">Previous</button>
+                                <button class="next-page btn btn-secondary" data-category="{{ Str::slug($category->category_name) }}">Next</button>
+                                <span class="current-page">Page 1</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        @endforeach
+    @endforeach
+    
     </div>
 </div>
 
@@ -143,6 +156,7 @@
         background-color: #28a745;
         color: white;
     }
+    
 </style>
 
 <script>
@@ -162,6 +176,60 @@
             $('.category-card[data-category="' + category + '"]').show();
             $('#categoryModal').modal('hide');
         });
+    });
+    
+</script>
+
+<script>
+    $(document).ready(function() {
+        var itemsPerPage = 10; // Number of items per page
+        var currentPage = 1; // Initial page
+        var totalPages = 0;
+
+        // Function to paginate products for each category
+        function paginateCategory(categorySlug) {
+            var $categoryProducts = $('.category-card[data-category="' + categorySlug + '"] .product-item');
+            var totalItems = $categoryProducts.length;
+            totalPages = Math.ceil(totalItems / itemsPerPage);
+
+            // Hide all products initially
+            $categoryProducts.hide();
+
+            // Show products for the current page
+            $categoryProducts.each(function(index) {
+                var start = (currentPage - 1) * itemsPerPage;
+                var end = currentPage * itemsPerPage;
+                if (index >= start && index < end) {
+                    $(this).show();
+                }
+            });
+
+            // Update the current page label
+            $('.category-card[data-category="' + categorySlug + '"] .current-page').text('Page ' + currentPage);
+        }
+
+        // Next page button click
+        $('.next-page').click(function() {
+            var categorySlug = $(this).data('category');
+            if (currentPage < totalPages) {
+                currentPage++;
+                paginateCategory(categorySlug);
+            }
+        });
+
+        // Previous page button click
+        $('.prev-page').click(function() {
+            var categorySlug = $(this).data('category');
+            if (currentPage > 1) {
+                currentPage--;
+                paginateCategory(categorySlug);
+            }
+        });
+
+        // Initialize pagination for each category
+        @foreach ($categories as $category)
+            paginateCategory("{{ Str::slug($category->category_name) }}");
+        @endforeach
     });
 </script>
 @endsection
