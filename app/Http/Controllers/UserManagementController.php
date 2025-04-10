@@ -99,6 +99,7 @@ class UserManagementController extends Controller
         
         $roleBadges = [
             'Admin'       => 'bg-inverse-danger',
+            'Maintenance' => 'bg-inverse-warning',
             'Super Admin' => 'bg-inverse-warning',
             'Normal User' => 'bg-inverse-info',
             'Client'      => 'bg-inverse-success',
