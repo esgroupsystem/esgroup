@@ -200,7 +200,7 @@ class PurchaseOrderController extends Controller
             ->orderByRaw('CAST(SUBSTRING(po_number, 4) AS UNSIGNED) DESC')
             ->first();
     
-        $latestNumber = 9919;
+        $latestNumber = 9920;
     
         if ($lastPo && preg_match('/^PO-(\d{4})$/', $lastPo->po_number, $matches)) {
             $latestNumber = (int) $matches[1];
