@@ -51,7 +51,7 @@
                                                 <th class="col-sm-3">Category</th>
                                                 <th class="col-md-3">Product Code</th>
                                                 <th class="col-md-3">Product Name</th>
-                                                <th class="col-md-1">Brand</th>
+                                                {{-- <th class="col-md-1">Brand</th> --}}
                                                 <th class="col-md-1">Unit</th>
                                                 <th class="col-md-1">Qty</th>
                                                 <th> </th>
@@ -75,9 +75,9 @@
                                                 <td>
                                                     <input class="form-control" style="min-width:100px" type="text" id="p_name" name="product_name[]" readonly>
                                                 </td>
-                                                <td>
+                                                {{-- <td>
                                                     <input class="form-control" style="min-width:80px" type="text" id="brand" name="brand[]" readonly>
-                                                </td>
+                                                </td> --}}
                                                 <td>
                                                     <input class="form-control" style="min-width:80px" type="text" id="unit" name="unit[]" readonly>
                                                 </td>

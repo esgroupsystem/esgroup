@@ -278,8 +278,8 @@ class PurchaseOrderController extends Controller
             'product_code.*'  => 'required|string|max:255',
             'product_name'    => 'required|array',
             'product_name.*'  => 'required|string|max:255',
-            'brand'           => 'required|array',
-            'brand.*'         => 'required|string|max:255',
+            // 'brand'           => 'required|array',
+            // 'brand.*'         => 'required|string|max:255',
             'unit'            => 'required|array',
             'unit.*'          => 'required|string|max:255',
         ]);
@@ -294,7 +294,7 @@ class PurchaseOrderController extends Controller
                     'product_code'      => $product_code,
                     'product_name'      => $request->product_name[$key],
                     'product_category'  => $request->category[$key],
-                    'product_brand'     => $request->brand[$key],
+                    // 'product_brand'     => $request->brand[$key],
                     'product_unit'      => $request->unit[$key],
                     'status'            => 'Pending',
                     'request_date'      => now()->toDateString(),
@@ -310,7 +310,7 @@ class PurchaseOrderController extends Controller
             }
             
             DB::commit();
-            flash()->success('Successfully submitted, please for confirmation :)');
+            flash()->success('Successfully submitted, please for wait for confirmation :)');
             return redirect()->route('purchase.index');
         }catch (\Exception $e) {
             DB::rollback();
