@@ -68,7 +68,7 @@
                                                     </select>                                                 
                                                 </td>
                                                 <td>
-                                                    <select class="form-control product-code-select" style="min-width:100px" type="text" name="product_name[]" >
+                                                    <select class="form-control product-code-select select2" style="min-width:100px" type="text" name="product_name[]" >
                                                         <option value="">Selection Area</option>
                                                     </select>
                                                 </td>
@@ -102,6 +102,7 @@
     @section('script')
     <script>
         $(document).ready(function () {
+            $(".select2").select2({ width: '100%' });
             let rowIdx = 1;
             let selectedProductCodes = []; // Array to track selected product codes
     
@@ -117,7 +118,7 @@
                                 @endforeach
                             </select>
                         </td>
-                                                <td>
+                        <td>
                             <select class="form-control product-code-select" style="min-width:100px" type="text" name="product_name[]">
                                 <option value="">Selection Area</option>
                             </select>
@@ -138,6 +139,7 @@
     
                 // Append the new row to the table
                 $("#tablePurchaseOrder tbody").append(newRow);
+                $("#tablePurchaseOrder tbody .select2").select2({ width: '100%' });
                 rowIdx++; // Increment row index
             }
     
