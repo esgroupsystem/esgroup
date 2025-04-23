@@ -118,12 +118,12 @@
                             </select>
                         </td>
                                                 <td>
-                            <select class="form-control product-code-select" style="min-width:100px" type="text" name="product_name[]" readonly>
+                            <select class="form-control product-code-select" style="min-width:100px" type="text" name="product_name[]">
                                 <option value="">Selection Area</option>
                             </select>
                         </td>
                         <td>
-                            <input class="form-control" style="min-width:150px" name="product_code[]">
+                            <input class="form-control" style="min-width:150px" name="product_code[]" readonly>
                         </td>
                         <td>
                             <input class="form-control" style="min-width:80px" type="text" name="unit[]" readonly>
