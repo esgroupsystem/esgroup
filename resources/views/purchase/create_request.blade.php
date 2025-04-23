@@ -49,8 +49,8 @@
                                         <thead>
                                             <tr>
                                                 <th class="col-sm-3">Category</th>
-                                                <th class="col-md-3">Product Code</th>
                                                 <th class="col-md-3">Product Name</th>
+                                                <th class="col-md-3">Product Code</th>
                                                 {{-- <th class="col-md-1">Brand</th> --}}
                                                 <th class="col-md-1">Unit</th>
                                                 <th class="col-md-1">Qty</th>
@@ -68,16 +68,13 @@
                                                     </select>                                                 
                                                 </td>
                                                 <td>
-                                                    <select class="form-control product-code-select" style="min-width:150px" id="p_code" name="product_code[]">
+                                                    <select class="form-control product-code-select" style="min-width:100px" type="text" name="product_name[]" >
                                                         <option value="">Selection Area</option>
-                                                    </select>                                                 
+                                                    </select>
                                                 </td>
                                                 <td>
-                                                    <input class="form-control" style="min-width:100px" type="text" id="p_name" name="product_name[]" readonly>
+                                                    <input class="form-control" style="min-width:150px" name="product_code[]" readonly>
                                                 </td>
-                                                {{-- <td>
-                                                    <input class="form-control" style="min-width:80px" type="text" id="brand" name="brand[]" readonly>
-                                                </td> --}}
                                                 <td>
                                                     <input class="form-control" style="min-width:80px" type="text" id="unit" name="unit[]" readonly>
                                                 </td>
@@ -120,16 +117,13 @@
                                 @endforeach
                             </select>
                         </td>
-                        <td>
-                            <select class="form-control product-code-select" style="min-width:150px" name="product_code[]">
+                                                <td>
+                            <select class="form-control product-code-select" style="min-width:100px" type="text" name="product_name[]" readonly>
                                 <option value="">Selection Area</option>
                             </select>
                         </td>
                         <td>
-                            <input class="form-control" style="min-width:100px" type="text" name="product_name[]" readonly>
-                        </td>
-                        <td>
-                            <input class="form-control" style="min-width:80px" type="text" name="brand[]" readonly>
+                            <input class="form-control" style="min-width:150px" name="product_code[]">
                         </td>
                         <td>
                             <input class="form-control" style="min-width:80px" type="text" name="unit[]" readonly>
@@ -169,7 +163,7 @@
             $(document).on('change', '.category-select', function () {
                 const selectedCategory = $(this).val();
                 const $productCodeDropdown = $(this).closest('tr').find('.product-code-select');
-                $productCodeDropdown.empty().append('<option value="">Select Product Code</option>');
+                $productCodeDropdown.empty().append('<option value="">Select Product Name</option>');
     
                 if (selectedCategory) {
                     $.ajax({
@@ -178,11 +172,11 @@
                         data: { category: selectedCategory },
                         success: function (response) {
                             if (response.success) {
-                                response.product_codes.forEach(function (productCode) {
+                                response.product_names.forEach(function (productName) {
                                     // Only add options that are not already selected
-                                    if (!selectedProductCodes.includes(productCode.code)) {
+                                    if (!selectedProductCodes.includes(productName.pname)) {
                                         $productCodeDropdown.append(
-                                            `<option value="${productCode.code}">${productCode.code}</option>`
+                                            `<option value="${productName.pname}">${productName.pname}</option>`
                                         );
                                     }
                                 });
@@ -199,32 +193,20 @@
     
             // Handle product code selection change
             $(document).on('change', '.product-code-select', function () {
-                const selectedProductCode = $(this).val();
+                const selectedProductName = $(this).val();
                 const $row = $(this).closest('tr');
-                const $productNameField = $row.find('input[name="product_name[]"]');
-                const $brandField = $row.find('input[name="brand[]"]');
+                const $productCodeField = $row.find('input[name="product_code[]"]');
                 const $unitField = $row.find('input[name="unit[]"]');
-    
-                if (selectedProductCode) {
-                    // Check if this product code is already selected
-                    if (selectedProductCodes.includes(selectedProductCode)) {
-                        alert('This Product Code is already selected. Please choose a different one.');
-                        $(this).val(''); // Reset the selection
-                        return;
-                    }
-    
-                    // Add the product code to the selectedProductCodes array
-                    selectedProductCodes.push(selectedProductCode);
-    
+
+                if (selectedProductName) {
                     $.ajax({
                         url: '/get-product-details',
                         type: 'GET',
-                        data: { product_code: selectedProductCode },
+                        data: { product_name: selectedProductName },
                         success: function (response) {
                             if (response.success) {
                                 const product = response.product;
-                                $productNameField.val(product.product_name);
-                                $brandField.val(product.brand_name);
+                                $productCodeField.val(product.product_code);
                                 $unitField.val(product.unit_name);
                             } else {
                                 alert('Product details not found.');
@@ -247,7 +229,7 @@
                 }
     
                 // Track the previously selected code
-                $(this).data('previous-code', selectedProductCode);
+                $(this).data('previous-code', selectedProductName);
             });
     
             // Fetch the latest REQUEST number and set the input field when the page loads

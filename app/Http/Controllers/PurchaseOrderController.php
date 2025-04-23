@@ -237,27 +237,31 @@ class PurchaseOrderController extends Controller
         $categoryId = $request->input('category');
     
         $productCodes = Products::where('product_category', $categoryId)
-            ->get(['id', 'product_code as code']);
+            ->get(['id', 'product_name as pname']);
     
         if ($productCodes->isEmpty()) {
             return response()->json(['success' => false, 'message' => 'No product codes found.']);
         }
     
-        return response()->json(['success' => true, 'product_codes' => $productCodes]);
+        return response()->json(['success' => true, 'product_names' => $productCodes]);
     }
 
     public function getProductDetails(Request $request)
     {
-        $productCode = $request->input('product_code');
-        $query = Products::where('product_code', $productCode);
-        $product = Products::select('products.product_name', 'product_brands.brand_name', 'product_units.unit_name')
-                ->leftJoin('product_brands', 'product_brands.id', '=', 'products.product_brand')
-                ->leftJoin('product_units', 'product_units.id', '=', 'products.product_unit')
-                ->where('products.product_code', $productCode)
-                ->first();
+        $productCode = $request->input('product_name');
+    
+        if (!$productCode) {
+            return response()->json(['success' => false, 'message' => 'Missing product_name']);
+        }
+    
+        $product = Products::select('products.product_code', 'product_brands.brand_name', 'product_units.unit_name')
+            ->leftJoin('product_brands', 'product_brands.id', '=', 'products.product_brand')
+            ->leftJoin('product_units', 'product_units.id', '=', 'products.product_unit')
+            ->where('products.product_name', $productCode)
+            ->first();
     
         if (!$product) {
-            return response()->json(['success' => false, 'message' => 'Product not found.']);
+            return response()->json(['success' => false, 'message' => 'Product not found for: ' . $productCode]);
         }
     
         return response()->json([
