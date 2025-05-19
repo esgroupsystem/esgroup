@@ -79,29 +79,43 @@ class ProductController extends Controller
     }
     
     // Auto generate of product code
-    public function getProductCode(Request $request)
+    public function getProductCode(Request $request) 
     {
         $categoryId = $request->input('category_id');
-        
-        $category = ProductCategory::find($categoryId);
-        $categoryCode = $category->category_code;
-        
-        $lastProduct = Products::where('id', $categoryId)
-                               ->orderBy('id', 'desc')
-                               ->first();
-        
-        $nextProductNumber = $lastProduct ? intval(substr($lastProduct->product_code, -3)) + 1 : 1;
-        do {
-            $formattedCode = $categoryCode . '-' . str_pad($nextProductNumber, 3, '0', STR_PAD_LEFT);
-            $existingProduct = Products::where('product_code', $formattedCode)->first();
     
-            if ($existingProduct) {
-                $nextProductNumber++;
+        // Get the category and its code
+        $category = ProductCategory::find($categoryId);
+        if (!$category) {
+            return response()->json(['product_code' => '']);
+        }
+    
+        $categoryCode = $category->category_code;
+    
+        // Get the last product with a code starting with the category code
+        $lastProduct = Products::where('product_category', $categoryId)
+            ->where('product_code', 'LIKE', $categoryCode . '-%')
+            ->orderByDesc('product_code')  // Ensure correct code-based ordering
+            ->first();
+    
+        $nextNumber = 1;
+    
+        if ($lastProduct) {
+            $matches = [];
+            if (preg_match('/-(\d+)$/', $lastProduct->product_code, $matches)) {
+                $nextNumber = intval($matches[1]) + 1;
             }
-        } while ($existingProduct);
-
-        return response()->json(['product_code' => $formattedCode]);
+        }
+        $newCode = $categoryCode . '-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+    
+        // Double-check uniqueness (optional)
+        while (Products::where('product_code', $newCode)->exists()) {
+            $nextNumber++;
+            $newCode = $categoryCode . '-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+        }
+    
+        return response()->json(['product_code' => $newCode]);
     }
+    
 
     /** Update Record */
     public function updateProduct(Request $request)
