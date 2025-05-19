@@ -166,7 +166,7 @@
                 const selectedCategory = $(this).val();
                 const $productCodeDropdown = $(this).closest('tr').find('.product-code-select');
                 $productCodeDropdown.empty().append('<option value="">Select Product Name</option>');
-    
+
                 if (selectedCategory) {
                     $.ajax({
                         url: '/get-product-codes',
@@ -174,11 +174,15 @@
                         data: { category: selectedCategory },
                         success: function (response) {
                             if (response.success) {
-                                response.product_names.forEach(function (productName) {
-                                    // Only add options that are not already selected
-                                    if (!selectedProductCodes.includes(productName.pname)) {
+                                response.product_names.forEach(function (product) {
+                                    // Unique value: product_name|product_serial
+                                    const uniqueKey = product.pname + '|' + product.serial;
+
+                                    // Prevent duplicates
+                                    if (!selectedProductCodes.includes(uniqueKey)) {
+                                        const label = `${product.pname} (Serial: ${product.serial})`;
                                         $productCodeDropdown.append(
-                                            `<option value="${productName.pname}">${productName.pname}</option>`
+                                            `<option value="${uniqueKey}">${label}</option>`
                                         );
                                     }
                                 });
@@ -192,19 +196,24 @@
                     });
                 }
             });
-    
+
             // Handle product code selection change
             $(document).on('change', '.product-code-select', function () {
-                const selectedProductName = $(this).val();
+                const selectedValue = $(this).val(); // example: "FAN BELT|FB001"
+                const [productName, serial] = selectedValue.split('|');
+
                 const $row = $(this).closest('tr');
                 const $productCodeField = $row.find('input[name="product_code[]"]');
                 const $unitField = $row.find('input[name="unit[]"]');
 
-                if (selectedProductName) {
+                if (productName && serial) {
                     $.ajax({
                         url: '/get-product-details',
                         type: 'GET',
-                        data: { product_name: selectedProductName },
+                        data: {
+                            product_name: productName,
+                            serial: serial
+                        },
                         success: function (response) {
                             if (response.success) {
                                 const product = response.product;
@@ -219,20 +228,20 @@
                         }
                     });
                 } else {
-                    // Clear the fields if no product is selected
+                    // Clear fields on no selection
                     const previousProductCode = $(this).data('previous-code');
                     if (previousProductCode) {
                         selectedProductCodes = selectedProductCodes.filter(code => code !== previousProductCode);
                     }
-                    $(this).data('previous-code', ''); // Reset tracking
-                    $productNameField.val('');
-                    $brandField.val('');
+                    $(this).data('previous-code', '');
+                    $productCodeField.val('');
                     $unitField.val('');
                 }
-    
-                // Track the previously selected code
-                $(this).data('previous-code', selectedProductName);
+
+                // Save selected value
+                $(this).data('previous-code', selectedValue);
             });
+
     
             // Fetch the latest REQUEST number and set the input field when the page loads
             function fetchLatestRequestNumber(callback) {

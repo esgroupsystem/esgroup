@@ -233,18 +233,23 @@ class PurchaseOrderController extends Controller
         ]);
     }
 
-    public function getProductCodes(Request $request){
+    public function getProductCodes(Request $request)
+    {
         $categoryId = $request->input('category');
     
         $productCodes = Products::where('product_category', $categoryId)
-            ->get(['id', 'product_name as pname']);
+            ->get(['id', 'product_name as pname', 'product_serial as serial']);
     
         if ($productCodes->isEmpty()) {
             return response()->json(['success' => false, 'message' => 'No product codes found.']);
         }
     
-        return response()->json(['success' => true, 'product_names' => $productCodes]);
+        return response()->json([
+            'success' => true,
+            'product_names' => $productCodes
+        ]);
     }
+    
 
     public function getProductDetails(Request $request)
     {
