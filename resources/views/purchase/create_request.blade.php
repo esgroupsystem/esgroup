@@ -33,7 +33,7 @@
                             <div class="col-sm-6 col-md-3">
                                 <div class="form-group">
                                     <label>Garage<span class="text-danger">*</span></label>
-                                    <select class="select" id="garage" name="gar_name" required>
+                                    <select class="form-control" id="garage" name="gar_name" required>
                                         <option value="">Select Garage</option>
                                             @foreach($garage as $item)
                                                 <option value="{{ $item->garage_name }}">{{ $item->garage_name }}</option>
@@ -119,7 +119,7 @@
                             </select>
                         </td>
                         <td>
-                            <select class="form-control product-code-select" style="min-width:100px" type="text" name="product_name[]">
+                            <select class="form-control product-code-select select2" style="min-width:100px" type="text" name="product_name[]">
                                 <option value="">Selection Area</option>
                             </select>
                         </td>

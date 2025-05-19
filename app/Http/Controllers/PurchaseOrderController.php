@@ -134,7 +134,7 @@ class PurchaseOrderController extends Controller
         $requestOrder = RequestOrder::get();
         $poOrder = PurchaseOrder::get();
         $product = Products::get();
-
+        
         return view('purchase.create_request', compact('garage','category', 'brand', 'unit', 'supplier', 'product', 'requestOrder', 'poOrder'));
     }
 
