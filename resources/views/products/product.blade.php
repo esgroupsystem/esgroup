@@ -24,7 +24,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="table-responsive">
-                        <table class="table table-striped custom-table datatable" id="productList" style="width: 100%">
+                        <table class="table table-striped custom-table" id="productList" style="width: 100%">
                             <thead>
                                 <tr>
                                     <th hidden>ID</th> 
@@ -254,16 +254,6 @@
             $('.e_id').val(categoryId); 
         });
     </script>
-    
-<!-- {{---- Filter Pagination ----}} -->
-<!-- {{---- Filter Pagination ----}} -->
-<!-- {{---- Filter Pagination ----}} -->
-
-    <script>
-        $(document).ready(function() {
-            $('#categoryList').DataTable();
-        });
-    </script>
 
 <!-- --- Auto Generated Product Code ---- -->
 <!-- --- Auto Generated Product Code ---- -->
@@ -309,6 +299,21 @@
             });
         });
     </script>
+
+<script>
+    $(document).ready(function() {
+        var table = $('#productList').DataTable({
+            paging: true,
+            ordering: true,
+            info: true
+        });
+
+        $('#productSearch').on('keyup', function() {
+            table.search(this.value).draw();
+        });
+    });
+</script>
+    
 
     @endsection
 @endsection
