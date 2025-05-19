@@ -60,7 +60,7 @@
                                         <tbody>
                                             <tr>
                                                 <td>
-                                                    <select class="form-control category-select" style="min-width:150px" name="category[]">
+                                                    <select class="form-control category-select select2" style="min-width:150px" name="category[]">
                                                         <option value="">Selection Area</option>
                                                         @foreach ($category as $item)
                                                             <option value="{{ $item->id }}">{{ $item->category_name }}</option>
@@ -111,7 +111,7 @@
                 const newRow = `
                     <tr>
                         <td>
-                            <select class="form-control category-select" style="min-width:150px" name="category[]">
+                            <select class="form-control category-select select2" style="min-width:150px" name="category[]">
                                 <option value="">Selection Area</option>
                                 @foreach ($category as $item)
                                     <option value="{{ $item->id }}">{{ $item->category_name }}</option>
