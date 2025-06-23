@@ -104,7 +104,8 @@
         $(document).ready(function () {
             $(".select2").select2({ width: '100%' });
             let rowIdx = 1;
-            let selectedProductCodes = []; // Array to track selected product codes
+            const productMap = {};
+            let selectedProductCodes = [];
     
             // Function to add a new row
             function addRow(poNumber) {
@@ -174,13 +175,20 @@
                         data: { category: selectedCategory },
                         success: function (response) {
                             if (response.success) {
-                                response.product_names.forEach(function (product) {
-                                    // Unique value: product_name|product_serial
-                                    const uniqueKey = product.pname + '|' + product.serial;
+                                // Clear current map & selected codes (optional: if you want to reset on category change)
+                                // productMap = {}; // do NOT reassign const, so clear keys:
+                                for (const key in productMap) delete productMap[key];
+                                selectedProductCodes = [];
 
-                                    // Prevent duplicates
+                                response.product_names.forEach(function (product) {
+                                    const uniqueKey = product.pname + '|' + product.serial;
+                                    productMap[uniqueKey] = product;
+
+                                    const label = `${product.pname} (Serial: ${product.serial})`;
+
                                     if (!selectedProductCodes.includes(uniqueKey)) {
-                                        const label = `${product.pname} (Serial: ${product.serial})`;
+                                        selectedProductCodes.push(uniqueKey);
+
                                         $productCodeDropdown.append(
                                             `<option value="${uniqueKey}">${label}</option>`
                                         );
@@ -199,21 +207,20 @@
 
             // Handle product code selection change
             $(document).on('change', '.product-code-select', function () {
-                const selectedValue = $(this).val(); // example: "FAN BELT|FB001"
-                const [productName, serial] = selectedValue.split('|');
+                const uniqueKey = $(this).val();  // value is "product_name|serial"
 
                 const $row = $(this).closest('tr');
                 const $productCodeField = $row.find('input[name="product_code[]"]');
                 const $unitField = $row.find('input[name="unit[]"]');
 
-                if (productName && serial) {
+                if (uniqueKey && productMap.hasOwnProperty(uniqueKey)) {
+                    const product = productMap[uniqueKey];
+                    const productId = product.id;
+
                     $.ajax({
                         url: '/get-product-details',
                         type: 'GET',
-                        data: {
-                            product_name: productName,
-                            serial: serial
-                        },
+                        data: { product_id: productId },
                         success: function (response) {
                             if (response.success) {
                                 const product = response.product;
@@ -221,12 +228,20 @@
                                 $unitField.val(product.unit_name);
                             } else {
                                 alert('Product details not found.');
+                                $productCodeField.val('');
+                                $unitField.val('');
                             }
                         },
                         error: function () {
                             alert('Failed to fetch product details.');
+                            $productCodeField.val('');
+                            $unitField.val('');
                         }
                     });
+
+                    // ✅ Move this line here, where productId is defined
+                    $(this).data('previous-code', productId);
+
                 } else {
                     // Clear fields on no selection
                     const previousProductCode = $(this).data('previous-code');
@@ -237,9 +252,6 @@
                     $productCodeField.val('');
                     $unitField.val('');
                 }
-
-                // Save selected value
-                $(this).data('previous-code', selectedValue);
             });
 
     

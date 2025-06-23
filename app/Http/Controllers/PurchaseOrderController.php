@@ -253,22 +253,22 @@ class PurchaseOrderController extends Controller
 
     public function getProductDetails(Request $request)
     {
-        $productCode = $request->input('product_name');
-    
-        if (!$productCode) {
-            return response()->json(['success' => false, 'message' => 'Missing product_name']);
+        $productId = $request->input('product_id');
+
+        if (!$productId) {
+            return response()->json(['success' => false, 'message' => 'Missing product_id']);
         }
-    
+
         $product = Products::select('products.product_code', 'product_brands.brand_name', 'product_units.unit_name')
             ->leftJoin('product_brands', 'product_brands.id', '=', 'products.product_brand')
             ->leftJoin('product_units', 'product_units.id', '=', 'products.product_unit')
-            ->where('products.product_name', $productCode)
+            ->where('products.id', $productId)
             ->first();
-    
+
         if (!$product) {
-            return response()->json(['success' => false, 'message' => 'Product not found for: ' . $productCode]);
+            return response()->json(['success' => false, 'message' => 'Product not found']);
         }
-    
+
         return response()->json([
             'success' => true,
             'product' => $product
