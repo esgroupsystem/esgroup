@@ -46,7 +46,7 @@
         <img src="{{ URL::to('assets/img/ESGroup-Logo.png') }}" alt="">
       </a>
 
-      <nav id="navmenu" class="navmenu">
+      <nav id="navmenu" class="navmenu pe-4">
         <ul>
           <li><a href="#hero" class="active">Home</a></li>
           <li><a href="#about">About</a></li>
@@ -79,12 +79,10 @@
               </div>
 
               <h1 class="mb-4">
-                To Enchance the Quality <br>
-                of Life for Individuals
-                who have special needs
-                and disabilities<br>
-                <span class="accent-text">Providing safe, reliable
-                    and promt mobility management services
+                Accessible Transport You Can Trust<br>
+                <span class="accent-text">Delivering safe, prompt, and reliable mobility
+                solutions for persons with disabilities
+                and special needs because everyone deserves to move freely.
                 </span>
               </h1>
 
@@ -174,29 +172,30 @@
 
           <div class="col-xl-5" data-aos="fade-up" data-aos-delay="200">
             <span class="about-meta">MORE ABOUT US</span>
-            <h2 class="about-title">ES Group of Companies</h2>
-            <p class="about-description">ES Group of Companies comprises 4 transport companies plying city routes within Metro Manila, namely: ES Transport, Inc., EarthStar Express, Inc., Kellen Transport, Inc., and Jell Transport, Inc. 
-
-                The four companies comprising the ES Group of Companies are currently operating on the newly established EDSA Carousel route since 2020. When the pandemic struck in early 2020, daily commuters would face difficulties getting to their destinations due to the lack of public transportation service in Metro Manila and nearby provinces. In order to assist commuters, who were considered essential workers, during the Covid-19 pandemic, ES Group participated in the MRT augmentation program and Libreng Sakay programs of the DOTr and LTFRB for the betterment of public commuters.</p>
-
+            <h2 class="about-title">ES Group</h2>
+            <p class="about-description" style="text-align: justify;" >
+              The ES Group of Companies is composed of four transport service providers operating within Metro Manila: ES Transport, Inc., EarthStar Express, Inc., Kellen Transport, Inc., and Jell Transport, Inc. Since 2020, these companies have been actively operating along the newly established EDSA Carousel route.
+              At the onset of the COVID-19 pandemic in early 2020, the suspension of public transportation posed significant challenges for daily commuters across Metro Manila and nearby provinces. In response, and in recognition of the vital role of essential workers, the ES Group of Companies took part in the MRT 
+              Augmentation Program and the Libreng Sakay initiatives spearheaded by the Department of Transportation (DOTr) and the Land Transportation Franchising and Regulatory Board (LTFRB). These efforts were aimed at supporting mobility and ensuring continued access to transportation for the benefit of the commuting public.
+            </p>
             <div class="row feature-list-wrapper">
               <div class="col-md-6">
                 <ul class="feature-list">
-                  <li><i class="bi bi-check-circle-fill"></i> Lorem ipsum dolor sit amet</li>
-                  <li><i class="bi bi-check-circle-fill"></i> Consectetur adipiscing elit</li>
-                  <li><i class="bi bi-check-circle-fill"></i> Sed do eiusmod tempor</li>
+                  <li><i class="bi bi-check-circle-fill"></i> Active Operator on the EDSA Carousel</li>
+                  <li><i class="bi bi-check-circle-fill"></i> Participant in the Libreng Sakay Program</li>
+                  <li><i class="bi bi-check-circle-fill"></i> Serving Essential Workers During the Pandemic</li>
                 </ul>
               </div>
               <div class="col-md-6">
                 <ul class="feature-list">
-                  <li><i class="bi bi-check-circle-fill"></i> Incididunt ut labore et</li>
-                  <li><i class="bi bi-check-circle-fill"></i> Dolore magna aliqua</li>
-                  <li><i class="bi bi-check-circle-fill"></i> Ut enim ad minim veniam</li>
+                  <li><i class="bi bi-check-circle-fill"></i> Committed to Safe and Reliable Transportation</li>
+                  <li><i class="bi bi-check-circle-fill"></i> 24/7 Operations Across Key PITX to MONUMENTO</li>
+                  <li><i class="bi bi-check-circle-fill"></i> Dedicated to Improving Commuter Experience</li>
                 </ul>
               </div>
             </div>
 
-            <div class="info-wrapper">
+            {{-- <div class="info-wrapper">
               <div class="row gy-4">
                 <div class="col-lg-5">
                   <div class="profile d-flex align-items-center gap-3">
@@ -217,7 +216,7 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </div> --}}
           </div>
 
           <div class="col-xl-6" data-aos="fade-up" data-aos-delay="300">
@@ -239,7 +238,7 @@
     </section><!-- /About Section -->
 
     <!-- Features Section -->
-    <section id="features" class="features section">
+    {{-- <section id="features" class="features section">
 
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
@@ -342,7 +341,7 @@
 
       </div>
 
-    </section><!-- /Features Section -->
+    </section><!-- /Features Section --> --}}
 
     <!-- Features Cards Section -->
     {{-- <section id="features-cards" class="features-cards section">
@@ -731,7 +730,7 @@
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
         <h2>Services</h2>
-        <p>Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p>
+        <p>Empowering your daily commute with safe, efficient, and inclusive transport solutions.</p>
       </div><!-- End Section Title -->
 
       <div class="container" data-aos="fade-up" data-aos-delay="100">
@@ -741,12 +740,12 @@
           <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
             <div class="service-card d-flex">
               <div class="icon flex-shrink-0">
-                <i class="bi bi-activity"></i>
+                <i class="bi bi-bus-front-fill"></i>
               </div>
               <div>
-                <h3>Nesciunt Mete</h3>
-                <p>Provident nihil minus qui consequatur non omnis maiores. Eos accusantium minus dolores iure perferendis tempore et consequatur.</p>
-                <a href="service-details.html" class="read-more">Read More <i class="bi bi-arrow-right"></i></a>
+                <h3>Express Bus Service</h3>
+                <p>Fast, point-to-point bus rides along EDSA, with fewer stops to help you reach your destination quickly and comfortably during peak hours.</p>
+                <a href="" class="read-more">Read More <i class="bi bi-arrow-right"></i></a>
               </div>
             </div>
           </div><!-- End Service Card -->
@@ -754,12 +753,12 @@
           <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
             <div class="service-card d-flex">
               <div class="icon flex-shrink-0">
-                <i class="bi bi-diagram-3"></i>
+                <i class="bi bi-clock"></i>
               </div>
               <div>
-                <h3>Eosle Commodi</h3>
-                <p>Ut autem aut autem non a. Sint sint sit facilis nam iusto sint. Libero corrupti neque eum hic non ut nesciunt dolorem.</p>
-                <a href="service-details.html" class="read-more">Read More <i class="bi bi-arrow-right"></i></a>
+                <h3>24/7 Terminal Assistance</h3>
+                <p>Friendly staff available at major terminals to assist with directions, fares, schedules, and lost & found concerns at any time of the day.</p>
+                <a href="" class="read-more">Read More <i class="bi bi-arrow-right"></i></a>
               </div>
             </div>
           </div><!-- End Service Card -->
@@ -767,12 +766,12 @@
           <div class="col-lg-6" data-aos="fade-up" data-aos-delay="300">
             <div class="service-card d-flex">
               <div class="icon flex-shrink-0">
-                <i class="bi bi-easel"></i>
+                <i class="bi bi-person-wheelchair"></i>
               </div>
               <div>
-                <h3>Ledo Markt</h3>
-                <p>Ut excepturi voluptatem nisi sed. Quidem fuga consequatur. Minus ea aut. Vel qui id voluptas adipisci eos earum corrupti.</p>
-                <a href="service-details.html" class="read-more">Read More <i class="bi bi-arrow-right"></i></a>
+                <h3>Accessible Transport</h3>
+                <p>Our buses are equipped with ramps, priority seating, and space for wheelchairs to ensure inclusivity for all passengers.</p>
+                <a href="" class="read-more">Read More <i class="bi bi-arrow-right"></i></a>
               </div>
             </div>
           </div><!-- End Service Card -->
@@ -780,12 +779,12 @@
           <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
             <div class="service-card d-flex">
               <div class="icon flex-shrink-0">
-                <i class="bi bi-clipboard-data"></i>
+                <i class="bi bi-person-check"></i>
               </div>
               <div>
-                <h3>Asperiores Commodit</h3>
-                <p>Non et temporibus minus omnis sed dolor esse consequatur. Cupiditate sed error ea fuga sit provident adipisci neque.</p>
-                <a href="service-details.html" class="read-more">Read More <i class="bi bi-arrow-right"></i></a>
+                <h3>Safe and Secure Rides</h3>
+                <p>We prioritize your safety with well-maintained buses, trained drivers, and strict compliance with government transport standards.</p>
+                <a href="" class="read-more">Read More <i class="bi bi-arrow-right"></i></a>
               </div>
             </div>
           </div><!-- End Service Card -->
@@ -938,7 +937,7 @@
 
           <div class="col-lg-5" data-aos="fade-up">
             <h2 class="faq-title">Have a question? Check out the FAQ</h2>
-            <p class="faq-description">Maecenas tempus tellus eget condimentum rhoncus sem quam semper libero sit amet adipiscing sem neque sed ipsum.</p>
+            <p class="faq-description">Get quick answers about schedules, routes, accessibility, and more.</p>
             <div class="faq-arrow d-none d-lg-block" data-aos="fade-up" data-aos-delay="200">
               <svg class="faq-arrow" width="200" height="211" viewBox="0 0 200 211" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M198.804 194.488C189.279 189.596 179.529 185.52 169.407 182.07L169.384 182.049C169.227 181.994 169.07 181.939 168.912 181.884C166.669 181.139 165.906 184.546 167.669 185.615C174.053 189.473 182.761 191.837 189.146 195.695C156.603 195.912 119.781 196.591 91.266 179.049C62.5221 161.368 48.1094 130.695 56.934 98.891C84.5539 98.7247 112.556 84.0176 129.508 62.667C136.396 53.9724 146.193 35.1448 129.773 30.2717C114.292 25.6624 93.7109 41.8875 83.1971 51.3147C70.1109 63.039 59.63 78.433 54.2039 95.0087C52.1221 94.9842 50.0776 94.8683 48.0703 94.6608C30.1803 92.8027 11.2197 83.6338 5.44902 65.1074C-1.88449 41.5699 14.4994 19.0183 27.9202 1.56641C28.6411 0.625793 27.2862 -0.561638 26.5419 0.358501C13.4588 16.4098 -0.221091 34.5242 0.896608 56.5659C1.8218 74.6941 14.221 87.9401 30.4121 94.2058C37.7076 97.0203 45.3454 98.5003 53.0334 98.8449C47.8679 117.532 49.2961 137.487 60.7729 155.283C87.7615 197.081 139.616 201.147 184.786 201.155L174.332 206.827C172.119 208.033 174.345 211.287 176.537 210.105C182.06 207.125 187.582 204.122 193.084 201.144C193.346 201.147 195.161 199.887 195.423 199.868C197.08 198.548 193.084 201.144 195.528 199.81C196.688 199.192 197.846 198.552 199.006 197.935C200.397 197.167 200.007 195.087 198.804 194.488ZM60.8213 88.0427C67.6894 72.648 78.8538 59.1566 92.1207 49.0388C98.8475 43.9065 106.334 39.2953 114.188 36.1439C117.295 34.8947 120.798 33.6609 124.168 33.635C134.365 33.5511 136.354 42.9911 132.638 51.031C120.47 77.4222 86.8639 93.9837 58.0983 94.9666C58.8971 92.6666 59.783 90.3603 60.8213 88.0427Z" fill="currentColor"></path>
@@ -950,49 +949,79 @@
             <div class="faq-container">
 
               <div class="faq-item faq-active">
-                <h3>Non consectetur a erat nam at lectus urna duis?</h3>
+                <h3>What are the operating hours of the EDSA Carousel?</h3>
                 <div class="faq-content">
-                  <p>Feugiat pretium nibh ipsum consequat. Tempus iaculis urna id volutpat lacus laoreet non curabitur gravida. Venenatis lectus magna fringilla urna porttitor rhoncus dolor purus non.</p>
+                  <p>Our buses run daily from 12:00 AM to 11:59 PM. Please note that schedules may vary on holidays or during special events. Check our official channels for service advisories.</p>
                 </div>
                 <i class="faq-toggle bi bi-chevron-right"></i>
               </div><!-- End Faq item-->
 
               <div class="faq-item">
-                <h3>Feugiat scelerisque varius morbi enim nunc faucibus?</h3>
+                <h3>Where can I find the list of EDSA Carousel bus stops?</h3>
                 <div class="faq-content">
-                  <p>Dolor sit amet consectetur adipiscing elit pellentesque habitant morbi. Id interdum velit laoreet id donec ultrices. Fringilla phasellus faucibus scelerisque eleifend donec pretium. Est pellentesque elit ullamcorper dignissim. Mauris ultrices eros in cursus turpis massa tincidunt dui.</p>
+                  <p>You can find the full list of bus stops on our website or posted at terminals. Major stops include PITX: (Parañaque Integrated Terminal Exchange)
+                  , Ayala Malls Manila Bay
+                  , City of Dreams
+                  , Macapagal – Bradco Avenue
+                  , SM Mall of Asia (MOA)
+                  , Roxas Boulevard
+                  , Taft Avenue
+                  , Tramo
+                  , Ayala
+                  , Buendia
+                  , Guadalupe
+                  , Ortigas
+                  , Santolan
+                  , Main Avenue
+                  , Mega Q-Mart
+                  , Quezon Avenue
+                  , North Avenue
+                  , SM North
+                  , Roosevelt
+                  , Kaingin Road
+                  , Balintawak
+                  , Bagong Barrio
+                  , Monumento </p>
                 </div>
                 <i class="faq-toggle bi bi-chevron-right"></i>
               </div><!-- End Faq item-->
 
               <div class="faq-item">
-                <h3>Dolor sit amet consectetur adipiscing elit pellentesque?</h3>
+                <h3>How much is the fare for the EDSA Carousel?</h3>
                 <div class="faq-content">
-                  <p>Eleifend mi in nulla posuere sollicitudin aliquam ultrices sagittis orci. Faucibus pulvinar elementum integer enim. Sem nulla pharetra diam sit amet nisl suscipit. Rutrum tellus pellentesque eu tincidunt. Lectus urna duis convallis convallis tellus. Urna molestie at elementum eu facilisis sed odio morbi quis</p>
+                  <p>The fare starts at ₱13.00 for the minimum distance and may vary based on your stop. Discounted fares apply to eligible passengers upon presenting valid IDs.</p>
                 </div>
                 <i class="faq-toggle bi bi-chevron-right"></i>
               </div><!-- End Faq item-->
 
               <div class="faq-item">
-                <h3>Ac odio tempor orci dapibus. Aliquam eleifend mi in nulla?</h3>
+                <h3>Are there discounted fares for students, senior citizens, and PWDs?</h3>
                 <div class="faq-content">
-                  <p>Dolor sit amet consectetur adipiscing elit pellentesque habitant morbi. Id interdum velit laoreet id donec ultrices. Fringilla phasellus faucibus scelerisque eleifend donec pretium. Est pellentesque elit ullamcorper dignissim. Mauris ultrices eros in cursus turpis massa tincidunt dui.</p>
+                  <p>Absolutely. Passengers with valid student, senior citizen, or PWD IDs are entitled to fare discounts in accordance with government guidelines.</p>
                 </div>
                 <i class="faq-toggle bi bi-chevron-right"></i>
               </div><!-- End Faq item-->
 
               <div class="faq-item">
-                <h3>Tempus quam pellentesque nec nam aliquam sem et tortor?</h3>
+                <h3>What safety protocols are followed on the buses?</h3>
                 <div class="faq-content">
-                  <p>Molestie a iaculis at erat pellentesque adipiscing commodo. Dignissim suspendisse in est ante in. Nunc vel risus commodo viverra maecenas accumsan. Sit amet nisl suscipit adipiscing bibendum est. Purus gravida quis blandit turpis cursus in</p>
+                  <p>We implement regular cleaning and disinfection, encourage mask-wearing, and monitor capacity to help ensure safe trips for all passengers.</p>
                 </div>
                 <i class="faq-toggle bi bi-chevron-right"></i>
               </div><!-- End Faq item-->
 
               <div class="faq-item">
-                <h3>Perspiciatis quod quo quos nulla quo illum ullam?</h3>
+                <h3>Who can I contact for lost items left on the bus?</h3>
                 <div class="faq-content">
-                  <p>Enim ea facilis quaerat voluptas quidem et dolorem. Quis et consequatur non sed in suscipit sequi. Distinctio ipsam dolore et.</p>
+                  <p>If you lose an item, please contact our hotline or approach staff at any major terminal. Provide details of your trip (date, time, bus stop) to help with recovery.</p>
+                </div>
+                <i class="faq-toggle bi bi-chevron-right"></i>
+              </div><!-- End Faq item-->
+
+              <div class="faq-item">
+                <h3>How can I provide feedback or report an issue with the service?</h3>
+                <div class="faq-content">
+                  <p>We value your feedback. You can reach us through our website’s Contact Us page, our official social media channels, or at terminal help desks.</p>
                 </div>
                 <i class="faq-toggle bi bi-chevron-right"></i>
               </div><!-- End Faq item-->
@@ -1027,7 +1056,7 @@
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
         <h2>Contact</h2>
-        <p>Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p>
+        <p>Get in touch with our team for assistance, service information, or partnership opportunities.</p>
       </div><!-- End Section Title -->
 
       <div class="container" data-aos="fade-up" data-aos-delay="100">
@@ -1075,7 +1104,7 @@
           <div class="col-lg-7">
             <div class="contact-form" data-aos="fade-up" data-aos-delay="300">
               <h3>Get In Touch</h3>
-              <p>Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Vestibulum ante ipsum primis.</p>
+              <p>Should you have any inquiries or require additional information, please do not hesitate to contact us using the details provided below.</p>
 
               <form action="forms/contact.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
                 <div class="row gy-4">
