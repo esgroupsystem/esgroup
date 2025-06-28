@@ -2,40 +2,114 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Log;
 use App\Models\module_permission;
 use Illuminate\Http\Request;
+use App\Models\EmployeeSchedule;
 use App\Models\department;
 use App\Models\Employee;
 use App\Models\User;
 use App\Models\designation;
+use Carbon\Carbon;
 use DB;
 
 class EmployeeController extends Controller
 {
-    /** All Employee Card View */
+    //Add schedule per employee
+    public function store(Request $request)
+    {
+        DB::beginTransaction();
+    
+        try {
+            $request->validate([
+                'employee_id' => 'required|exists:users,user_id', // This is user_id like 'ESGROUP-0001'
+                'month'       => 'required|date_format:Y-m',
+                'start_time'  => 'required|date_format:H:i',
+                'end_time'    => 'required|date_format:H:i',
+            ]);
+    
+            // Find employee by user_id (string)
+            $employee = Employee::where('employee_id', $request->employee_id)->first();
+    
+            if (!$employee) {
+                throw new \Exception('Employee not found for user_id: ' . $request->employee_id);
+            }
+    
+            $startOfMonth = Carbon::parse($request->month)->startOfMonth();
+            $endOfMonth = Carbon::parse($request->month)->endOfMonth();
+    
+            for ($date = $startOfMonth; $date->lte($endOfMonth); $date->addDay()) {
+                // Optional: Skip weekends
+                // if ($date->isWeekend()) continue;
+    
+                EmployeeSchedule::updateOrCreate([
+                    'employee_id' => $employee->id,
+                    'work_date' => $date->toDateString(),
+                ], [
+                    'start_time' => $request->start_time,
+                    'end_time' => $request->end_time,
+                ]);
+            }
+    
+            DB::commit();
+            flash()->success('Updated schedule successfully :)');
+            return redirect()->route('all/employee/card');
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('Error updating schedule: ' . $e->getMessage());
+            flash()->error('Schedule update failed :(');
+            return redirect()->back();
+        }
+    }
+    
     public function cardAllEmployee(Request $request)
     {
         $users = DB::table('users')
-        ->join('employees', 'users.user_id', 'employees.employee_id')
-        ->leftJoin('departments', 'employees.department_id', 'departments.id')
-        ->leftJoin('designations', 'employees.designation_id', 'designations.id')
-        ->select(
-            'users.*',
-            'employees.birth_date',
-            'employees.gender',
-            'employees.company',
-            'departments.department as department',
-            'designations.designation as designation'
-        )
-        ->get();
-
+            ->join('employees', 'users.user_id', 'employees.employee_id')
+            ->leftJoin('departments', 'employees.department_id', 'departments.id')
+            ->leftJoin('designations', 'employees.designation_id', 'designations.id')
+            ->select(
+                'users.*',
+                'employees.birth_date',
+                'employees.gender',
+                'employees.company',
+                'departments.department as department',
+                'designations.designation as designation'
+            )
+            ->get();
+    
         $userList = DB::table('users')->get();
         $permission_lists = DB::table('permission_lists')->get();
         $departments = department::all();
         $designations = designation::all();
-
-        return view('employees.allemployeecard', compact('users', 'userList', 'permission_lists', 'departments', 'designations'));
-    }
+    
+        $year = 2025;
+        $month = 5;
+    
+        // Get all schedules for the month (May 2025)
+        $schedulesRaw = EmployeeSchedule::whereYear('work_date', $year)
+            ->whereMonth('work_date', $month)
+            ->get();
+    
+        // Group schedules by employee_id
+        $schedules = [];
+        foreach ($schedulesRaw as $sched) {
+            $schedules[$sched->employee_id][] = [
+                'date'  => Carbon::parse($sched->work_date)->format('F j, Y (l)'),
+                'start' => Carbon::parse($sched->start_time)->format('g:i A'),
+                'end'   => Carbon::parse($sched->end_time)->format('g:i A'),
+            ];
+        }
+    
+        return view('employees.allemployeecard', compact(
+            'users',
+            'userList',
+            'permission_lists',
+            'departments',
+            'designations',
+            'schedules' // ✅ Passed to view
+        ));
+    }    
 
     /** All Employee List */
     public function listAllEmployee()

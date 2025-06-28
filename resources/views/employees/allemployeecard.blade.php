@@ -61,27 +61,90 @@
             <!-- Search Filter -->
               
             <div class="row staff-grid-row">
-                @foreach ($users as $lists )
+                @foreach ($users as $user)
                 <div class="col-md-4 col-sm-6 col-12 col-lg-4 col-xl-3">
                     <div class="profile-widget">
                         <div class="profile-img">
-                            <a href="{{ url('employee/profile/'.$lists->user_id) }}" class="avatar">
-                                <img class="user-profile" src="{{ URL::to('/assets/images/'. $lists->avatar) }}" alt="{{ $lists->avatar }}" alt="{{ $lists->avatar }}">
+                            <a href="{{ url('employee/profile/' . $user->user_id) }}" class="avatar">
+                                <img class="user-profile" src="{{ asset('assets/images/' . $user->avatar) }}" alt="{{ $user->avatar }}">
                             </a>
                         </div>
                         <div class="dropdown profile-action">
-                            <a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="material-icons">more_vert</i></a>
+                            <a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown">
+                                <i class="material-icons">more_vert</i>
+                            </a>
                             <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item" href="{{ url('all/employee/view/edit/'.$lists->user_id) }}"><i class="fa fa-pencil m-r-5"></i> Edit</a>
-                                <a class="dropdown-item" href="{{url('all/employee/delete/'.$lists->user_id)}}"onclick="return confirm('Are you sure to want to delete it?')"><i class="fa fa-trash-o m-r-5"></i> Delete</a>
+                                <a class="dropdown-item" href="{{ url('all/employee/view/edit/' . $user->user_id) }}">
+                                    <i class="fa fa-pencil m-r-5"></i> Edit
+                                </a>
+                                <a class="dropdown-item" href="{{ url('all/employee/delete/' . $user->user_id) }}"
+                                    onclick="return confirm('Are you sure?')">
+                                    <i class="fa fa-trash-o m-r-5"></i> Delete
+                                </a>
                             </div>
                         </div>
-                        <h4 class="user-name m-t-10 mb-0 text-ellipsis"><a href="profile.html">{{ $lists->name }}</a></h4>
-                        <div class="small text-muted">{{ $lists->position }}</div>
+                        <h4 class="user-name m-t-10 mb-0 text-ellipsis">
+                            <a href="#">{{ $user->name }}</a>
+                        </h4>
+                        <div class="small text-muted">{{ $user->designation }}</div>
+            
+                        <button class="btn btn-sm btn-light mt-2" type="button" data-toggle="collapse"
+                            data-target="#schedule-{{ $user->user_id }}">
+                            Show Schedule
+                        </button>
+            
+                        <!-- Add Schedule Button -->
+                        <button class="btn btn-sm btn-primary mt-1" data-toggle="modal" data-target="#setScheduleModal-{{ $user->user_id }}">
+                            Set Monthly Schedule
+                        </button>
+            
+                        <!-- Collapsible Schedule -->
+                        <div class="collapse mt-2" id="schedule-{{ $user->user_id }}"
+                            style="max-height: 200px; overflow-y: auto; font-size: 12px;">
+                            @forelse ($schedules[$user->user_id] ?? [] as $entry)
+                                <div>{{ $entry['date'] }} &nbsp; {{ $entry['start'] }} - {{ $entry['end'] }}</div>
+                            @empty
+                                <div>No schedule available</div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Monthly Schedule Modal -->
+                <div class="modal fade" id="setScheduleModal-{{ $user->user_id }}" tabindex="-1" role="dialog" aria-labelledby="setScheduleLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <form action="{{ route('schedule.store') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="employee_id" value="{{ $user->user_id }}">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Set Monthly Schedule for {{ $user->name }}</h5>
+                                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <label for="month">Month</label>
+                                        <input type="month" name="month" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Start Time</label>
+                                        <input type="time" name="start_time" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>End Time</label>
+                                        <input type="time" name="end_time" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-success">Save Schedule</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
                 @endforeach
-            </div>
+            </div>                                    
         </div>
         <!-- /Page Content -->
 

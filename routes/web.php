@@ -172,6 +172,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
         Route::get('all/employee/delete/{employee_id}', 'deleteRecord')->middleware('auth');
         Route::post('all/employee/search', 'employeeSearch')->name('all/employee/search');
         Route::post('all/employee/list/search', 'employeeListSearch')->name('all/employee/list/search');
+        Route::post('schedule/employee', 'store')->middleware('auth')->name('schedule.store');
 
         Route::get('form/departments/page', 'index')->middleware('auth')->name('form/departments/page');    
         Route::post('form/departments/save', 'saveRecordDepartment')->middleware('auth')->name('form/departments/save');    

@@ -52,13 +52,13 @@
           <li><a href="#about">About</a></li>
           <li><a href="#features">Features</a></li>
           <li><a href="#services">Services</a></li>
-          <li><a href="#pricing">Pricing</a></li>
+          {{-- <li><a href="#pricing">Pricing</a></li> --}}
           <li><a href="#contact">Contact</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
 
-      <a class="btn-getstarted" href="{{ route('login') }}">Login</a>
+      {{-- <a class="btn-getstarted" href="{{ route('login') }}">Login</a> --}}
 
     </div>
   </header>
@@ -345,7 +345,7 @@
     </section><!-- /Features Section -->
 
     <!-- Features Cards Section -->
-    <section id="features-cards" class="features-cards section">
+    {{-- <section id="features-cards" class="features-cards section">
 
       <div class="container">
 
@@ -387,10 +387,10 @@
 
       </div>
 
-    </section><!-- /Features Cards Section -->
+    </section><!-- /Features Cards Section --> --}}
 
     <!-- Features 2 Section -->
-    <section id="features-2" class="features-2 section">
+    {{-- <section id="features-2" class="features-2 section">
 
       <div class="container" data-aos="fade-up" data-aos-delay="100">
 
@@ -485,10 +485,10 @@
 
       </div>
 
-    </section><!-- /Features 2 Section -->
+    </section><!-- /Features 2 Section --> --}}
 
     <!-- Call To Action Section -->
-    <section id="call-to-action" class="call-to-action section">
+    {{-- <section id="call-to-action" class="call-to-action section">
 
       <div class="container" data-aos="fade-up" data-aos-delay="100">
 
@@ -540,10 +540,10 @@
 
       </div>
 
-    </section><!-- /Call To Action Section -->
+    </section><!-- /Call To Action Section --> --}}
 
     <!-- Clients Section -->
-    <section id="clients" class="clients section">
+    {{-- <section id="clients" class="clients section">
 
       <div class="container" data-aos="fade-up" data-aos-delay="100">
 
@@ -596,10 +596,11 @@
 
       </div>
 
-    </section><!-- /Clients Section -->
+    </section> --}}
+    <!-- /Clients Section -->
 
     <!-- Testimonials Section -->
-    <section id="testimonials" class="testimonials section light-background">
+    {{-- <section id="testimonials" class="testimonials section light-background">
 
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
@@ -641,7 +642,8 @@
                 <i class="bi bi-quote quote-icon-right"></i>
               </p>
             </div>
-          </div><!-- End testimonial item -->
+          </div>
+          <!-- End testimonial item -->
 
           <div class="col-lg-6" data-aos="fade-up" data-aos-delay="300">
             <div class="testimonial-item">
@@ -679,10 +681,10 @@
 
       </div>
 
-    </section><!-- /Testimonials Section -->
+    </section><!-- /Testimonials Section --> --}}
 
     <!-- Stats Section -->
-    <section id="stats" class="stats section">
+    {{-- <section id="stats" class="stats section">
 
       <div class="container" data-aos="fade-up" data-aos-delay="100">
 
@@ -720,7 +722,8 @@
 
       </div>
 
-    </section><!-- /Stats Section -->
+    </section> --}}
+    <!-- /Stats Section -->
 
     <!-- Services Section -->
     <section id="services" class="services section light-background">
@@ -794,7 +797,7 @@
     </section><!-- /Services Section -->
 
     <!-- Pricing Section -->
-    <section id="pricing" class="pricing section light-background">
+    {{-- <section id="pricing" class="pricing section light-background">
 
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
@@ -925,7 +928,7 @@
 
       </div>
 
-    </section><!-- /Pricing Section -->
+    </section><!-- /Pricing Section --> --}}
 
     <!-- Faq Section -->
     <section class="faq-9 faq section light-background" id="faq">
@@ -1002,7 +1005,7 @@
     </section><!-- /Faq Section -->
 
     <!-- Call To Action 2 Section -->
-    <section id="call-to-action-2" class="call-to-action-2 section dark-background">
+    {{-- <section id="call-to-action-2" class="call-to-action-2 section dark-background">
 
       <div class="container">
         <div class="row justify-content-center" data-aos="zoom-in" data-aos-delay="100">
@@ -1016,7 +1019,7 @@
         </div>
       </div>
 
-    </section><!-- /Call To Action 2 Section -->
+    </section><!-- /Call To Action 2 Section --> --}}
 
     <!-- Contact Section -->
     <section id="contact" class="contact section light-background">
@@ -1122,11 +1125,11 @@
       <div class="row gy-4">
         <div class="col-lg-4 col-md-6 footer-about">
           <a href="index.html" class="logo d-flex align-items-center">
-            <span class="sitename">iLanding</span>
+            <span class="sitename">ES Group of Companies</span>
           </a>
           <div class="footer-contact pt-3">
-            <p>A108 Adam Street</p>
-            <p>New York, NY 535022</p>
+            <p>14 Mirasol Street, San Roque</p>
+            <p>Quezon City, Philippines</p>
             <p class="mt-3"><strong>Phone:</strong> <span>+1 5589 55488 55</span></p>
             <p><strong>Email:</strong> <span>info@example.com</span></p>
           </div>
@@ -1138,7 +1141,7 @@
           </div>
         </div>
 
-        <div class="col-lg-2 col-md-3 footer-links">
+        {{-- <div class="col-lg-2 col-md-3 footer-links">
           <h4>Useful Links</h4>
           <ul>
             <li><a href="#">Home</a></li>
@@ -1180,7 +1183,7 @@
             <li><a href="#">Trodelas</a></li>
             <li><a href="#">Flexo</a></li>
           </ul>
-        </div>
+        </div> --}}
 
       </div>
     </div>
