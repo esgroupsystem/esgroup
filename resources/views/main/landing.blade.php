@@ -1036,7 +1036,7 @@
           <div class="col-lg-5">
             <div class="info-box" data-aos="fade-up" data-aos-delay="200">
               <h3>Contact Info</h3>
-              <p>Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Vestibulum ante ipsum primis.</p>
+              <p>If you have any questions or require further assistance, please feel free to reach out to us using the contact details below. We look forward to hearing from you.</p>
 
               <div class="info-item" data-aos="fade-up" data-aos-delay="300">
                 <div class="icon-box">
@@ -1044,8 +1044,8 @@
                 </div>
                 <div class="content">
                   <h4>Our Location</h4>
-                  <p>A108 Adam Street</p>
-                  <p>New York, NY 535022</p>
+                  <p>14 Mirasol Stree, San Roque, Murphy Cubao</p>
+                  <p>Quezon City, Metro Manila, Philippines, 1109</p>
                 </div>
               </div>
 
@@ -1055,8 +1055,7 @@
                 </div>
                 <div class="content">
                   <h4>Phone Number</h4>
-                  <p>+1 5589 55488 55</p>
-                  <p>+1 6678 254445 41</p>
+                  <p>+63 9629845018</p>
                 </div>
               </div>
 
@@ -1066,8 +1065,8 @@
                 </div>
                 <div class="content">
                   <h4>Email Address</h4>
-                  <p>info@example.com</p>
-                  <p>contact@example.com</p>
+                  <p>support@esgroup.com.ph</p>
+                  <p>hrd.esgroup@gmail.com</p>
                 </div>
               </div>
             </div>
@@ -1119,7 +1118,7 @@
 
   </main>
 
-  <footer id="footer" class="footer">
+  {{-- <footer id="footer" class="footer">
 
     <div class="container footer-top">
       <div class="row gy-4">
@@ -1130,8 +1129,8 @@
           <div class="footer-contact pt-3">
             <p>14 Mirasol Street, San Roque</p>
             <p>Quezon City, Philippines</p>
-            <p class="mt-3"><strong>Phone:</strong> <span>+1 5589 55488 55</span></p>
-            <p><strong>Email:</strong> <span>info@example.com</span></p>
+            <p class="mt-3"><strong>Phone:</strong> <span>+63 9210614527</span></p>
+            <p><strong>Email:</strong> <span>support@esgroup.com.ph</span></p>
           </div>
           <div class="social-links d-flex mt-4">
             <a href=""><i class="bi bi-twitter-x"></i></a>
@@ -1141,7 +1140,7 @@
           </div>
         </div>
 
-        {{-- <div class="col-lg-2 col-md-3 footer-links">
+        <div class="col-lg-2 col-md-3 footer-links">
           <h4>Useful Links</h4>
           <ul>
             <li><a href="#">Home</a></li>
@@ -1183,20 +1182,16 @@
             <li><a href="#">Trodelas</a></li>
             <li><a href="#">Flexo</a></li>
           </ul>
-        </div> --}}
+        </div>
 
       </div>
-    </div>
+    </div> --}}
 
     <div class="container copyright text-center mt-4">
-      <p>© <span>Copyright</span> <strong class="px-1 sitename">iLanding</strong> <span>All Rights Reserved</span></p>
+      {{-- <p>© <span>Copyright</span> <strong class="px-1 sitename">iLanding</strong> <span>All Rights Reserved</span></p>
       <div class="credits">
-        <!-- All the links in the footer should remain intact. -->
-        <!-- You can delete the links only if you've purchased the pro version. -->
-        <!-- Licensing information: https://bootstrapmade.com/license/ -->
-        <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
         Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
-      </div>
+      </div> --}}
     </div>
 
   </footer>
