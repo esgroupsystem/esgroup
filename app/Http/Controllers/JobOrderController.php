@@ -164,59 +164,43 @@ class JobOrderController extends Controller
             'remarks.*' => 'nullable|string',
             'notes.*' => 'nullable|string',
         ]);
-    
+
         DB::beginTransaction();
+
         try {
             if ($request->hasFile('files')) {
                 foreach ($request->file('files') as $index => $file) {
                     $originalName = $file->getClientOriginalName();
                     $extension = $file->getClientOriginalExtension();
                     $filename = time() . '_' . pathinfo($originalName, PATHINFO_FILENAME) . '.' . $extension;
-                    $filePath = $file->storeAs('assets/videos', $filename, 'public');
 
-                    if ($extension === 'asf') {
-                        $mp4Filename = time() . '_' . pathinfo($originalName, PATHINFO_FILENAME) . '.mp4';
-                        $mp4FilePath = 'assets/videos/' . $mp4Filename;
-    
-                        $ffmpegPath = env('FFMPEG_PATH', 'C:/ffmpeg/bin/ffmpeg.exe');
-                        if (!file_exists($ffmpegPath)) {
-                            $ffmpegPath = '/usr/bin/ffmpeg';
-                        }
-
-                        if (!file_exists($ffmpegPath)) {
-                            throw new \Exception('FFmpeg is not installed or path is incorrect.');
-                        }
-    
-                        $process = new Process([$ffmpegPath, '-i', storage_path('app/public/' . $filePath), storage_path('app/public/' . $mp4FilePath)]);
-                        $process->run();
-    
-                        if (!$process->isSuccessful()) {
-                            throw new ProcessFailedException($process);
-                        }
-
-                        Storage::disk('public')->delete($filePath);
-                        $filePath = $mp4FilePath;
+                    $destinationPath = public_path('assets/videos');
+                    if (!file_exists($destinationPath)) {
+                        mkdir($destinationPath, 0755, true);
                     }
-    
+
+                    $file->move($destinationPath, $filename);
+                    $filePath = 'assets/videos/' . $filename;
+
                     JobFiles::create([
                         'job_id' => $request->input('job_order_id'),
-                        'file_name' => $file->getClientOriginalName(),
+                        'file_name' => $originalName,
                         'file_remarks' => $request->input('remarks')[$index],
                         'file_notes' => $request->input('notes')[$index],
                         'file_path' => $filePath,
                     ]);
                 }
             }
-    
+
             DB::commit();
-            flash()->success('Files uploaded and converted successfully.');
+            flash()->success('Files uploaded successfully.');
             return redirect()->back();
         } catch (\Exception $e) {
             DB::rollback();
-            flash()->error('Failed to upload or convert files.');
+            flash()->error('Failed to upload files. Error: ' . $e->getMessage());
             return redirect()->back();
         }
-    }    
+    }
 
     /*---- Deleteing Files or Video ---*/
     public function deleteVideoFiles($id)

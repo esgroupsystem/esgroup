@@ -28,7 +28,7 @@
                 <div class="col-sm-6 col-md-3">  
                     <div class="form-group form-focus">
                         <div class="cal-icon">
-                            <input class="form-control floating datetimepicker" type="text">
+                            <input class="form-control floating datetimepicker" type="text" id="from_date">
                         </div>
                         <label class="focus-label">From</label>
                     </div>
@@ -36,18 +36,17 @@
                 <div class="col-sm-6 col-md-3">  
                     <div class="form-group form-focus">
                         <div class="cal-icon">
-                            <input class="form-control floating datetimepicker" type="text">
+                            <input class="form-control floating datetimepicker" type="text" id="to_date">
                         </div>
                         <label class="focus-label">To</label>
                     </div>
                 </div>
                 <div class="col-sm-6 col-md-3"> 
                     <div class="form-group form-focus select-focus">
-                        <select class="select floating"> 
-                            <option>Select Status</option>
-                            <option>Accepted</option>
-                            <option>Declined</option>
-                            <option>Expired</option>
+                        <select id="status_filter" class="select floating"> 
+                            <option value="">All Status</option>
+                            <option value="New">New</option>
+                            <option value="Complete">Complete</option>
                         </select>
                         <label class="focus-label">Status</label>
                     </div>
@@ -170,11 +169,11 @@
                                     <select class="form-control custom-select" tabindex="1" name="job_status" required>
                                         <option>New</option>
                                         <option value="Complete">Complete</option>
-                                        <option value="Extracted">Extracted</option>
+                                        {{-- <option value="Extracted">Extracted</option>
                                         <option value="Processing">On Process</option>
                                         <option value="DVR Problem">DVR Problem</option>
                                         <option value="No Record Found">No Record Found</option>
-                                        <option value="Unit Not Available">Unit Not Available</option>
+                                        <option value="Unit Not Available">Unit Not Available</option> --}}
                                     </select>
                                 </div>
                                 <div class="col-sm-6"> 
@@ -225,6 +224,18 @@
                     ]
                 });
                 
+                // Add custom search filter for Status column
+                $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                    const selectedStatus = $('#status_filter').val();
+                    const rowStatus = data[4].trim(); // Status is column index 4
+
+                    if (selectedStatus === "" || rowStatus === selectedStatus) {
+                        return true;
+                    }
+                    return false;
+                });
+                
+                // Filter on button click
                 $('.btn_search').on('click', function() {
                     table.draw();
                 });

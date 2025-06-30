@@ -33,60 +33,54 @@
                                 <tbody>
                                     <tr>
                                         <td>
-                                            <form>
-                                                <div class="form-group">
-                                                    <label for="name">Bus Name</label>
-                                                    <input type="text" class="form-control" id="name" value="{{ $jobDetail->job_name }}" readonly>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="depart3">Concern</label>
-                                                    <input type="text" class="form-control" id="depart3" value="{{ $jobDetail->job_type }}" readonly>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="departa">Date of Accident</label>
-                                                    <input type="text" class="form-control" id="departa" value="{{ date('j M Y', strtotime($jobDetail->job_datestart)) }}" readonly>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="qualif">Technician / Extractor </label>
-                                                    <input type="text" class="form-control" id="qualif" value="{{ $jobDetail->job_assign_person }}" readonly>
-                                                </div>
-                                            </form>
+                                            <div class="form-group">
+                                                <label for="name">Bus Name</label>
+                                                <input type="text" class="form-control" id="name" value="{{ $jobDetail->job_name }}" readonly>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="depart3">Concern</label>
+                                                <input type="text" class="form-control" id="depart3" value="{{ $jobDetail->job_type }}" readonly>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="departa">Date of Accident</label>
+                                                <input type="text" class="form-control" id="departa" value="{{ date('j M Y', strtotime($jobDetail->job_datestart)) }}" readonly>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="qualif">Technician / Extractor </label>
+                                                <input type="text" class="form-control" id="qualif" value="{{ $jobDetail->job_assign_person }}" readonly>
                                         </td>
                                         <td>
-                                            <form>
-                                                <div class="form-group">
-                                                    <label for="doj">Start Time</label>
-                                                    <input type="text" class="form-control" value="{{ $jobDetail->job_time_start }}" readonly>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="doj">Date of Join</label>
-                                                    <input type="text" class="form-control" id="doj" value="{{ $jobDetail->job_time_end }}" readonly>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="doc">Sit Number</label>
-                                                    <input type="text" class="form-control" id="doc" value="{{ $jobDetail->job_sitNumber }}" readonly>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="qualif1">Remarks</label>
-                                                    <textarea type="text" class="form-control" rows="4" id="qualif1" readonly>{{ $jobDetail->job_remarks }}</textarea>
-                                                    </div>
-                                            </form>
+                                            <div class="form-group">
+                                                <label for="doj">Start Time</label>
+                                                <input type="text" class="form-control" value="{{ $jobDetail->job_time_start }}" readonly>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="doj">Date of Join</label>
+                                                <input type="text" class="form-control" id="doj" value="{{ $jobDetail->job_time_end }}" readonly>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="doc">Sit Number</label>
+                                                <input type="text" class="form-control" id="doc" value="{{ $jobDetail->job_sitNumber }}" readonly>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="qualif1">Remarks</label>
+                                                <textarea type="text" class="form-control" rows="4" id="qualif1" readonly>{{ $jobDetail->job_remarks }}</textarea>
+                                            </div>
                                         </td>
-                                        <td>
-                                            <form>
-                                                <div class="form-group">
-                                                    <input hidden type="text" class="form-control" id="name1" value="{{ $jobDetail->job_status}}" readonly>
-                                                </div>
-                                                <center>
-                                                <div class="logo-container">
-                                                    @if($jobDetail->job_status === 'Complete')
-                                                        <img src="{{ asset('assets/img/completelogo.png') }}" alt="Complete Logo" class="img-fluid custom-com-logo" disabled>
-                                                    @elseif($jobDetail->job_status === 'New')
-                                                        <img src="{{ asset('assets/img/newlogo.png') }}" alt="Complete Logo" class="img-fluid custom-new-logo" disabled>
-                                                    @endif
-                                                </div>
-                                                </center>
-                                            </form>
+                                        
+                                        <td>               
+                                            <div class="form-group">
+                                                <input hidden type="text" class="form-control" id="name1" value="{{ $jobDetail->job_status}}" readonly>
+                                            </div>
+                                            <center>
+                                            <div class="logo-container">
+                                                @if($jobDetail->job_status === 'Complete' || $jobDetail->job_status == 'Extracted')
+                                                    <img src="{{ asset('assets/img/completelogo.png') }}" alt="Complete Logo" class="img-fluid custom-com-logo" disabled>
+                                                @elseif($jobDetail->job_status === 'New')
+                                                    <img src="{{ asset('assets/img/newlogo.png') }}" alt="Complete Logo" class="img-fluid custom-new-logo" disabled>
+                                                @endif
+                                            </div>
+                                            </center>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -157,9 +151,9 @@
                                                     <td>
                                                         @if(in_array(pathinfo($file->file_name, PATHINFO_EXTENSION), ['mp4', 'mp3', 'asf']))
                                                             <!-- Show file name as clickable link -->
-                                                            <a href="#" class="view-video" data-file-path="{{ asset('storage/' . $file->file_path) }}">
+                                                            <a href="#" class="view-video" data-file-path="{{ asset($file->file_path) }}">
                                                                 {{ $file->file_name }} <p class="text-muted">(Click the link above to watch video)</p>
-                                                            </a>    
+                                                            </a>  
                                                         @else
                                                             <img src="{{ asset('storage/' . $file->file_path) }}" alt="{{ $file->file_name }}" class="img-fluid" />
                                                         @endif
@@ -233,21 +227,21 @@
                                     @foreach($relatedTasks as $index => $task)
                                         <tr>
                                             <td>{{ $index + 1 }}</td>
-                                            <td>{{ $task->job_name }}</td>
-                                            <td>{{ $task->job_type }}</td>
-                                            <td><span class="badge badge-large
-                                                @if($task->job_status == 'New') 
-                                                    bg-inverse-primary 
-                                                @elseif($task->job_status == 'Complete' || $item->job_status == 'Extracted') 
-                                                    bg-inverse-success 
-                                                @elseif($task->job_status == 'Processing') 
-                                                    bg-inverse-warning 
-                                                @else
-                                                    bg-inverse-danger 
-                                                @endif">
-                                                {{ $task->job_status }}
-                                            </span></td>
-                                            <td>{{ $task->job_creator }}</td>
+                                            <td>{{ $task->job_name ?? '-' }}</td>
+                                            <td>{{ $task->job_type ?? '-' }}</td>
+                                            <td>
+                                                <span class="badge badge-large
+                                                    @if($task->job_status == 'New') 
+                                                        bg-inverse-primary 
+                                                    @elseif($task->job_status == 'Complete') 
+                                                        bg-inverse-success 
+                                                    @else
+                                                        bg-inverse-danger 
+                                                    @endif">
+                                                    {{ $task->job_status ?? 'Unknown' }}
+                                                </span>
+                                            </td>
+                                            <td>{{ $task->job_creator ?? 'N/A' }}</td>
                                         </tr>
                                     @endforeach
                                     @endif
@@ -333,23 +327,6 @@
 
                 $('#delete_order').on('hidden.bs.modal', function () {
                     fileIdToDelete = null;
-                });
-            </script>
-
-            <script>
-                $(document).ready(function() {
-                    const table = $('#jobList').DataTable({
-                        pageLength: 10,
-                        processing: true,
-                        serverSide: false,
-                        ordering: true,
-                        dom: 't<"bottom"p>',
-                    });
-
-                    // Optional: Trigger search on a button click
-                    $('.btn_search').on('click', function() {
-                        table.draw();
-                    });
                 });
             </script>
 
