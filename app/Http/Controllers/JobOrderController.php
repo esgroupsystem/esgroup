@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Notifications\GlobalUserNotification;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
@@ -67,28 +68,40 @@ class JobOrderController extends Controller
                 'job_date_filled',
                 'job_creator',
             ]);
-            
+
             DB::beginTransaction();
             try {
-                Joborder::create([
-                    'job_name'                  => $request->job_name,
-                    'job_type'                  => $request->job_type,
-                    'job_datestart'             => $request->job_datestart,
-                    'job_time_start'            => Carbon::parse($request->job_time_start)->format('H:i:s'),
-                    'job_time_end'              => Carbon::parse($request->job_time_end)->format('H:i:s'),
-                    'job_sitNumber'             => $request->job_sitNumber,
-                    'job_remarks'               => $request->job_remarks,
-                    'job_status'                => 'New',
-                    'job_assign_person'         => 'Not assigned',
-                    'job_date_filled'           => now()->format('Y-m-d H:i:s'),
-                    'job_creator'               => $request->user()->name,
+                $jobOrder = Joborder::create([
+                    'job_name'          => $request->job_name,
+                    'job_type'          => $request->job_type,
+                    'job_datestart'     => $request->job_datestart,
+                    'job_time_start'    => Carbon::parse($request->job_time_start)->format('H:i:s'),
+                    'job_time_end'      => Carbon::parse($request->job_time_end)->format('H:i:s'),
+                    'job_sitNumber'     => $request->job_sitNumber,
+                    'job_remarks'       => $request->job_remarks,
+                    'job_status'        => 'New',
+                    'job_assign_person' => 'Not assigned',
+                    'job_date_filled'   => now()->format('Y-m-d H:i:s'),
+                    'job_creator'       => $request->user()->name,
                 ]);
-                
+
+                // 🔔 Send global notification to IT and Admin
+                $itUsers = User::whereIn('role_name', ['IT', 'Admin'])->get();
+                foreach ($itUsers as $user) {
+                    $user->notify(new GlobalUserNotification(
+                        'New Job Order Created',
+                        'A new job order "' . $jobOrder->job_name . '" was created by ' . $jobOrder->job_creator,
+                        route('view/details', ['id' => $jobOrder->id])
+                    ));
+                }
+
                 DB::commit();
                 flash()->success('Created new job order successfully :)');
                 return redirect()->route('form/joborders/page');
+
             } catch (\Exception $e) {
                 DB::rollback();
+                \Log::error('Job Order Save Error: ' . $e->getMessage());
                 flash()->error('Failed to add job order :)');
                 return redirect()->back();
             }
@@ -231,5 +244,6 @@ class JobOrderController extends Controller
                 'flash' => true,
             ], 500);
         }
-    }    
+    }
+        
 }

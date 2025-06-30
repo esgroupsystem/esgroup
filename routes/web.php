@@ -31,6 +31,12 @@ Auth::routes();
 
 Route::group(['namespace' => 'App\Http\Controllers\Auth'],function()
 {
+    // ---------------- Notification -------------- //
+    Route::get('/notifications/clear', function () {
+        Auth::user()->unreadNotifications->markAsRead();
+        return back();
+    })->name('notifications.clear');
+
     // -----------------------------login--------------------------------------//
     Route::controller(LoginController::class)->group(function () {
         Route::get('/main-index', 'mainpages')->name('mainPages');
