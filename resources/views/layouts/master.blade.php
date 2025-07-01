@@ -130,15 +130,15 @@
 							<ul class="notification-list">
 								@forelse ($notifications as $notification)
 									<li class="notification-message">
-										<a href="{{ $notification->data['url'] ?? '#' }}">
+										<a href="{{ route('notifications.read', $notification->id) }}">
 											<div class="media">
 												<span class="avatar">
-													<img alt="" src="{{ asset('/assets/images/' . Auth::user()->avatar) }}">
+													<img alt="" src="{{ asset('/assets/images/' . ($notification->data['creator_avatar'] ?? 'default.png')) }}">
 												</span>
 												<div class="media-body">
 													<p class="noti-details">
 														<span class="noti-title">{{ $notification->data['title'] }}</span><br>
-														{{ $notification->data['message'] ?? 'No message available'}}
+														{{ $notification->data['body'] ?? 'No message available'}}
 													</p>
 													<p class="noti-time">
 														<span class="notification-time">{{ $notification->created_at->diffForHumans() }}</span>
@@ -329,6 +329,27 @@
 	<script src="{{ URL::to('assets/js/jquery.validate.js') }}"></script>	
 	<!-- Custom JS -->
 	<script src="{{ URL::to('assets/js/app.js') }}"></script>
+	<script src="{{ URL::to('assets/js/pusher.min.js') }}"></script>
+	<!-- Pass user ID to JS -->
+    <script>
+        window.Laravel = {
+            userId: {{ Auth::check() ? Auth::id() : 'null' }}
+        };
+    </script>
+
+    <!-- Vite build -->
+    @vite('resources/js/app.js')
+
+    <!-- Echo listener -->
+    <script>
+        if (window.Echo && window.Laravel.userId) {
+            window.Echo.private(`App.Models.User.${window.Laravel.userId}`)
+                .notification((notification) => {
+                    console.log("New Notification:", notification);
+                    toastr.info(notification.message || 'New Notification');
+                });
+        }
+    </script>
 	@yield('script')
 </body>
 </html>

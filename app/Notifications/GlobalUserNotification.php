@@ -8,6 +8,8 @@ use Illuminate\Notifications\Messages\DatabaseMessage;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Notifications\Messages\BroadcastMessage;
+use App\Models\User;
+
 
 class GlobalUserNotification extends Notification implements ShouldBroadcast
 {
@@ -33,6 +35,7 @@ class GlobalUserNotification extends Notification implements ShouldBroadcast
             'title' => $this->title,
             'body' => $this->body,
             'url' => $this->url,
+            'creator_avatar' => auth()->user()->avatar,
         ];
     }
 

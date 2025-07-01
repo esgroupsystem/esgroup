@@ -66,6 +66,11 @@ Route::group(['namespace' => 'App\Http\Controllers\Auth'],function()
 
 Route::group(['namespace' => 'App\Http\Controllers'],function()
 {
+    // --------------------- Notification ----------------------------------//
+    Route::controller(NotificationController::class)->group(function () {
+        Route::get('/notifications/{id}', 'redirectToDetail')->name('notifications.read');
+        Route::get('/notifications/fetch', 'fetch')->name('notifications.fetch');
+    });
     // ----------------------------- main dashboard ------------------------------//
     Route::controller(HomeController::class)->group(function () {
         Route::get('/home', 'index')->name('home');
