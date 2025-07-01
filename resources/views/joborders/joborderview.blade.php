@@ -20,7 +20,15 @@
             </div>
             <!-- /Page Header -->
             
-            <section class="review-section information">
+            
+            <section id="printable-area" class="review-section information">
+                <!-- Print Button -->
+                <div class="text-end mb-3 no-print">
+                    <button onclick="printSection()" class="btn btn-primary">
+                        <i class="fa fa-print"></i> Print
+                    </button>
+                </div>
+                <!-- Printable Area -->
                 <div class="review-header text-center">
                     <h2 class="review-title">{{ $jobDetail->job_name }}</h2>
                     <p class="text-muted">Bus Name</p>
@@ -174,7 +182,17 @@
                                         @endif
                                     </tbody>
                                 </table>
-                                <button type="submit" class="btn btn-success mt-3">Upload Files</button>
+                                <button type="button" id="submitBtn" class="btn btn-success mt-3">Upload Files</button>
+                                <div class="progress mt-3" style="height: 25px; display: none;" id="uploadProgressContainer">
+                                    <div id="uploadProgressBar" class="progress-bar bg-info progress-bar-striped progress-bar-animated"
+                                        role="progressbar"
+                                        aria-valuenow="0"
+                                        aria-valuemin="0"
+                                        aria-valuemax="100"
+                                        style="width: 0%;">
+                                        0%
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -254,95 +272,246 @@
     @section ('script')
 
     {{--- Saving Files ---}}
-            <script>
-                document.querySelector('.btn-add-row').addEventListener('click', function () {
-                    var tableBody = document.getElementById('table_alterations_tbody');
-                    var noDataRow = tableBody.querySelector('.no-data');
-                    
-                    if (noDataRow) {
-                        noDataRow.style.display = 'none';
-                    }
+<script>
+    // Add Row Functionality
+    document.querySelector('.btn-add-row').addEventListener('click', function () {
+        const tableBody = document.getElementById('table_alterations_tbody');
+        const noDataRow = tableBody.querySelector('.no-data');
 
-                    var rowCount = tableBody.querySelectorAll('tr.data-row').length + 1;
-                    var newRow = document.createElement('tr');
-                    newRow.classList.add('data-row');
-                    newRow.innerHTML = `
-                        <td>${rowCount}</td>
-                        <td><input type="file" class="form-control" name="files[]" accept=".mp4, .mp3, .asf" required></td>
-                        <td><input type="text" class="form-control" name="remarks[]" required></td>
-                        <td><input type="text" class="form-control" name="notes[]" required></td>
-                        <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa fa-minus"></i></button></td>
-                    `;
-                    tableBody.appendChild(newRow);
-                    newRow.querySelector('.btn-remove-row').addEventListener('click', function () {
-                    newRow.remove();
-                        if (tableBody.querySelectorAll('tr.data-row').length === 0) {
-                            if (noDataRow) {
-                                noDataRow.style.display = 'table-row';
-                            }
+        if (noDataRow) {
+            noDataRow.style.display = 'none';
+        }
+
+        const rowCount = tableBody.querySelectorAll('tr.data-row').length + 1;
+        const newRow = document.createElement('tr');
+        newRow.classList.add('data-row');
+        newRow.innerHTML = `
+            <td>${rowCount}</td>
+            <td><input type="file" class="form-control" name="files[]" accept=".mp4, .mp3, .asf" required></td>
+            <td><input type="text" class="form-control" name="remarks[]" required></td>
+            <td><input type="text" class="form-control" name="notes[]" required></td>
+            <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa fa-minus"></i></button></td>
+        `;
+        tableBody.appendChild(newRow);
+
+        newRow.querySelector('.btn-remove-row').addEventListener('click', function () {
+            newRow.remove();
+            if (tableBody.querySelectorAll('tr.data-row').length === 0 && noDataRow) {
+                noDataRow.style.display = 'table-row';
+            }
+        });
+    });
+
+    // Upload with Progress
+    document.getElementById('submitBtn').addEventListener('click', function (e) {
+        e.preventDefault();
+
+        const form = document.getElementById('uploadForm');
+        const formData = new FormData(form);
+
+        // Check if at least one file is selected
+        const files = form.querySelectorAll('input[type="file"]');
+        let hasFile = false;
+        files.forEach(file => {
+            if (file.files.length > 0) hasFile = true;
+        });
+
+        if (!hasFile) {
+            alert('Please select at least one file.');
+            return;
+        }
+
+        // Reset progress
+        const progressBar = document.getElementById('uploadProgressBar');
+        const progressContainer = document.getElementById('uploadProgressContainer');
+        progressBar.style.width = '0%';
+        progressBar.innerText = '0%';
+        progressBar.setAttribute('aria-valuenow', 0);
+        progressBar.classList.remove('bg-success', 'bg-danger');
+        progressBar.classList.add('bg-info');
+        progressContainer.style.display = 'block';
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", form.action, true);
+        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+
+        // Progress Tracking
+        xhr.upload.onprogress = function (event) {
+            if (event.lengthComputable) {
+                const percent = Math.round((event.loaded / event.total) * 100);
+                progressBar.style.width = percent + '%';
+                progressBar.innerText = percent + '%';
+                progressBar.setAttribute('aria-valuenow', percent);
+            }
+        };
+
+        // Success
+        xhr.onload = function () {
+        console.log('XHR responseText:', xhr.responseText);
+            if (xhr.status === 200) {
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        progressBar.classList.remove('bg-info');
+                        progressBar.classList.add('bg-success');
+                        progressBar.innerText = 'Upload Complete';
+
+                        // Optional: delay to let user see 100%
+                        setTimeout(() => location.reload(), 1200);
+                    } else {
+                        throw new Error(response.message || 'Unknown error');
+                    }
+                } catch (err) {
+                    progressBar.classList.remove('bg-info');
+                    progressBar.classList.add('bg-danger');
+                    progressBar.innerText = 'Upload Failed';
+                    console.error('Response parse error:', err.message);
+                }
+            } else {
+                progressBar.classList.remove('bg-info');
+                progressBar.classList.add('bg-danger');
+                progressBar.innerText = 'Upload Failed';
+                console.error('Upload failed:', xhr.responseText);
+            }
+        };
+
+        // Error
+        xhr.onerror = function () {
+            progressBar.classList.remove('bg-info');
+            progressBar.classList.add('bg-danger');
+            progressBar.innerText = 'Upload Error';
+            console.error('XHR Network error');
+        };
+
+        xhr.send(formData);
+    });
+</script>
+
+
+{{--- Deleting Modal or Files ----}}
+    <script>
+
+        let fileIdToDelete = null;
+
+        document.querySelectorAll('.delete-file-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                fileIdToDelete = this.getAttribute('data-id');
+                document.querySelector('.file-id').value = fileIdToDelete;
+                $('#delete_order').modal('show');
+            });
+        });
+        document.getElementById('confirm-delete-btn').addEventListener('click', function () {
+            if (fileIdToDelete) {
+                $.ajax({
+                    url: "{{ route('joborders.delete', ':id') }}".replace(':id', fileIdToDelete),
+                    type: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        id: fileIdToDelete
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            location.reload();
+                        } else {
+                            alert('Failed to delete the file.');
                         }
-                    });
-                });
-                    document.getElementById('uploadForm').addEventListener('submit', function() {
-                    document.getElementById('loader-wrapper-files').style.display = 'block';
-                });
-            </script>
-
-            {{--- Deleting Modal or Files ----}}
-            <script>
-
-                let fileIdToDelete = null;
-
-                document.querySelectorAll('.delete-file-btn').forEach(button => {
-                    button.addEventListener('click', function () {
-                        fileIdToDelete = this.getAttribute('data-id');
-                        document.querySelector('.file-id').value = fileIdToDelete;
-                        $('#delete_order').modal('show');
-                    });
-                });
-                document.getElementById('confirm-delete-btn').addEventListener('click', function () {
-                    if (fileIdToDelete) {
-                        $.ajax({
-                            url: "{{ route('joborders.delete', ':id') }}".replace(':id', fileIdToDelete),
-                            type: 'POST',
-                            data: {
-                                _token: "{{ csrf_token() }}",
-                                id: fileIdToDelete
-                            },
-                            success: function(response) {
-                                if (response.success) {
-                                    location.reload();
-                                } else {
-                                    alert('Failed to delete the file.');
-                                }
-                            },
-                            error: function(xhr, status, error) {
-                                alert('Failed to delete the file. Please try again.');
-                            }
-                        });
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Failed to delete the file. Please try again.');
                     }
-                    $('#delete_order').modal('hide');
                 });
+            }
+            $('#delete_order').modal('hide');
+        });
 
-                $('#delete_order').on('hidden.bs.modal', function () {
-                    fileIdToDelete = null;
-                });
-            </script>
+        $('#delete_order').on('hidden.bs.modal', function () {
+            fileIdToDelete = null;
+        });
+    </script>
 
-            <script>
-                document.querySelectorAll('.view-video').forEach(function(link) {
-                    link.addEventListener('click', function(event) {
-                        event.preventDefault();  // Prevent the default link behavior
-                        const filePath = this.getAttribute('data-file-path');  // Get the file path from the data attribute
-                        const modal = new bootstrap.Modal(document.getElementById('videoModal'));  // Bootstrap modal
-                        const videoElement = document.getElementById('videoPreview');
-                        
-                        console.log('File Path: ', filePath);
+    <script>
+        document.querySelectorAll('.view-video').forEach(function(link) {
+            link.addEventListener('click', function(event) {
+                event.preventDefault();  // Prevent the default link behavior
+                const filePath = this.getAttribute('data-file-path');  // Get the file path from the data attribute
+                const modal = new bootstrap.Modal(document.getElementById('videoModal'));  // Bootstrap modal
+                const videoElement = document.getElementById('videoPreview');
+                
+                console.log('File Path: ', filePath);
 
-                        videoElement.src = filePath;  // Set the source of the video element
-                        modal.show();  // Show the modal
-                    });
-                });
-            </script>
+                videoElement.src = filePath;  // Set the source of the video element
+                modal.show();  // Show the modal
+            });
+        });
+    </script>
+
+        <!-- Print Script -->
+    <script>
+        function printSection() {
+            var printContents = document.getElementById('printable-area').innerHTML;
+            var originalContents = document.body.innerHTML;
+
+            document.body.innerHTML = printContents;
+            window.print();
+            document.body.innerHTML = originalContents;
+
+            location.reload(); // Optional: restores page functionality
+        }
+    </script>
+
+    <!-- Print Styles -->
+    <style>
+    @media print {
+        body * {
+            visibility: hidden !important;
+        }
+
+        #printable-area, #printable-area * {
+            visibility: visible !important;
+        }
+
+        #printable-area {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            padding: 20px;
+            background: white;
+        }
+
+        .no-print, .btn {
+            display: none !important;
+        }
+
+        input, textarea {
+            border: none;
+            outline: none;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        .table td, .table th {
+            border: 1px solid #000 !important;
+            padding: 8px;
+            vertical-align: top;
+        }
+
+        .custom-com-logo, .custom-new-logo {
+            max-width: 120px;
+        }
+
+        #uploadProgressBar {
+            background-color: red !important;
+        }
+
+        #uploadProgressContainer {
+        display: block !important;
+        }
+    }
+    </style>
     @endsection
 @endsection

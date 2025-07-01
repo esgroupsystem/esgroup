@@ -206,6 +206,11 @@ class JobOrderController extends Controller
             }
 
             DB::commit();
+
+            // ✅ Return JSON if request is AJAX (from JS)
+            if ($request->expectsJson()) {
+                return response()->json(['success' => true, 'message' => 'Files uploaded successfully.']);
+            }
             flash()->success('Files uploaded successfully.');
             return redirect()->back();
         } catch (\Exception $e) {
