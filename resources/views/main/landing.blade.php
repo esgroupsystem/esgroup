@@ -989,7 +989,7 @@
               <div class="faq-item">
                 <h3>How much is the fare for the EDSA Carousel?</h3>
                 <div class="faq-content">
-                  <p>The fare starts at ₱13.00 for the minimum distance and may vary based on your stop. Discounted fares apply to eligible passengers upon presenting valid IDs.</p>
+                  <p>The fare starts at ₱15.00 for the minimum distance and may vary based on your stop. Discounted fares apply to eligible passengers upon presenting valid IDs.</p>
                 </div>
                 <i class="faq-toggle bi bi-chevron-right"></i>
               </div><!-- End Faq item-->

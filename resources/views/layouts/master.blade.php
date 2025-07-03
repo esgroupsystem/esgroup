@@ -350,6 +350,25 @@
                 });
         }
     </script>
+
+	<!-- No Privilege Modal -->
+	<div class="modal fade" id="no_privilege_modal" tabindex="-1" aria-labelledby="no_privilege_label" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content text-center">
+				<div class="modal-body">
+					<h3>Access Denied</h3>
+					<p>You don't have privilege to use this.<br>Please contact IT Department.</p>
+					<button type="button" class="btn btn-primary mt-3" data-bs-dismiss="modal">OK</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		function noPrivilegeAlert() {
+			$('#no_privilege_modal').modal('show');
+		}
+	</script>
 	@yield('script')
 </body>
 </html>

@@ -88,7 +88,7 @@
                         </h4>
                         <div class="small text-muted">{{ $user->designation }}</div>
             
-                        <button class="btn btn-sm btn-light mt-2" type="button" data-toggle="collapse"
+                        {{-- <button class="btn btn-sm btn-light mt-2" type="button" data-toggle="collapse"
                             data-target="#schedule-{{ $user->user_id }}">
                             Show Schedule
                         </button>
@@ -96,7 +96,7 @@
                         <!-- Add Schedule Button -->
                         <button class="btn btn-sm btn-primary mt-1" data-toggle="modal" data-target="#setScheduleModal-{{ $user->user_id }}">
                             Set Monthly Schedule
-                        </button>
+                        </button> --}}
             
                         <!-- Collapsible Schedule -->
                         <div class="collapse mt-2" id="schedule-{{ $user->user_id }}"
