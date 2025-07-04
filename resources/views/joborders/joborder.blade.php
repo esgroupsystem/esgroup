@@ -204,7 +204,7 @@
     $(document).ready(function () {
         const table = $('#jobList').DataTable({
             lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
-            pageLength: 10,
+            pageLength: 30,
             order: [[3, 'desc']],
             processing: true,
             serverSide: false,
