@@ -61,12 +61,14 @@
             <!-- Search Filter -->
               
             <div class="row staff-grid-row">
-                @foreach ($users as $user)
+                @foreach ($employees as $employee)
                 <div class="col-md-4 col-sm-6 col-12 col-lg-4 col-xl-3">
                     <div class="profile-widget">
                         <div class="profile-img">
-                            <a href="{{ url('employee/profile/' . $user->user_id) }}" class="avatar">
-                                <img class="user-profile" src="{{ asset('assets/images/' . $user->avatar) }}" alt="{{ $user->avatar }}">
+                            <a href="{{ url('employee/profile/' . $employee->id) }}" class="avatar">
+                                <img class="user-profile" 
+                                    src="{{ asset('assets/employeepic/' . ($employee->profile_picture ?? 'default.png')) }}" 
+                                    alt="{{ $employee->name }}">
                             </a>
                         </div>
                         <div class="dropdown profile-action">
@@ -74,77 +76,23 @@
                                 <i class="material-icons">more_vert</i>
                             </a>
                             <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item" href="{{ url('all/employee/view/edit/' . $user->user_id) }}">
+                                <a class="dropdown-item" href="{{ url('all/employee/view/edit/' . $employee->id) }}">
                                     <i class="fa fa-pencil m-r-5"></i> Edit
                                 </a>
-                                <a class="dropdown-item" href="{{ url('all/employee/delete/' . $user->user_id) }}"
+                                <a class="dropdown-item" href="{{ url('all/employee/delete/' . $employee->id) }}"
                                     onclick="return confirm('Are you sure?')">
                                     <i class="fa fa-trash-o m-r-5"></i> Delete
                                 </a>
                             </div>
                         </div>
                         <h4 class="user-name m-t-10 mb-0 text-ellipsis">
-                            <a href="#">{{ $user->name }}</a>
+                            <a href="#">{{ $employee->name }}</a>
                         </h4>
-                        <div class="small text-muted">{{ $user->designation }}</div>
-            
-                        {{-- <button class="btn btn-sm btn-light mt-2" type="button" data-toggle="collapse"
-                            data-target="#schedule-{{ $user->user_id }}">
-                            Show Schedule
-                        </button>
-            
-                        <!-- Add Schedule Button -->
-                        <button class="btn btn-sm btn-primary mt-1" data-toggle="modal" data-target="#setScheduleModal-{{ $user->user_id }}">
-                            Set Monthly Schedule
-                        </button> --}}
-            
-                        <!-- Collapsible Schedule -->
-                        <div class="collapse mt-2" id="schedule-{{ $user->user_id }}"
-                            style="max-height: 200px; overflow-y: auto; font-size: 12px;">
-                            @forelse ($schedules[$user->user_id] ?? [] as $entry)
-                                <div>{{ $entry['date'] }} &nbsp; {{ $entry['start'] }} - {{ $entry['end'] }}</div>
-                            @empty
-                                <div>No schedule available</div>
-                            @endforelse
-                        </div>
-                    </div>
-                </div>
-            
-                <!-- Monthly Schedule Modal -->
-                <div class="modal fade" id="setScheduleModal-{{ $user->user_id }}" tabindex="-1" role="dialog" aria-labelledby="setScheduleLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <form action="{{ route('schedule.store') }}" method="POST">
-                            @csrf
-                            <input type="hidden" name="employee_id" value="{{ $user->user_id }}">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Set Monthly Schedule for {{ $user->name }}</h5>
-                                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="form-group">
-                                        <label for="month">Month</label>
-                                        <input type="month" name="month" class="form-control" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Start Time</label>
-                                        <input type="time" name="start_time" class="form-control" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>End Time</label>
-                                        <input type="time" name="end_time" class="form-control" required>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="submit" class="btn btn-success">Save Schedule</button>
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                </div>
-                            </div>
-                        </form>
+                        <div class="small text-muted">{{ $employee->designation }}</div>
                     </div>
                 </div>
                 @endforeach
-            </div>                                    
+            </div>                                  
         </div>
         <!-- /Page Content -->
 
@@ -159,25 +107,20 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form action="{{ route('all/employee/save') }}" method="POST">
+                        <form action="{{ route('all/employee/save') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="col-form-label">Full Name <span class="text-danger">*</span></label>
-                                        <select class="select select2s-hidden-accessible" style="width: 100%;" tabindex="-1" aria-hidden="true" id="name" name="name" required>
-                                            <option value="">-- Select --</option>
-                                            @foreach ($userList as $key=>$user )
-                                                <option value="{{ $user->name }}" data-employee_id="{{ $user->user_id }}" data-email="{{ $user->email }}">{{ $user->name }}</option>
-                                            @endforeach
-                                        </select>
+                                        <input class="form-control" style="width: 100%;" tabindex="-1" aria-hidden="true" id="name" name="name" required oninput="capitalizeWords(this)">
                                     </div>
                                 </div>
                             
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="col-form-label">Email <span class="text-danger">*</span></label>
-                                        <input class="form-control" type="email" id="email" name="email" placeholder="Auto email" readonly required>
+                                        <input class="form-control" type="email" id="email" name="email" required>
                                     </div>
                                 </div>
 
@@ -198,24 +141,19 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-sm-6">  
+                                <div class="col-md-6">  
                                     <div class="form-group">
                                         <label class="col-form-label">Employee ID <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="employee_id" name="employee_id" placeholder="Auto id employee" readonly required>
+                                        <input type="text" class="form-control" id="employee_id" name="employee_id" required>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="col-form-label">Line Manager <span class="text-danger">*</span></label>
-                                        <select class="select select2s-hidden-accessible" style="width: 100%;" tabindex="-1" aria-hidden="true" id="company" name="company" required>
-                                            <option value="">-- Select --</option>
-                                            @foreach ($userList as $key=>$user )
-                                                <option value="{{ $user->name }}">{{ $user->name }}</option>
-                                            @endforeach
-                                        </select>
+                                        <input class="select select2s-hidden-accessible" style="width: 100%;" tabindex="-1" aria-hidden="true" id="company" name="company" required>
                                     </div>
                                 </div>
-                                <div class="col-sm-6">
+                                <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="col-form-label">Phone <span class="text-danger">*</span></label>
                                         <input class="form-control" type="text" id="phone" name="phone" required>
@@ -281,58 +219,14 @@
                                         </select>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="table-responsive m-t-15">
-                                <table class="table table-striped custom-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Module Permission</th>
-                                            <th class="text-center">Read</th>
-                                            <th class="text-center">Write</th>
-                                            <th class="text-center">Create</th>
-                                            <th class="text-center">Delete</th>
-                                            <th class="text-center">Import</th>
-                                            <th class="text-center">Export</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php
-                                            $key = 0;
-                                            $key1 = 0;
-                                        ?>
-                                        @foreach ($permission_lists as $lists )
-                                        <tr>
-                                            <td>{{ $lists->permission_name }}</td>
-                                            <input type="hidden" name="permission[]" value="{{ $lists->permission_name }}">
-                                            <input type="hidden" name="id_count[]" value="{{ $lists->id }}">
-                                            <td class="text-center">
-                                                <input type="checkbox" class="option-input checkbox read{{ ++$key }}" id="read" name="read[]" value="Y"{{ $lists->read =="Y" ? 'checked' : ''}} >
-                                                <input type="checkbox" class="option-input checkbox read{{ ++$key1 }}" id="read" name="read[]" value="N" {{ $lists->read =="N" ? 'checked' : ''}}>
-                                            </td>
-                                            <td class="text-center">
-                                                <input type="checkbox" class="option-input checkbox write{{ ++$key }}" id="write" name="write[]" value="Y" {{ $lists->write =="Y" ? 'checked' : ''}}>
-                                                <input type="checkbox" class="option-input checkbox write{{ ++$key1 }}" id="write" name="write[]" value="N" {{ $lists->write =="N" ? 'checked' : ''}}>
-                                            </td>
-                                            <td class="text-center">
-                                                <input type="checkbox" class="option-input checkbox create{{ ++$key }}" id="create" name="create[]" value="Y" {{ $lists->create =="Y" ? 'checked' : ''}}>
-                                                <input type="checkbox" class="option-input checkbox create{{ ++$key1 }}" id="create" name="create[]" value="N" {{ $lists->create =="N" ? 'checked' : ''}}>
-                                            </td>
-                                            <td class="text-center">
-                                                <input type="checkbox" class="option-input checkbox delete{{ ++$key }}" id="delete" name="delete[]" value="Y" {{ $lists->delete =="Y" ? 'checked' : ''}}>
-                                                <input type="checkbox" class="option-input checkbox delete{{ ++$key1 }}" id="delete" name="delete[]" value="N" {{ $lists->delete =="N" ? 'checked' : ''}}>
-                                            </td>
-                                            <td class="text-center">
-                                                <input type="checkbox" class="option-input checkbox import{{ ++$key }}" id="import" name="import[]" value="Y" {{ $lists->import =="Y" ? 'checked' : ''}}>
-                                                <input type="checkbox" class="option-input checkbox import{{ ++$key1 }}" id="import" name="import[]" value="N" {{ $lists->import =="N" ? 'checked' : ''}}>
-                                            </td>
-                                            <td class="text-center">
-                                                <input type="checkbox" class="option-input checkbox export{{ ++$key }}" id="export" name="export[]" value="Y" {{ $lists->export =="Y" ? 'checked' : ''}}>
-                                                <input type="checkbox" class="option-input checkbox export{{ ++$key1 }}" id="export" name="export[]" value="N" {{ $lists->export =="N" ? 'checked' : ''}}>
-                                            </td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Profile Picture</label>
+                                        <input type="file" class="form-control" name="profile_picture" accept="image/*" onchange="previewProfilePic(this)">
+                                        <br>
+                                        <img id="profilePicPreview" src="{{ asset('assets/employeepic/default.png') }}" alt="Profile Picture Preview" width="100" style="display: none; border: 1px solid #ccc; padding: 3px;">
+                                    </div>
+                                </div>
                             </div>
                             <div class="submit-section">
                                 <button class="btn btn-primary submit-btn">Submit</button>
@@ -371,23 +265,29 @@
     </script>
 
     <script>
-        // select auto id and email
-        $('#name').on('change',function()
-        {
-            $('#employee_id').val($(this).find(':selected').data('employee_id'));
-            $('#email').val($(this).find(':selected').data('email'));
-        });
+        function capitalizeWords(input) {
+            let words = input.value.toLowerCase().split(' ');
+            for (let i = 0; i < words.length; i++) {
+                if (words[i].length > 0) {
+                    words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+                }
+            }
+            input.value = words.join(' ');
+        }
     </script>
 
     <script>
-        document.getElementById('name').addEventListener('change', function () {
-            const selectedOption = this.options[this.selectedIndex];
-            const emailField = document.getElementById('email');
-
-            emailField.value = selectedOption.getAttribute('data-email');
-            document.getElementById('employee_id').value = selectedOption.getAttribute('data-employee_id');
-        });
+        function previewProfilePic(input) {
+            if (input.files && input.files[0]) {
+                let reader = new FileReader();
+                reader.onload = function (e) {
+                    let img = document.getElementById('profilePicPreview');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
     </script>
     @endsection
-
 @endsection

@@ -78,7 +78,9 @@
                                 <td hidden class="id">{{ $item->id }}</td>
                                 <td class="j_name font-weight-bold text-primary">{{ $item->job_name }}</td>
                                 <td class="j_type">{{ $item->job_type }}</td>
-                                <td class="j_filled">{{ date('j M Y (h:i A)', strtotime($item->job_date_filled)) }}</td>
+                                <td class="j_filled" data-order="{{ $item->job_date_filled }}">
+                                {{ date('j M Y (h:i A)', strtotime($item->job_date_filled)) }}
+                                </td>
                                 <td class="text-center">
                                     <span class="badge px-4 py-2 fs-5 fw-bold rounded-pill
                                         @if($item->job_status == 'New') badge-primary

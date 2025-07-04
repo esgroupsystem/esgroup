@@ -64,50 +64,36 @@ class EmployeeController extends Controller
     
     public function cardAllEmployee(Request $request)
     {
-        $users = DB::table('users')
-            ->join('employees', 'users.user_id', 'employees.employee_id')
+        $employees = DB::table('employees')
             ->leftJoin('departments', 'employees.department_id', 'departments.id')
             ->leftJoin('designations', 'employees.designation_id', 'designations.id')
             ->select(
-                'users.*',
+                'employees.id',
+                'employees.name',
+                'employees.email',
+                'employees.phone',
                 'employees.birth_date',
                 'employees.gender',
+                'employees.employee_id',
                 'employees.company',
+                'employees.garage',
+                'employees.date_hired',
+                'employees.end_date',
+                'employees.status',
+                'employees.profile_picture',
                 'departments.department as department',
                 'designations.designation as designation'
             )
             ->get();
     
-        $userList = DB::table('users')->get();
-        $permission_lists = DB::table('permission_lists')->get();
         $departments = department::all();
         $designations = designation::all();
-    
-        $year = 2025;
-        $month = 5;
-    
-        // Get all schedules for the month (May 2025)
-        $schedulesRaw = EmployeeSchedule::whereYear('work_date', $year)
-            ->whereMonth('work_date', $month)
-            ->get();
-    
-        // Group schedules by employee_id
-        $schedules = [];
-        foreach ($schedulesRaw as $sched) {
-            $schedules[$sched->employee_id][] = [
-                'date'  => Carbon::parse($sched->work_date)->format('F j, Y (l)'),
-                'start' => Carbon::parse($sched->start_time)->format('g:i A'),
-                'end'   => Carbon::parse($sched->end_time)->format('g:i A'),
-            ];
-        }
+
     
         return view('employees.allemployeecard', compact(
-            'users',
-            'userList',
-            'permission_lists',
+            'employees',
             'departments',
-            'designations',
-            'schedules' // ✅ Passed to view
+            'designations'
         ));
     }    
 
@@ -134,17 +120,19 @@ class EmployeeController extends Controller
             'gender'      => 'required|string|max:10',
             'employee_id' => 'required|string|max:255',
             'company'     => 'required|string|max:255',
-            'department'  => 'required|exists:departments,id', // Assuming you have a departments table
-            'designation' => 'required|exists:designations,id', // Assuming you have a designations table
+            'department'  => 'required|exists:departments,id',
+            'designation' => 'required|exists:designations,id',
             'garage'      => 'required|string|max:255',
             'date_hired'  => 'required|date',
             'status'      => 'required|string|max:50',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         DB::beginTransaction();
         try {
-            // Check if employee already exists
+
             $existingEmployee = Employee::where('email', $request->email)->first();
+            
             if (!$existingEmployee) {
                 $employee = new Employee();
                 $employee->name         = $request->name;
@@ -153,36 +141,31 @@ class EmployeeController extends Controller
                 $employee->gender       = $request->gender;
                 $employee->employee_id  = $request->employee_id;
                 $employee->company      = $request->company;
-                $employee->phone        = $request->phone; // Add this line to save phone
-                $employee->date_hired   = $request->date_hired; // Add this line to save date_hired
-                $employee->status       = $request->status; // Add this line to save status
-                $employee->department_id = $request->department; // Assuming you have a foreign key relation
-                $employee->designation_id = $request->designation; // Assuming you have a foreign key relation
+                $employee->phone        = $request->phone;
+                $employee->date_hired   = $request->date_hired; 
+                $employee->status       = $request->status; 
+                $employee->department_id = $request->department; 
+                $employee->designation_id = $request->designation; 
                 $employee->garage       = $request->garage;
-                $employee->save();
 
-                // Saving permissions
-                foreach ($request->id_count as $index => $idCount) {
-                    $module_permissions = [
-                        'employee_id' => $employee->id, // Save with the newly created employee ID
-                        'module_permission' => $request->permission[$index],
-                        'id_count' => $idCount,
-                        'read' => $request->read[$index] ?? 'N',
-                        'write' => $request->write[$index] ?? 'N',
-                        'create' => $request->create[$index] ?? 'N',
-                        'delete' => $request->delete[$index] ?? 'N',
-                        'import' => $request->import[$index] ?? 'N',
-                        'export' => $request->export[$index] ?? 'N',
-                    ];
-                    DB::table('module_permissions')->insert($module_permissions);
+                if ($request->hasFile('profile_picture')) {
+                    $file = $request->file('profile_picture');
+                    $filename = time().'_'.uniqid().'_'.$file->getClientOriginalName();
+                    $file->move(public_path('assets/employeepic'), $filename);
+                    $employee->profile_picture = $filename; 
+                } else {
+
+                    $employee->profile_picture = 'default.png'; 
                 }
+
+                $employee->save();
 
                 DB::commit();
                 flash()->success('Add new employee successfully :)');
                 return redirect()->route('all/employee/card');
             } else {
                 DB::rollback();
-                flash()->error('Employee already exists.');
+                flash()->error('Employee already exists. ');
                 return redirect()->back();
             }
         } catch (\Exception $e) {
@@ -191,7 +174,6 @@ class EmployeeController extends Controller
             return redirect()->back();
         }
     }
-
     
     /** Edit Record */
     public function viewRecord($employee_id)
@@ -449,33 +431,58 @@ class EmployeeController extends Controller
     }
 
     /** Employee profile */
-    public function profileEmployee($user_id)
+    public function profileEmployee($id)
     {
-        $user = DB::table('users') 
-                ->leftJoin('personal_information as pi','pi.user_id','users.user_id')
-                ->leftJoin('profile_information as pr','pr.user_id','users.user_id')
-                ->leftJoin('user_emergency_contacts as ue','ue.user_id','users.user_id')
-                ->select('users.*','pi.passport_no','pi.passport_expiry_date','pi.tel',
-                'pi.nationality','pi.religion','pi.marital_status','pi.employment_of_spouse',
-                'pi.children','pr.birth_date','pr.gender','pr.address','pr.country','pr.state','pr.pin_code',
-                'pr.phone_number','pr.department','pr.designation','pr.reports_to',
-                'ue.name_primary','ue.relationship_primary','ue.phone_primary','ue.phone_2_primary',
-                'ue.name_secondary','ue.relationship_secondary','ue.phone_secondary','ue.phone_2_secondary')
-                ->where('users.user_id',$user_id)->get();
-        $users = DB::table('users')
-                ->leftJoin('personal_information as pi','pi.user_id','users.user_id')
-                ->leftJoin('profile_information as pr','pr.user_id','users.user_id')
-                ->leftJoin('user_emergency_contacts as ue','ue.user_id','users.user_id')
-                ->select('users.*','pi.passport_no','pi.passport_expiry_date','pi.tel',
-                'pi.nationality','pi.religion','pi.marital_status','pi.employment_of_spouse',
-                'pi.children','pr.birth_date','pr.gender','pr.address','pr.country','pr.state','pr.pin_code',
-                'pr.phone_number','pr.department','pr.designation','pr.reports_to',
-                'ue.name_primary','ue.relationship_primary','ue.phone_primary','ue.phone_2_primary',
-                'ue.name_secondary','ue.relationship_secondary','ue.phone_secondary','ue.phone_2_secondary')
-                ->where('users.user_id',$user_id)->first();
+        try {
+            $employee = DB::table('employees')
+                ->leftJoin('personal_information as pi', 'pi.user_id', 'employees.employee_id')
+                ->leftJoin('profile_information as pr', 'pr.user_id', 'employees.employee_id')
+                ->leftJoin('user_emergency_contacts as ue', 'ue.user_id', 'employees.employee_id')
+                ->leftJoin('departments', 'employees.department_id', 'departments.id')
+                ->leftJoin('designations', 'employees.designation_id', 'designations.id')
+                ->select(
+                    'employees.*',
+                    'pi.passport_no',
+                    'pi.passport_expiry_date',
+                    'pi.tel',
+                    'pi.nationality',
+                    'pi.religion',
+                    'pi.marital_status',
+                    'pi.employment_of_spouse',
+                    'pi.children',
+                    'pr.birth_date',
+                    'pr.gender',
+                    'pr.address',
+                    'pr.country',
+                    'pr.state',
+                    'pr.pin_code',
+                    'pr.phone_number',
+                    'pr.reports_to',
+                    'departments.department as department',
+                    'designations.designation as designation',
+                    'ue.name_primary',
+                    'ue.relationship_primary',
+                    'ue.phone_primary',
+                    'ue.phone_2_primary',
+                    'ue.name_secondary',
+                    'ue.relationship_secondary',
+                    'ue.phone_secondary',
+                    'ue.phone_2_secondary'
+                )
+                ->where('employees.id', $id)
+                ->first();
 
-        return view('employees.employeeprofile',compact('user','users'));
+            $reportToList = DB::table('employees')->select('id', 'name')->get();
+
+            return view('employees.employeeprofile', compact('employee', 'reportToList'));
+
+        } catch (\Exception $e) {
+            \Log::error('Error loading employee profile: ' . $e->getMessage());
+            flash()->error('Failed to load employee profile: ' . $e->getMessage());
+            return redirect()->back();
+        }
     }
+
 
     /** Page Departments */
     public function index()

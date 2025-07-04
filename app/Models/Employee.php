@@ -22,5 +22,6 @@ class Employee extends Model
         'date_hired',
         'end_date',
         'status',
+        'profile_picture'
     ];
 }

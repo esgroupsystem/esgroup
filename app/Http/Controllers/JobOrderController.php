@@ -24,12 +24,14 @@ class JobOrderController extends Controller
         /** Display All Holidays */
         public function jobordersIndex()
         {
-            $joborderview = Joborder::all();
+            $joborderview = Joborder::orderBy('created_at', 'desc')->get(); 
+            // or if no timestamps:
+            // $joborderview = Joborder::orderBy('id', 'desc')->get();
+
             $users = User::whereIn('role_name', ['IT', 'Safety Office','Admin'])->get();
 
             return view('joborders.joborder', compact('joborderview', 'users'));
         }
-
         /** Page Create Estimates */
         public function createJobOrderIndex()
         {
