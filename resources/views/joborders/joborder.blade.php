@@ -98,22 +98,25 @@
                                         <i class="fa fa-eye"></i>
                                     </a>
 
-                                    <a class="btn btn-sm btn-warning text-white edit_joborder" title="Edit"
-                                    href="#"
-                                    data-id="{{ $item->id }}"
-                                    data-job_status="{{ $item->job_status }}"
-                                    data-job_assign-person="{{ $item->job_assign_person }}"
-                                    data-toggle="modal"
-                                    data-target="#edit_joborder">
-                                        <i class="fa fa-pencil"></i>
-                                    </a>
-
-                                    <a class="btn btn-sm btn-danger delete_order" title="Delete"
-                                    href="#"
-                                    data-toggle="modal"
-                                    data-target="#delete_order">
-                                        <i class="fa fa-trash"></i>
-                                    </a>
+                                    @if (Auth::user()->role_name === 'Admin' && $item->job_status !== 'Complete')
+                                        <a class="btn btn-sm btn-warning text-white edit_joborder" title="Edit"
+                                        href="#"
+                                        data-id="{{ $item->id }}"
+                                        data-job_status="{{ $item->job_status }}"
+                                        data-job_assign-person="{{ $item->job_assign_person }}"
+                                        data-toggle="modal"
+                                        data-target="#edit_joborder">
+                                            <i class="fa fa-pencil"></i>
+                                        </a>
+                                    @endif
+                                    @if (Auth::user()->role_name === 'Admin')
+                                        <a class="btn btn-sm btn-danger delete_order" title="Delete"
+                                        href="#"
+                                        data-toggle="modal"
+                                        data-target="#delete_order">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    @endif
                                 </td>
                             </tr>
                             @endforeach
@@ -175,13 +178,13 @@
                             </div>
                             <div class="col-sm-6">
                                 <label>Assign to</label>
-                                <select class="select" name="job_assign_person" required>
-                                    @foreach ($users as $user)
-                                        <option value="{{ $user->name }}">{{ $user->name }}</option>
-                                    @endforeach
-                                </select>
+                                <!-- Hidden input to actually submit the ID -->
+                                <input type="hidden" name="job_assign_person" value="{{ Auth::id() }}">
+                                
+                                <!-- Readonly input just to display the name -->
+                                <input type="text" class="form-control" value="{{ Auth::user()->name }}" readonly>
                             </div>
-                        </div><br>
+                        </div>
                         <div class="submit-section">
                             <button type="submit" class="btn btn-primary submit-btn">Update</button>
                         </div>
