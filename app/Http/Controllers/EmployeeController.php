@@ -10,6 +10,7 @@ use App\Models\department;
 use App\Models\Employee;
 use App\Models\User;
 use App\Models\designation;
+use App\Models\PersonalInfomation;
 use Carbon\Carbon;
 use DB;
 use Auth;

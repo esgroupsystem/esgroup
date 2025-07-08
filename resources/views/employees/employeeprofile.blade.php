@@ -65,7 +65,7 @@
                                                     <div class="title">Birthday:</div>
                                                     <div class="text">
                                                         @if(!empty($employee->birth_date))
-                                                        <a>{{ $employee->birth_date }}</a>
+                                                            <a>{{ \Carbon\Carbon::parse($employee->birth_date)->format('F d, Y') }}</a>
                                                         @else
                                                             <a>N/A</a>
                                                         @endif
@@ -74,8 +74,17 @@
                                                 <li>
                                                     <div class="title">Address:</div>
                                                     <div class="text">
-                                                        @if(!empty($employee->address))
-                                                        <a>{{ $employee->address }}</a>
+                                                        @php
+                                                            $addressParts = array_filter([
+                                                                $employee->address ?? null,
+                                                                $employee->state ?? null,
+                                                                $employee->country ?? null,
+                                                                $employee->pin_code ?? null,
+                                                            ]);
+                                                        @endphp
+
+                                                        @if(count($addressParts))
+                                                            <a>{{ implode(', ', $addressParts) }}</a>
                                                         @else
                                                             <a>N/A</a>
                                                         @endif
@@ -91,7 +100,7 @@
                                                         @endif
                                                     </div>
                                                 </li>
-                                                <li>
+                                                {{-- <li>
                                                     <div class="title">Reports to:</div>
                                                     <div class="text">
                                                         <div class="avatar-box">
@@ -101,7 +110,7 @@
                                                         </div>
                                                         <a>{{ $employee->name }}</a>
                                                     </div>
-                                                </li> 
+                                                </li>  --}}
                                             </ul>
                                         </div>
                                     </div>

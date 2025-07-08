@@ -121,6 +121,12 @@
                         <form action="{{ route('all/employee/save') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="row">
+                                <div class="col-md-6">  
+                                    <div class="form-group">
+                                        <label class="col-form-label">Employee ID <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="employee_id" name="employee_id" required>
+                                    </div>
+                                </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="col-form-label">Full Name <span class="text-danger">*</span></label>
@@ -152,18 +158,12 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-6">  
-                                    <div class="form-group">
-                                        <label class="col-form-label">Employee ID <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="employee_id" name="employee_id" required>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
+                                {{-- <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="col-form-label">Line Manager <span class="text-danger">*</span></label>
                                         <input class="select select2s-hidden-accessible" style="width: 100%;" tabindex="-1" aria-hidden="true" id="company" name="company" required>
                                     </div>
-                                </div>
+                                </div> --}}
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="col-form-label">Phone <span class="text-danger">*</span></label>

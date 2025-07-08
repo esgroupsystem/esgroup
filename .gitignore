@@ -46,3 +46,5 @@ Thumbs.db
 # Optional: ignore test coverage reports
 coverage/
 *.log
+*.log
+/storage/logs
