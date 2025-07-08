@@ -84,7 +84,7 @@
                                 <td class="text-center">
                                     <span class="badge px-4 py-2 fs-5 fw-bold rounded-pill
                                         @if($item->job_status == 'New') badge-primary
-                                        @elseif($item->job_status == 'Complete' || $item->job_status == 'Extracted') badge-success
+                                        @elseif($item->job_status == 'Completed' || $item->job_status == 'Extracted') badge-success
                                         @elseif($item->job_status == 'Processing') badge-warning
                                         @else badge-danger
                                         @endif">
@@ -98,7 +98,7 @@
                                         <i class="fa fa-eye"></i>
                                     </a>
 
-                                    @if (Auth::user()->role_name === 'Admin' && $item->job_status !== 'Complete')
+                                    @if (Auth::user()->role_name === 'Admin' && $item->job_status !== 'Completed')
                                         <a class="btn btn-sm btn-warning text-white edit_joborder" title="Edit"
                                         href="#"
                                         data-id="{{ $item->id }}"
