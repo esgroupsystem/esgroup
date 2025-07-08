@@ -50,7 +50,7 @@
     </section>
 
     <section class="dash-section">
-        <h1 class="dash-sec-title">Today</h1>
+        <h1 class="dash-sec-title">YESTERDAY TASK</h1>
             <div class="dash-sec-content">
                 @forelse ($yesterdayJobs as $item)
                     <div class="dash-info-list">
@@ -99,7 +99,7 @@
     </section>
 
     <section class="dash-section">
-        <h1 class="dash-sec-title">Today</h1>
+        <h1 class="dash-sec-title">LAST SEVEN DAYS</h1>
             <div class="dash-sec-content">
                 @forelse ($pastThreeToSevenDaysJobs as $item)
                     <div class="dash-info-list">
