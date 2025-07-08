@@ -124,7 +124,7 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="col-form-label">Full Name <span class="text-danger">*</span></label>
-                                        <input class="form-control" style="width: 100%;" tabindex="-1" aria-hidden="true" id="name" name="name" required oninput="capitalizeWords(this)">
+                                        <input class="form-control" style="width: 100%;" tabindex="-1" id="name" name="name" required oninput="capitalizeWords(this)">
                                     </div>
                                 </div>
                             
