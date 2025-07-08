@@ -55,6 +55,11 @@ class LoginController extends Controller
                     flash()->success('Login successfully :)');
                     return redirect()->intended('stock/dashboard');
                 }
+                elseif($user->role_name === 'IT')
+                {
+                    flash()->success('Login successfully :)');
+                    return redirect()->intended('dashboard/joborders');
+                }
                 
                 flash()->success('Login successfully :)');
                 return redirect()->intended('home');

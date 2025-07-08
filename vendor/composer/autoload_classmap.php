@@ -61,6 +61,7 @@ return array(
     'App\\Http\\Controllers\\TrainingController' => $baseDir . '/app/Http/Controllers/TrainingController.php',
     'App\\Http\\Controllers\\TrainingTypeController' => $baseDir . '/app/Http/Controllers/TrainingTypeController.php',
     'App\\Http\\Controllers\\UserManagementController' => $baseDir . '/app/Http/Controllers/UserManagementController.php',
+    'App\\Http\\Middleware\\CheckRole' => $baseDir . '/app/Http/Middleware/CheckRole.php',
     'App\\Http\\Middleware\\ContentSecurityPolicy' => $baseDir . '/app/Http/Middleware/ContentSecurityPolicy.php',
     'App\\Models\\AddJob' => $baseDir . '/app/Models/AddJob.php',
     'App\\Models\\ApplyForJob' => $baseDir . '/app/Models/ApplyForJob.php',

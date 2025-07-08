@@ -11,8 +11,8 @@
                     * DASHBOARD 
                     *
                     *-->
-                <li class="{{ set_active(['home', 'em/dashboard', 'stock/dashboard']) }} submenu">
-                    <a href="#" class="{{ set_active(['home', 'em/dashboard']) ? 'noti-dot' : '' }}">
+                <li class="{{ set_active(['home', 'em/dashboard', 'stock/dashboard', 'dashboard/joborders']) }} submenu">
+                    <a href="#" class="{{ set_active(['home', 'em/dashboard', 'dashboard/joborders']) ? 'noti-dot' : '' }}">
                         <i class="la la-dashboard"></i>
                         <span> Dashboard</span> <span class="menu-arrow"></span>
                     </a>
@@ -25,6 +25,9 @@
                             </li>
                         <li>
                             {!! privilege_link('stock/dashboard', ['Maintenance', 'Admin', 'StockManager'], 'Stocks Dashboard', set_active(['stock/dashboard'])) !!}
+                        </li>
+                        <li>
+                            {!! privilege_link('dashboard/joborders', ['IT', 'Admin'], 'Job Orders Dashboard', set_active(['dashboard/joborders'])) !!}
                         </li>
                     </ul>
                 </li>
@@ -129,14 +132,15 @@
                     <li class="{{ set_active(['all/employee/list','all/employee/card','form/holidays/new','form/leaves/new',
                         'form/leavesemployee/new','form/leavesettings/page','attendance/page',
                         'attendance/employee/page','form/departments/page','form/designations/page',
-                        'form/timesheet/page','form/shiftscheduling/page','form/overtime/page']) }} submenu">
+                        'form/timesheet/page','form/shiftscheduling/page','form/overtime/page', 'admin/employee-requests']) }} submenu">
                         <a href="#" class="{{ set_active(['all/employee/list','all/employee/card','form/holidays/new','form/leaves/new',
                         'form/leavesemployee/new','form/leavesettings/page','attendance/page',
                         'attendance/employee/page','form/departments/page','form/designations/page',
-                        'form/timesheet/page','form/shiftscheduling/page','form/overtime/page']) ? 'noti-dot' : '' }}">
+                        'form/timesheet/page','form/shiftscheduling/page','form/overtime/page', 'admin/employee-requests']) ? 'noti-dot' : '' }}">
                             <i class="la la-user"></i> <span> Employees</span> <span class="menu-arrow"></span>
                         </a>
                         <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">
+                            <li>{!! privilege_link('employees.request', ['Admin'], 'For Approval Request', set_active(['all/employee/list'])) !!}</li>
                             <li>{!! privilege_link('all/employee/card', ['HR', 'Admin'], 'All Employees', set_active(['all/employee/list','all/employee/card'])) !!}</li>
                             <li>{!! privilege_link('form/holidays/new', ['HR', 'Admin'], 'Holidays', set_active(['form/holidays/new'])) !!}</li>
                             <li>{!! privilege_link('form/leaves/new', ['HR', 'Admin'], 'Leaves (Admin) <span class="badge badge-pill bg-primary float-right">1</span>', set_active(['form/leaves/new'])) !!}</li>

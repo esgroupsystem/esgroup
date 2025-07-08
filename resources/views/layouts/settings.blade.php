@@ -14,6 +14,7 @@
         <link rel="stylesheet" href="{{ URL::to('assets/css/bootstrap.min.css') }}">
 		<!-- Fontawesome CSS -->
         <link rel="stylesheet" href="{{ URL::to('assets/css/font-awesome.min.css') }}">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 		<!-- Lineawesome CSS -->
         <link rel="stylesheet" href="{{ URL::to('assets/css/line-awesome.min.css') }}">
 		<!-- Select2 CSS -->
@@ -22,6 +23,7 @@
         <link rel="stylesheet" href="{{ URL::to('assets/css/style.css') }}">
 		{{-- message toastr --}}
 		<link rel="stylesheet" href="{{ URL::to('assets/css/toastr.min.css') }}">
+
 		<script src="{{ URL::to('assets/js/toastr_jquery.min.js') }}"></script>
 		<script src="{{ URL::to('assets/js/toastr.min.js') }}"></script>
 

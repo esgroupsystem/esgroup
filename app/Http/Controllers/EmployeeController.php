@@ -12,9 +12,154 @@ use App\Models\User;
 use App\Models\designation;
 use Carbon\Carbon;
 use DB;
+use Auth;
 
 class EmployeeController extends Controller
 {
+
+    public function viewProfile($id)
+    {
+        $user = Auth::user();
+
+        if ($user->role_name === 'Admin') {
+            return $this->profileEmployee($id);
+        }
+
+        $approval = DB::table('employee_view_approvals')
+            ->where('employee_id', $id)
+            ->where('requested_by', $user->id)
+            ->where('status', 'approved')
+            ->where('approved_until', '>=', now())
+            ->first();
+
+        if ($approval) {
+            return $this->profileEmployee($id);
+        }
+
+        return redirect()->back()->with('error', 'Access denied. Please request admin approval.');
+    }
+    
+    public function requestApproval($employeeId)
+    {
+        $user = Auth::user();
+
+        $existing = DB::table('employee_view_approvals')
+            ->where('employee_id', $employeeId)
+            ->where('requested_by', $user->id)
+            ->whereIn('status', ['pending', 'approved'])
+            ->where(function($q) {
+                $q->whereNull('approved_until')
+                ->orWhere('approved_until', '>=', now());
+            })
+            ->first();
+
+        if ($existing) {
+            return redirect()->back()->with('info', 'You already have a pending or active approval for this employee.');
+        }
+
+        DB::table('employee_view_approvals')->insert([
+            'employee_id' => $employeeId,
+            'requested_by' => $user->id,
+            'status' => 'pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Access request sent to Admin.');
+    }
+
+    public function viewRequests()
+    {
+        $requests = DB::table('employee_view_approvals')
+            ->join('employees', 'employee_view_approvals.employee_id', '=', 'employees.id')
+            ->join('users as hr', 'employee_view_approvals.requested_by', '=', 'hr.id')
+            ->select('employee_view_approvals.*', 'employees.name as employee_name', 'hr.name as hr_name')
+            ->where('employee_view_approvals.status', 'pending')
+            ->get();
+
+        return view('employees.employee_requests', compact('requests'));
+    }
+
+    public function approveRequest(Request $request, $id)
+    {
+        DB::table('employee_view_approvals')
+            ->where('id', $id)
+            ->update([
+                'status' => 'approved',
+                'approved_by' => Auth::id(),
+                'approved_until' => $request->approved_until,
+                'updated_at' => now(),
+            ]);
+
+        return redirect()->back()->with('success', 'Request approved.');
+    }
+
+    public function rejectRequest($id)
+    {
+        DB::table('employee_view_approvals')
+            ->where('id', $id)
+            ->update([
+                'status' => 'rejected',
+                'approved_by' => Auth::id(),
+                'updated_at' => now(),
+            ]);
+
+        return redirect()->back()->with('success', 'Request rejected.');
+    }
+
+    /** Employee profile */
+    public function profileEmployee($id)
+    {
+        try {
+            $employee = DB::table('employees')
+                ->leftJoin('personal_information as pi', 'pi.user_id', 'employees.employee_id')
+                ->leftJoin('profile_information as pr', 'pr.user_id', 'employees.employee_id')
+                ->leftJoin('user_emergency_contacts as ue', 'ue.user_id', 'employees.employee_id')
+                ->leftJoin('departments', 'employees.department_id', 'departments.id')
+                ->leftJoin('designations', 'employees.designation_id', 'designations.id')
+                ->select(
+                    'employees.*',
+                    'pi.passport_no',
+                    'pi.passport_expiry_date',
+                    'pi.tel',
+                    'pi.nationality',
+                    'pi.religion',
+                    'pi.marital_status',
+                    'pi.employment_of_spouse',
+                    'pi.children',
+                    'pr.birth_date',
+                    'pr.gender',
+                    'pr.address',
+                    'pr.country',
+                    'pr.state',
+                    'pr.pin_code',
+                    'pr.phone_number',
+                    'pr.reports_to',
+                    'departments.department as department',
+                    'designations.designation as designation',
+                    'ue.name_primary',
+                    'ue.relationship_primary',
+                    'ue.phone_primary',
+                    'ue.phone_2_primary',
+                    'ue.name_secondary',
+                    'ue.relationship_secondary',
+                    'ue.phone_secondary',
+                    'ue.phone_2_secondary'
+                )
+                ->where('employees.id', $id)
+                ->first();
+
+            $reportToList = DB::table('employees')->select('id', 'name')->get();
+
+            return view('employees.employeeprofile', compact('employee', 'reportToList'));
+
+        } catch (\Exception $e) {
+            \Log::error('Error loading employee profile: ' . $e->getMessage());
+            flash()->error('Failed to load employee profile: ' . $e->getMessage());
+            return redirect()->back();
+        }
+    }
+
     //Add schedule per employee
     public function store(Request $request)
     {
@@ -88,12 +233,19 @@ class EmployeeController extends Controller
     
         $departments = department::all();
         $designations = designation::all();
+        $approvals = DB::table('employee_view_approvals')
+        ->where('requested_by', Auth::id())
+        ->where('status', 'approved')
+        ->where('approved_until', '>=', now())
+        ->pluck('employee_id')
+        ->toArray();
 
     
         return view('employees.allemployeecard', compact(
             'employees',
             'departments',
-            'designations'
+            'designations', 
+            'approvals'
         ));
     }    
 
@@ -429,60 +581,6 @@ class EmployeeController extends Controller
         }
         return view('employees.employeelist',compact('users','userList','permission_lists'));
     }
-
-    /** Employee profile */
-    public function profileEmployee($id)
-    {
-        try {
-            $employee = DB::table('employees')
-                ->leftJoin('personal_information as pi', 'pi.user_id', 'employees.employee_id')
-                ->leftJoin('profile_information as pr', 'pr.user_id', 'employees.employee_id')
-                ->leftJoin('user_emergency_contacts as ue', 'ue.user_id', 'employees.employee_id')
-                ->leftJoin('departments', 'employees.department_id', 'departments.id')
-                ->leftJoin('designations', 'employees.designation_id', 'designations.id')
-                ->select(
-                    'employees.*',
-                    'pi.passport_no',
-                    'pi.passport_expiry_date',
-                    'pi.tel',
-                    'pi.nationality',
-                    'pi.religion',
-                    'pi.marital_status',
-                    'pi.employment_of_spouse',
-                    'pi.children',
-                    'pr.birth_date',
-                    'pr.gender',
-                    'pr.address',
-                    'pr.country',
-                    'pr.state',
-                    'pr.pin_code',
-                    'pr.phone_number',
-                    'pr.reports_to',
-                    'departments.department as department',
-                    'designations.designation as designation',
-                    'ue.name_primary',
-                    'ue.relationship_primary',
-                    'ue.phone_primary',
-                    'ue.phone_2_primary',
-                    'ue.name_secondary',
-                    'ue.relationship_secondary',
-                    'ue.phone_secondary',
-                    'ue.phone_2_secondary'
-                )
-                ->where('employees.id', $id)
-                ->first();
-
-            $reportToList = DB::table('employees')->select('id', 'name')->get();
-
-            return view('employees.employeeprofile', compact('employee', 'reportToList'));
-
-        } catch (\Exception $e) {
-            \Log::error('Error loading employee profile: ' . $e->getMessage());
-            flash()->error('Failed to load employee profile: ' . $e->getMessage());
-            return redirect()->back();
-        }
-    }
-
 
     /** Page Departments */
     public function index()

@@ -76,6 +76,8 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
         Route::get('/home', 'index')->name('home');
         Route::get('em/dashboard', 'emDashboard')->name('em/dashboard');
         Route::get('stock/dashboard', 'stockMirasol')->name('stock/dashboard');
+        Route::get('dashboard/joborders', 'jobordersDashboard')->name('dashboard/joborders');
+        Route::get('/joborders-refresh', 'jobordersRefresh')->name('joborders.refresh');
     });
 
     // ----------------------------- lock screen --------------------------------//
@@ -140,6 +142,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
         Route::post('form/joborders/delete', 'deleteRecordJoborders')->name('form/joborders/delete');
         Route::post('/saving', 'Job_Files')->name('job.files');
         Route::post('joborders/delete/{id}', 'deleteVideoFiles')->name('joborders.delete');
+
     });
 
     // --------------------------------- job ---------------------------------//
@@ -216,6 +219,14 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
             Route::post('form/overtime/save', 'saveRecordOverTime')->name('form/overtime/save');
             Route::post('form/overtime/update', 'updateRecordOverTime')->name('form/overtime/update');
             Route::post('form/overtime/delete', 'deleteRecordOverTime')->name('form/overtime/delete');
+
+            // Employee actions
+            Route::get('employee/request-approval/{id}','requestApproval');
+
+            // Admin approval actions
+            Route::get('admin/employee-requests','viewRequests')->name('employees.request');
+            Route::post('admin/employee-requests/approve/{id}','approveRequest');
+            Route::post('admin/employee-requests/reject/{id}','rejectRequest');
         });
 
     // -------------------------- PROFILE EMPLOYEE ---------------------------//

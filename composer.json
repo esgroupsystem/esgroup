@@ -8,6 +8,7 @@
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^2.2",
         "brian2694/laravel-toastr": "^5.59",
+        "guzzlehttp/guzzle": "^7.9",
         "laracasts/flash": "^3.2",
         "laravel/framework": "^11.9",
         "laravel/sanctum": "^4.0",

@@ -30,6 +30,7 @@ class JobOrderController extends Controller
         
             return view('joborders.joborder', compact('joborderview', 'users'));
         }
+        
         /** Page Create Estimates */
         public function createJobOrderIndex()
         {

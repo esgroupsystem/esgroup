@@ -207,8 +207,5 @@
             $('#categoryList').DataTable();
         });
     </script>
-
-
-
     @endsection
 @endsection
