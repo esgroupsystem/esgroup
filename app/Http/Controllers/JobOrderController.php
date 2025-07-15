@@ -35,7 +35,7 @@ class JobOrderController extends Controller
         public function createJobOrderIndex()
         {
             $loggedUser = Auth::user();
-            $busList = DB::Table('assets_category')
+            $busList = DB::Table('bus_details')
             ->selectRaw("cat_id, cat_name, cat_busnum, CONCAT(cat_name, ' - (', cat_busnum, ') - ', cat_busplate) as full_name")
             ->get();
             return view('joborders.createjoborder', compact('busList','loggedUser'));
