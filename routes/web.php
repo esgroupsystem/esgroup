@@ -189,7 +189,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
     
 // ---------------------------- FORM EMPLOYEE ----------------------------//
     Route::controller(EmployeeController::class)
-        ->middleware(['auth', 'role:Admin,HR','DPO'])
+        ->middleware(['auth', 'role:Admin,HR,DPO'])
         ->group(function () {
             Route::get('all/employee/card', 'cardAllEmployee')->name('all/employee/card');
             Route::get('all/employee/list', 'listAllEmployee')->name('all/employee/list');
