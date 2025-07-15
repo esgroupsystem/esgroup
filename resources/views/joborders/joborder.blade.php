@@ -85,8 +85,8 @@
                                     <span class="badge px-4 py-2 fs-5 fw-bold rounded-pill
                                         @if($item->job_status == 'New') badge-primary
                                         @elseif($item->job_status == 'Completed' || $item->job_status == 'Extracted') badge-success
-                                        @elseif($item->job_status == 'Processing') badge-warning
-                                        @else badge-danger
+                                        @elseif($item->job_status == 'Pending') badge-warning
+                                        @else badge-warning
                                         @endif">
                                         {{ $item->job_status }}
                                     </span>
@@ -172,8 +172,8 @@
                             <div class="col-sm-6">
                                 <label>Status</label>
                                 <select class="form-control custom-select" name="job_status" required>
-                                    <option value="New">New</option>
-                                    <option value="Complete">Complete</option>
+                                    <option value="Pending">New</option>
+                                    <option value="Completed">Complete</option>
                                 </select>
                             </div>
                             <div class="col-sm-6">
