@@ -3,6 +3,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\LeavesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -261,7 +262,15 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
             Route::get('attendance/employee/page', 'AttendanceEmployee')->name('attendance/employee/page');
             Route::get('form/shiftscheduling/page', 'shiftScheduLing')->name('form/shiftscheduling/page');
             Route::get('form/shiftlist/page', 'shiftList')->name('form/shiftlist/page');
+
+            Route::post('/schedule/store', 'storeSchedule')->name('schedule.store');
+            Route::post('/schedule/update', 'update')->name('schedule.update');
+            Route::get('/driver-profiles', 'showDriverSchedules')->name('all.schedule');
+            
+            Route::post('/schedule/update-log', 'updateScheduleLog')->name('schedule.update.log');
+
         });
+
 
     // ---------------------------- FORM PAYROLL -----------------------------//
     Route::controller(PayrollController::class)

@@ -359,7 +359,7 @@
 				<div class="modal-body">
 					<h3>Access Denied</h3>
 					<p>You don't have privilege to use this.<br>Please contact IT Department.</p>
-					<button type="button" class="btn btn-primary mt-3" data-bs-dismiss="modal">OK</button>
+					<button type="button" class="btn btn-primary mt-3" data-dismiss="modal">OK</button>
 				</div>
 			</div>
 		</div>

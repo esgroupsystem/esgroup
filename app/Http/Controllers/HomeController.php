@@ -94,7 +94,7 @@ class HomeController extends Controller
 
         // ✅ Add these
         $totalTasks = Joborder::count();
-        $pendingTasks = Joborder::where('job_status', 'New')->count();
+        $pendingTasks = Joborder::where('job_status', 'Pending')->count();
         $completedTasks = Joborder::where('job_status', 'Completed')->count();
 
         $year = now()->year;

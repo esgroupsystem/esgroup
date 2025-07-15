@@ -152,6 +152,7 @@
                             <li>{!! privilege_link('form/designations/page', ['HR', 'Admin'], 'Designations', set_active(['form/designations/page'])) !!}</li>
                             <li>{!! privilege_link('form/timesheet/page', ['HR', 'Admin'], 'Timesheet', set_active(['form/timesheet/page'])) !!}</li>
                             <li>{!! privilege_link('form/shiftscheduling/page', ['HR', 'Admin'], 'Shift & Schedule', set_active(['form/shiftscheduling/page'])) !!}</li>
+                            <li>{!! privilege_link('all.schedule', ['HR', 'Admin'], 'All Schedule', set_active(['all.schedule'])) !!}</li>
                             <li>{!! privilege_link('form/overtime/page', ['HR', 'Admin'], 'Overtime', set_active(['form/overtime/page'])) !!}</li>
                         </ul>
                     </li>
