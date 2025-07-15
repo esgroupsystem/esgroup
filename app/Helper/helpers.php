@@ -9,7 +9,7 @@ function set_active($route) {
 }
 
 if (!function_exists('privilege_link')) {
-    function privilege_link($routeName, $rolesAllowed = ['Maintenance', 'Admin', 'IT', 'HR'], $linkText = '', $extraClasses = '') {
+    function privilege_link($routeName, $rolesAllowed = ['Maintenance', 'Admin', 'IT', 'HR', 'DPO'], $linkText = '', $extraClasses = '') {
         $userRole = Auth::user()->role_name ?? '';
         if (in_array($userRole, $rolesAllowed)) {
             return '<a class="' . $extraClasses . '" href="' . route($routeName) . '">' . $linkText . '</a>';
