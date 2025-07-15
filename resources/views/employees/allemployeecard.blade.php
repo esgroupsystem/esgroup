@@ -66,7 +66,7 @@
                     <div class="profile-widget">
                         @php
                             $user = Auth::user();
-                            $approved = in_array($employee->id, $approvals ?? []); // Make sure $approvals is passed from controller
+                            $approved = in_array($employee->id, $approvals ?? []);
                         @endphp
 
                             <!-- Status badge -->
@@ -75,7 +75,7 @@
                         </span>
 
                         <div class="profile-img">
-                            @if ($user->role_name === 'Admin' || $approved)
+                            @if ($user->role_name === 'Admin' || $user->role_name === 'DPO' || $approved)
                                 <a href="{{ url('employee/profile/' . $employee->id) }}" class="avatar">
                                     <img class="user-profile" 
                                         src="{{ asset('assets/employeepic/' . ($employee->profile_picture ?? 'default.png')) }}" 

@@ -18,10 +18,10 @@
                     </a>
                     <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">
                             <li>
-                                {!! privilege_link('home', ['HR', 'Admin'], 'Admin Dashboard', set_active(['home'])) !!}
+                                {!! privilege_link('home', ['HR', 'Admin', 'DPO'], 'Admin Dashboard', set_active(['home'])) !!}
                             </li>
                             <li>
-                                {!! privilege_link('em/dashboard', ['HR', 'Admin'], 'Employee Dashboard', set_active(['em/dashboard'])) !!}
+                                {!! privilege_link('em/dashboard', ['HR', 'Admin', 'DPO'], 'Employee Dashboard', set_active(['em/dashboard'])) !!}
                             </li>
                         <li>
                             {!! privilege_link('stock/dashboard', ['Maintenance', 'Admin', 'StockManager'], 'Stocks Dashboard', set_active(['stock/dashboard'])) !!}
@@ -140,20 +140,20 @@
                             <i class="la la-user"></i> <span> Employees</span> <span class="menu-arrow"></span>
                         </a>
                         <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">
-                            <li>{!! privilege_link('employees.request', ['Admin'], 'For Approval Request', set_active(['all/employee/list'])) !!}</li>
-                            <li>{!! privilege_link('all/employee/card', ['HR', 'Admin'], 'All Employees', set_active(['all/employee/list','all/employee/card'])) !!}</li>
-                            <li>{!! privilege_link('form/holidays/new', ['HR', 'Admin'], 'Holidays', set_active(['form/holidays/new'])) !!}</li>
-                            <li>{!! privilege_link('form/leaves/new', ['HR', 'Admin'], 'Leaves (Admin) <span class="badge badge-pill bg-primary float-right">1</span>', set_active(['form/leaves/new'])) !!}</li>
-                            <li>{!! privilege_link('form/leavesemployee/new', ['HR', 'Admin'], 'Leaves (Employee)', set_active(['form/leavesemployee/new'])) !!}</li>
-                            <li>{!! privilege_link('form/leavesettings/page', ['HR', 'Admin'], 'Leave Settings', set_active(['form/leavesettings/page'])) !!}</li>
+                            <li>{!! privilege_link('employees.request', ['Admin', 'DPO'], 'For Approval Request', set_active(['all/employee/list'])) !!}</li>
+                            <li>{!! privilege_link('all/employee/card', ['HR', 'Admin', 'DPO'], 'All Employees', set_active(['all/employee/list','all/employee/card'])) !!}</li>
+                            <li>{!! privilege_link('form/holidays/new', ['HR', 'Admin', 'DPO'], 'Holidays', set_active(['form/holidays/new'])) !!}</li>
+                            <li>{!! privilege_link('form/leaves/new', ['HR', 'Admin', 'DPO'], 'Leaves (Admin) <span class="badge badge-pill bg-primary float-right">1</span>', set_active(['form/leaves/new'])) !!}</li>
+                            <li>{!! privilege_link('form/leavesemployee/new', ['HR', 'Admin', 'DPO'], 'Leaves (Employee)', set_active(['form/leavesemployee/new'])) !!}</li>
+                            <li>{!! privilege_link('form/leavesettings/page', ['HR', 'Admin', 'DPO'], 'Leave Settings', set_active(['form/leavesettings/page'])) !!}</li>
                             <li>{!! privilege_link('attendance/page', ['HR', 'Admin'], 'Attendance (Admin)', set_active(['attendance/page'])) !!}</li>
-                            <li>{!! privilege_link('attendance/employee/page', ['HR', 'Admin'], 'Attendance (Employee)', set_active(['attendance/employee/page'])) !!}</li>
-                            <li>{!! privilege_link('form/departments/page', ['HR', 'Admin'], 'Departments', set_active(['form/departments/page'])) !!}</li>
-                            <li>{!! privilege_link('form/designations/page', ['HR', 'Admin'], 'Designations', set_active(['form/designations/page'])) !!}</li>
-                            <li>{!! privilege_link('form/timesheet/page', ['HR', 'Admin'], 'Timesheet', set_active(['form/timesheet/page'])) !!}</li>
-                            <li>{!! privilege_link('form/shiftscheduling/page', ['HR', 'Admin'], 'Shift & Schedule', set_active(['form/shiftscheduling/page'])) !!}</li>
-                            <li>{!! privilege_link('all.schedule', ['HR', 'Admin'], 'All Schedule', set_active(['all.schedule'])) !!}</li>
-                            <li>{!! privilege_link('form/overtime/page', ['HR', 'Admin'], 'Overtime', set_active(['form/overtime/page'])) !!}</li>
+                            <li>{!! privilege_link('attendance/employee/page', ['HR', 'Admin', 'DPO'], 'Attendance (Employee)', set_active(['attendance/employee/page'])) !!}</li>
+                            <li>{!! privilege_link('form/departments/page', ['HR', 'Admin', 'DPO'], 'Departments', set_active(['form/departments/page'])) !!}</li>
+                            <li>{!! privilege_link('form/designations/page', ['HR', 'Admin', 'DPO'], 'Designations', set_active(['form/designations/page'])) !!}</li>
+                            <li>{!! privilege_link('form/timesheet/page', ['HR', 'Admin', 'DPO'], 'Timesheet', set_active(['form/timesheet/page'])) !!}</li>
+                            <li>{!! privilege_link('form/shiftscheduling/page', ['HR', 'Admin', 'DPO'], 'Shift & Schedule', set_active(['form/shiftscheduling/page'])) !!}</li>
+                            <li>{!! privilege_link('all.schedule', ['HR', 'Admin', 'DPO'], 'All Schedule', set_active(['all.schedule'])) !!}</li>
+                            <li>{!! privilege_link('form/overtime/page', ['HR', 'Admin', 'DPO'], 'Overtime', set_active(['form/overtime/page'])) !!}</li>
                         </ul>
                     </li>
 
@@ -163,9 +163,9 @@
                             <i class="la la-files-o"></i> <span> Sales </span> <span class="menu-arrow"></span>
                         </a>
                         <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">
-                            <li>{!! privilege_link('form/estimates/page', ['HR', 'Admin'], 'Estimates', set_active(['create/estimate/page','form/estimates/page'])) !!}</li>
-                            <li>{!! privilege_link('payments', ['HR', 'Admin'], 'Payments', set_active(['payments'])) !!}</li>
-                            <li>{!! privilege_link('expenses/page', ['HR', 'Admin'], 'Expenses', set_active(['expenses/page'])) !!}</li>
+                            <li>{!! privilege_link('form/estimates/page', ['HR', 'Admin', 'DPO'], 'Estimates', set_active(['create/estimate/page','form/estimates/page'])) !!}</li>
+                            <li>{!! privilege_link('payments', ['HR', 'Admin', 'DPO'], 'Payments', set_active(['payments'])) !!}</li>
+                            <li>{!! privilege_link('expenses/page', ['HR', 'Admin', 'DPO'], 'Expenses', set_active(['expenses/page'])) !!}</li>
                         </ul>
                     </li>
 
@@ -202,9 +202,9 @@
                             <i class="la la-graduation-cap"></i> <span> Performance </span> <span class="menu-arrow"></span>
                         </a>
                         <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">
-                            <li>{!! privilege_link('form/performance/indicator/page', ['HR', 'Admin'], 'Performance Indicator', set_active(['form/performance/indicator/page'])) !!}</li>
-                            <li>{!! privilege_link('form/performance/page', ['HR', 'Admin'], 'Performance Review', set_active(['form/performance/page'])) !!}</li>
-                            <li>{!! privilege_link('form/performance/appraisal/page', ['HR', 'Admin'], 'Performance Appraisal', set_active(['form/performance/appraisal/page'])) !!}</li>
+                            <li>{!! privilege_link('form/performance/indicator/page', ['HR', 'Admin', 'DPO'], 'Performance Indicator', set_active(['form/performance/indicator/page'])) !!}</li>
+                            <li>{!! privilege_link('form/performance/page', ['HR', 'Admin', 'DPO'], 'Performance Review', set_active(['form/performance/page'])) !!}</li>
+                            <li>{!! privilege_link('form/performance/appraisal/page', ['HR', 'Admin', 'DPO'], 'Performance Appraisal', set_active(['form/performance/appraisal/page'])) !!}</li>
                         </ul>
                     </li>
 
@@ -213,9 +213,9 @@
                             <i class="la la-edit"></i> <span> Training </span> <span class="menu-arrow"></span>
                         </a>
                         <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">
-                            <li>{!! privilege_link('form/training/list/page', ['HR', 'Admin'], 'Training List', set_active(['form/training/list/page'])) !!}</li>
-                            <li>{!! privilege_link('form/trainers/list/page', ['HR', 'Admin'], 'Trainers', set_active(['form/trainers/list/page'])) !!}</li>
-                            <li>{!! privilege_link('form/training/type/list/page', ['HR', 'Admin'], 'Training Type', set_active(['form/training/type/list/page'])) !!}</li>
+                            <li>{!! privilege_link('form/training/list/page', ['HR', 'Admin', 'DPO'], 'Training List', set_active(['form/training/list/page'])) !!}</li>
+                            <li>{!! privilege_link('form/trainers/list/page', ['HR', 'Admin', 'DPO'], 'Trainers', set_active(['form/trainers/list/page'])) !!}</li>
+                            <li>{!! privilege_link('form/training/type/list/page', ['HR', 'Admin', 'DPO'], 'Training Type', set_active(['form/training/type/list/page'])) !!}</li>
                         </ul>
                     </li>
                 <!--*
@@ -238,17 +238,17 @@
                         </a>
 
                         <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }} {{ (request()->is('job/applicants/*')) ? 'display: block;' : 'display: none;' }}">
-                            <li>{!! privilege_link('user/dashboard/index', ['Admin', 'HR'], 'User Dashboard', set_active(['user/dashboard/index','user/dashboard/all','user/dashboard/applied/jobs','user/dashboard/interviewing','user/dashboard/offered/jobs','user/dashboard/visited/jobs','user/dashboard/archived/jobs','user/dashboard/save'])) !!}</li>
-                            <li>{!! privilege_link('jobs/dashboard/index', ['Admin', 'HR'], 'Jobs Dashboard', set_active(['jobs/dashboard/index'])) !!}</li>
-                            <li>{!! privilege_link('jobs', ['Admin', 'HR'], 'Manage Jobs', set_active(['jobs','job/applicants','job/details']).' '.(request()->is('job/applicants/*','job/details/*') ? 'active' : '')) !!}</li>
-                            <li>{!! privilege_link('page/manage/resumes', ['Admin', 'HR'], 'Manage Resumes', set_active(['page/manage/resumes'])) !!}</li>
-                            <li>{!! privilege_link('page/shortlist/candidates', ['Admin', 'HR'], 'Shortlist Candidates', set_active(['page/shortlist/candidates'])) !!}</li>
-                            <li>{!! privilege_link('page/interview/questions', ['Admin', 'HR'], 'Interview Questions', set_active(['page/interview/questions'])) !!}</li>
-                            <li>{!! privilege_link('page/offer/approvals', ['Admin', 'HR'], 'Offer Approvals', set_active(['page/offer/approvals'])) !!}</li>
-                            <li>{!! privilege_link('page/experience/level', ['Admin', 'HR'], 'Experience Level', set_active(['page/experience/level'])) !!}</li>
-                            <li>{!! privilege_link('page/candidates', ['Admin', 'HR'], 'Candidates List', set_active(['page/candidates'])) !!}</li>
-                            <li>{!! privilege_link('page/schedule/timing', ['Admin', 'HR'], 'Schedule Timing', set_active(['page/schedule/timing'])) !!}</li>
-                            <li>{!! privilege_link('page/aptitude/result', ['Admin', 'HR'], 'Aptitude Results', set_active(['page/aptitude/result'])) !!}</li>
+                            <li>{!! privilege_link('user/dashboard/index', ['Admin', 'HR', 'DPO'], 'User Dashboard', set_active(['user/dashboard/index','user/dashboard/all','user/dashboard/applied/jobs','user/dashboard/interviewing','user/dashboard/offered/jobs','user/dashboard/visited/jobs','user/dashboard/archived/jobs','user/dashboard/save'])) !!}</li>
+                            <li>{!! privilege_link('jobs/dashboard/index', ['Admin', 'HR', 'DPO'], 'Jobs Dashboard', set_active(['jobs/dashboard/index'])) !!}</li>
+                            <li>{!! privilege_link('jobs', ['Admin', 'HR', 'DPO'], 'Manage Jobs', set_active(['jobs','job/applicants','job/details']).' '.(request()->is('job/applicants/*','job/details/*') ? 'active' : '')) !!}</li>
+                            <li>{!! privilege_link('page/manage/resumes', ['Admin', 'HR', 'DPO'], 'Manage Resumes', set_active(['page/manage/resumes'])) !!}</li>
+                            <li>{!! privilege_link('page/shortlist/candidates', ['Admin', 'HR', 'DPO'], 'Shortlist Candidates', set_active(['page/shortlist/candidates'])) !!}</li>
+                            <li>{!! privilege_link('page/interview/questions', ['Admin', 'HR', 'DPO'], 'Interview Questions', set_active(['page/interview/questions'])) !!}</li>
+                            <li>{!! privilege_link('page/offer/approvals', ['Admin', 'HR', 'DPO'], 'Offer Approvals', set_active(['page/offer/approvals'])) !!}</li>
+                            <li>{!! privilege_link('page/experience/level', ['Admin', 'HR', 'DPO'], 'Experience Level', set_active(['page/experience/level'])) !!}</li>
+                            <li>{!! privilege_link('page/candidates', ['Admin', 'HR', 'DPO'], 'Candidates List', set_active(['page/candidates'])) !!}</li>
+                            <li>{!! privilege_link('page/schedule/timing', ['Admin', 'HR', 'DPO'], 'Schedule Timing', set_active(['page/schedule/timing'])) !!}</li>
+                            <li>{!! privilege_link('page/aptitude/result', ['Admin', 'HR', 'DPO'], 'Aptitude Results', set_active(['page/aptitude/result'])) !!}</li>
                         </ul>
                     </li>
                 <!--*
