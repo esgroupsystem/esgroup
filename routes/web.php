@@ -232,14 +232,14 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
 
     // -------------------------- PROFILE EMPLOYEE ---------------------------//
     Route::controller(EmployeeController::class)
-        ->middleware(['auth', 'role:Admin,HR'])
+        ->middleware(['auth', 'role:Admin,HR,DPO'])
         ->group(function () {
             Route::get('employee/profile/{user_id}', 'profileEmployee');
         });
 
     // ---------------------------- FORM HOLIDAY -----------------------------//
     Route::controller(HolidayController::class)
-        ->middleware(['auth', 'role:Admin,HR'])
+        ->middleware(['auth', 'role:Admin,HR,DPO'])
         ->group(function () {
             Route::get('form/holidays/new', 'holiday')->name('form/holidays/new');
             Route::post('form/holidays/save', 'saveRecord')->name('form/holidays/save');
@@ -249,7 +249,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
 
     // ---------------------------- FORM LEAVES ------------------------------//
     Route::controller(LeavesController::class)
-        ->middleware(['auth', 'role:Admin,HR'])
+        ->middleware(['auth', 'role:Admin,HR,DPO'])
         ->group(function () {
             Route::get('form/leaves/new', 'leaves')->name('form/leaves/new');
             Route::get('form/leavesemployee/new', 'leavesEmployee')->name('form/leavesemployee/new');
@@ -274,7 +274,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
 
     // ---------------------------- FORM PAYROLL -----------------------------//
     Route::controller(PayrollController::class)
-        ->middleware(['auth', 'role:Admin,HR'])
+        ->middleware(['auth', 'role:Admin,HR,DPO'])
         ->group(function () {
             Route::get('form/salary/page', 'salary')->name('form/salary/page');
             Route::post('form/salary/save', 'saveRecord')->name('form/salary/save');
@@ -288,7 +288,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
 
     // ----------------------------- REPORTS ----------------------------------//
     Route::controller(ExpenseReportsController::class)
-        ->middleware(['auth', 'role:Admin,HR'])
+        ->middleware(['auth', 'role:Admin,HR,DPO'])
         ->group(function () {
             Route::get('form/expense/reports/page', 'index')->name('form/expense/reports/page');
             Route::get('form/invoice/reports/page', 'invoiceReports')->name('form/invoice/reports/page');
@@ -300,7 +300,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
 
     // --------------------------- performance  -------------------------//
     Route::controller(PerformanceController::class)
-    ->middleware(['auth', 'role:Admin,HR'])
+    ->middleware(['auth', 'role:Admin,HR,DPO'])
     ->group(function () {
         Route::get('form/performance/indicator/page','index')->name('form/performance/indicator/page');
         Route::get('form/performance/page', 'performance')->name('form/performance/page');
@@ -315,7 +315,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
 
     // --------------------------- training  ----------------------------//
     Route::controller(TrainingController::class)
-    ->middleware(['auth', 'role:Admin,HR'])
+    ->middleware(['auth', 'role:Admin,HR,DPO'])
     ->group(function () {
         Route::get('form/training/list/page','index')->name('form/training/list/page');
         Route::post('form/training/save', 'addNewTraining')->name('form/training/save');
@@ -325,7 +325,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
 
     // --------------------------- trainers  ----------------------------//
     Route::controller(TrainersController::class)
-    ->middleware(['auth', 'role:Admin,HR'])
+    ->middleware(['auth', 'role:Admin,HR,DPO'])
     ->group(function () {
         Route::get('form/trainers/list/page', 'index')->name('form/trainers/list/page');
         Route::post('form/trainers/save', 'saveRecord')->name('form/trainers/save');
@@ -335,7 +335,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
 
     // ------------------------- training type  -------------------------//
     Route::controller(TrainingTypeController::class)
-    ->middleware(['auth', 'role:Admin,HR'])
+    ->middleware(['auth', 'role:Admin,HR,DPO'])
     ->group(function () {
         Route::get('form/training/type/list/page', 'index')->name('form/training/type/list/page');
         Route::post('form/training/type/save', 'saveRecord')->name('form/training/type/save');
@@ -345,7 +345,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
 
     // ----------------------------- sales  ----------------------------//
     Route::controller(SalesController::class)
-    ->middleware(['auth', 'role:Admin,HR'])
+    ->middleware(['auth', 'role:Admin,HR,DPO'])
     ->group(function () {
         // -------------------- estimate  --------------------//
         Route::get('form/estimates/page', 'estimatesIndex')->name('form/estimates/page');
@@ -373,14 +373,14 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
 
     // ---------------------- personal information ----------------------//
     Route::controller(PersonalInformationController::class)
-    ->middleware(['auth', 'role:Admin,HR'])
+    ->middleware(['auth', 'role:Admin,HR,DPO'])
     ->group(function () {
         Route::post('user/information/save', 'saveRecord')->name('user/information/save');
     });
 
     // ---------------------- bank information  -----------------------//
     Route::controller(BankInformationController::class)
-    ->middleware(['auth', 'role:Admin,HR'])
+    ->middleware(['auth', 'role:Admin,HR,DPO'])
     ->group(function () {
         Route::post('bank/information/save', 'saveRecord')->name('bank/information/save');
     });
