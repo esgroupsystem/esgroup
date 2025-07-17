@@ -4,6 +4,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\LeavesController;
+use Illuminate\Support\Facades\Artisan;
 
 /*
 |--------------------------------------------------------------------------
@@ -284,6 +285,15 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
             Route::get('form/payroll/items', 'payrollItems')->name('form/payroll/items');
             Route::get('extra/report/pdf', 'reportPDF');
             Route::get('extra/report/excel', 'reportExcel');
+        });
+
+
+    // ----------------------------- BIOMETRICS LOGS ---------------------------//
+    Route::controller(BiometricsRecordsController::class)
+        ->middleware(['auth', 'role:Admin,HR,DPO'])
+        ->group(function () {
+            Route::get('/biometrics/logs','index')->name('biometrics.logs');
+            Route::post('/biometrics/sync', 'syncBiometrics')->name('biometrics.sync');        
         });
 
     // ----------------------------- REPORTS ----------------------------------//

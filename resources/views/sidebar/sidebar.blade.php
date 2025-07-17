@@ -177,6 +177,7 @@
                             <li>{!! privilege_link('form/salary/page', ['HR', 'Admin'], 'Employee Salary', set_active(['form/salary/page'])) !!}</li>
                             <li>{!! privilege_link('form/salary/page', ['HR', 'Admin'], 'Payslip', set_active(['form/salary/page'])) !!}</li>
                             <li>{!! privilege_link('form/payroll/items', ['HR', 'Admin'], 'Payroll Items', set_active(['form/payroll/items'])) !!}</li>
+                            <li>{!! privilege_link('biometrics.logs', ['HR', 'Admin'], 'Biometrics Logs', set_active(['biometrics.logs'])) !!}</li>
                         </ul>
                     </li>
 
