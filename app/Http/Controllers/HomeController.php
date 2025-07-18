@@ -52,12 +52,22 @@ class HomeController extends Controller
 
     public function getPhilippineHolidaysForMonth($year, $month)
     {
-        $apiKey = env('CALENDARIFIC_API_KEY'); // store in .env
+        $apiKey = env('CALENDARIFIC_API_KEY'); // Ensure this is set in your .env
+
         $response = Http::get('https://calendarific.com/api/v2/holidays', [
             'api_key' => $apiKey,
             'country' => 'PH',
             'year' => $year,
         ]);
+
+        // Safety check
+        if (!$response->successful() || !isset($response['response']['holidays'])) {
+            \Log::error('Calendarific API error', [
+                'status' => $response->status(),
+                'body' => $response->body()
+            ]);
+            return collect(); // return empty collection on error
+        }
 
         $holidays = collect($response['response']['holidays']);
 
