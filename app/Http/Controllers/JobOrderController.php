@@ -31,14 +31,16 @@ class JobOrderController extends Controller
             return view('joborders.joborder', compact('joborderview', 'users'));
         }
         
-        /** Page Create Estimates */
+        /** Page Create Jobs */
         public function createJobOrderIndex()
         {
             $loggedUser = Auth::user();
-            $busList = DB::Table('bus_details')
-            ->selectRaw("cat_id, cat_name, cat_busnum, CONCAT(cat_name, ' - (', cat_busnum, ') - ', cat_busplate) as full_name")
-            ->get();
-            return view('joborders.createjoborder', compact('busList','loggedUser'));
+            $busList = DB::table('bus_details')
+                ->selectRaw("id as cat_id, name as cat_name, body_number as cat_busnum, 
+                            CONCAT(name, ' - (', body_number, ') - ', plate_number) as full_name")
+                ->get();
+
+            return view('joborders.createjoborder', compact('busList', 'loggedUser'));
         }
 
         /** For View of Job Order */
