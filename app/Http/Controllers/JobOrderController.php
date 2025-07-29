@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Employee;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Mail\JobOrderNotification;
+use Illuminate\Support\Facades\Mail;
 use App\Notifications\GlobalUserNotification;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Process\Exception\ProcessFailedException;
@@ -84,18 +88,26 @@ class JobOrderController extends Controller
                     'job_remarks'       => $request->job_remarks,
                     'job_status'        => 'New',
                     'job_assign_person' => 'Not assigned',
-                    'job_date_filled'   => now()->format('Y-m-d H:i:s'),
+                    'job_date_filled'   => now(),
                     'job_creator'       => $request->user()->name,
                 ]);
 
-                // 🔔 Send global notification to IT and Admin
+                // 🔔 Notify and Email Only IT and Admin Users
                 $itUsers = User::whereIn('role_name', ['IT', 'Admin'])->get();
                 foreach ($itUsers as $user) {
+                    // In-app notification
                     $user->notify(new GlobalUserNotification(
                         'New Job Order Created',
                         'A new job order "' . $jobOrder->job_name . '" was created by ' . $jobOrder->job_creator,
                         route('view/details', ['id' => $jobOrder->id])
                     ));
+
+                    // Email notification (queued)
+                    try {
+                        Mail::to($user->email)->queue(new JobOrderNotification($jobOrder));
+                    } catch (\Exception $e) {
+                        \Log::error("Failed to queue email for {$user->email}: " . $e->getMessage());
+                    }
                 }
 
                 DB::commit();
@@ -103,7 +115,7 @@ class JobOrderController extends Controller
                 return redirect()->route('form/joborders/page');
 
             } catch (\Exception $e) {
-                DB::rollback();
+                DB::rollBack();
                 \Log::error('Job Order Save Error: ' . $e->getMessage());
                 flash()->error('Failed to add job order :)');
                 return redirect()->back();
