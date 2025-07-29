@@ -119,7 +119,7 @@
                         </a>
                         <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">
                             <li>
-                                {!! privilege_link('form/joborders/page', ['IT', 'Admin'], 'Job Orders', set_active(['form/joborders/page'])) !!}
+                                {!! privilege_link('form/joborders/page', ['IT', 'Admin', 'Maintenace'], 'Job Orders', set_active(['form/joborders/page'])) !!}
                             </li>
                         </ul>
                     </li>
