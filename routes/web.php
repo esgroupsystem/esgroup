@@ -134,7 +134,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
 
     // ---------------------- IT JobOrders  -----------------------//
     Route::controller(JobOrderController::class)
-    ->middleware(['auth', 'role:Admin,IT'])
+    ->middleware(['auth', 'role:Admin,IT,Maintenance'])
     ->group(function () {
         Route::get('form/joborders/page', 'jobordersIndex')->name('form/joborders/page');
         Route::get('create/joborders/page', 'createJobOrderIndex')->name('create/joborders/page');  
@@ -149,7 +149,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
 
     // --------------------------------- job ---------------------------------//
     Route::controller(JobController::class)
-    ->middleware(['auth', 'role:Admin,IT'])
+    ->middleware(['auth', 'role:Admin,IT,Maintenance'])
     ->group(function () {
         Route::get('form/job/list','categoryIndex')->name('form/job/list');
         Route::get('form/job/view/{id}', 'jobView');
@@ -236,6 +236,8 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
         ->middleware(['auth', 'role:Admin,HR,DPO'])
         ->group(function () {
             Route::get('employee/profile/{user_id}', 'profileEmployee');
+            Route::post('/employee/schedule/save', 'AdminScheduleSave')->name('schedule.save');
+
         });
 
     // ---------------------------- FORM HOLIDAY -----------------------------//
@@ -396,8 +398,6 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
     });
 
 
-    //////// ==================== Maintenance Inventory ===========================/////////////////
-    //////// ==================== Maintenance Inventory ===========================/////////////////
     //////// ==================== Maintenance Inventory ===========================/////////////////
 
     // ---------------------- PRODUCTS ----------------------- //
