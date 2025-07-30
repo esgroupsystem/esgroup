@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 use App\Models\Employee;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Mail\JobOrderNotification;
@@ -52,12 +54,19 @@ class JobOrderController extends Controller
         {
             $id = Crypt::decryptString($encryptedId);
             $jobDetail = Joborder::findOrFail($id);
-            $FileDetails = JobFiles::where('job_id', $id)->get();
-            $relatedTasks = JobOrder::where('id', $id)->whereIn('job_status', ['New', 'On Process'])->get();
-            
-            return view('joborders.joborderview', compact('jobDetail','id','FileDetails', 'relatedTasks'));
-        }
 
+            // Get all files and attach file extension
+            $FileDetails = JobFiles::where('job_id', $id)->get()->map(function ($file) {
+                $file->extension = strtolower(pathinfo($file->file_path, PATHINFO_EXTENSION));
+                return $file;
+            });
+
+            $relatedTasks = JobOrder::where('id', $id)
+                ->whereIn('job_status', ['New', 'On Process'])
+                ->get();
+
+            return view('joborders.joborderview', compact('jobDetail', 'id', 'FileDetails', 'relatedTasks'));
+        }
 
         /** Save Record */
         public function saveRecordJoborders(Request $request)
@@ -183,16 +192,8 @@ class JobOrderController extends Controller
         }
     }
 
-    /* Saving a Files or Video ----*/
-    public function Job_Files(Request $request)
+   public function Job_Files(Request $request)
     {
-        $request->validate([
-            'job_order_id' => 'required|integer',
-            'files.*' => 'required|mimes:mp4,mp3,asf,png,jpg,jpeg|max:40480000',
-            'remarks.*' => 'nullable|string',
-            'notes.*' => 'nullable|string',
-        ]);
-
         DB::beginTransaction();
 
         try {
@@ -200,7 +201,7 @@ class JobOrderController extends Controller
                 foreach ($request->file('files') as $index => $file) {
                     $originalName = $file->getClientOriginalName();
                     $extension = $file->getClientOriginalExtension();
-                    $filename = time() . '_' . pathinfo($originalName, PATHINFO_FILENAME) . '.' . $extension;
+                    $filename = time() . '_' . uniqid() . '.' . $extension;
 
                     $destinationPath = public_path('assets/videos');
                     if (!file_exists($destinationPath)) {
@@ -213,8 +214,8 @@ class JobOrderController extends Controller
                     JobFiles::create([
                         'job_id' => $request->input('job_order_id'),
                         'file_name' => $originalName,
-                        'file_remarks' => $request->input('remarks')[$index],
-                        'file_notes' => $request->input('notes')[$index],
+                        'file_remarks' => $request->input('remarks')[$index] ?? '',
+                        'file_notes' => $request->input('notes')[$index] ?? '',
                         'file_path' => $filePath,
                     ]);
                 }
@@ -222,16 +223,11 @@ class JobOrderController extends Controller
 
             DB::commit();
 
-            // ✅ Return JSON if request is AJAX (from JS)
-            if ($request->expectsJson()) {
-                return response()->json(['success' => true, 'message' => 'Files uploaded successfully.']);
-            }
-            flash()->success('Files uploaded successfully.');
-            return redirect()->back();
+            return response()->json(['success' => true, 'message' => 'Files uploaded successfully.']);
         } catch (\Exception $e) {
-            DB::rollback();
-            flash()->error('Failed to upload files. Error: ' . $e->getMessage());
-            return redirect()->back();
+            DB::rollBack();
+            Log::error('Upload error', ['error' => $e->getMessage()]);
+            return response()->json(['success' => false, 'message' => 'Upload failed: ' . $e->getMessage()], 500);
         }
     }
 

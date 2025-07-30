@@ -138,106 +138,80 @@
             <section class="review-section">
                 <div class="review-header text-center">
                     <h3 class="review-title">Video Files / Documents Files</h3>
-                    <p class="text-muted">Allowed file types: MP4, MP3, ASF.</p>
+                    <p class="text-muted">Allowed file types: MP4, MP3, ASF, JPG, PNG.</p>
                 </div>
-                <form id="uploadForm" action="{{ route('job.files') }}" method="POST" enctype="multipart/form-data">
+
+                <form id="uploadForm" method="POST" action="{{ route('job.files') }}" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="job_order_id" value="{{ $jobDetail->id }}">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-review review-table mb-0" id="table_alterations">
-                                    <thead>
-                                        <tr>
-                                            <th style="width:40px;">#</th>
-                                            <th>Files<span class="text-danger">*</span></th>
-                                            <th>Remarks<span class="text-danger">*</span></th>
-                                            <th>Notes<span class="text-danger">*</span></th>
-                                            <th style="width: 64px;">
-                                                <button type="button" class="btn btn-primary btn-add-row">
-                                                    <i class="fa fa-plus"></i>
-                                                </button>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="table_alterations_tbody">
-                                        @if ($FileDetails->isEmpty())
-                                            <tr class="no-data">
-                                                <td colspan="5" class="text-center text-muted">No video uploaded.</td>
-                                            </tr>
-                                        @else
-                                            @foreach ($FileDetails as $key => $file)
-                                                <tr>
-                                                    <td>{{ $key + 1 }}</td>
-                                                    <td>
-                                                        @if (in_array(pathinfo($file->file_name, PATHINFO_EXTENSION), ['mp4', 'mp3', 'asf']))
-                                                            <!-- Show file name as clickable link -->
-                                                            <a href="#" class="view-video"
-                                                                data-file-path="{{ asset($file->file_path) }}">
-                                                                {{ $file->file_name }} <p class="text-muted">(Click the
-                                                                    link above to watch video)</p>
-                                                            </a>
-                                                        @else
-                                                            <img src="{{ asset('storage/' . $file->file_path) }}"
-                                                                alt="{{ $file->file_name }}" class="img-fluid" />
-                                                        @endif
-                                                    </td>
-                                                    <td>{{ $file->file_remarks }}</td>
-                                                    <td>{{ $file->file_notes }}</td>
-                                                    <td>
-                                                        <!-- Delete Button inside the table -->
-                                                        <form id="delete-form-{{ $file->id }}">
-                                                            @csrf
-                                                            <input type="hidden" name="id"
-                                                                value="{{ $file->id }}">
-                                                            <button type="button"
-                                                                class="btn btn-danger btn-sm delete-file-btn"
-                                                                data-id="{{ $file->id }}">
-                                                                <i class="fa fa-trash"></i> Delete
-                                                            </button>
-                                                        </form>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        @endif
-                                    </tbody>
-                                </table>
-                                <button type="button" id="submitBtn" class="btn btn-success mt-3">Upload Files</button>
-                                <div class="progress mt-3" style="height: 25px; display: none;"
-                                    id="uploadProgressContainer">
-                                    <div id="uploadProgressBar"
-                                        class="progress-bar bg-info progress-bar-striped progress-bar-animated"
-                                        role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
-                                        style="width: 0%;">
-                                        0%
-                                    </div>
-                                </div>
-                            </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>File</th>
+                                <th>Remarks</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table_alterations_tbody">
+                            <tr>
+                                <td><input type="file" class="form-control" name="files[]" accept=".mp4,.mp3,.asf,.jpg,.jpeg,.png" required></td>
+                                <td><input type="text" class="form-control" name="remarks[]" placeholder="Remarks"></td>
+                                <td><input type="text" class="form-control" name="notes[]" placeholder="Notes"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Upload</button>
+
+                    <div id="uploadProgressContainer" class="mt-3" style="display: none;">
+                        <div class="progress">
+                            <div class="progress-bar" id="uploadProgressBar" role="progressbar" style="width: 0%;">0%</div>
                         </div>
                     </div>
                 </form>
             </section>
 
-            <!-- To Watch Video Modal -->
-            <div class="modal fade" id="videoModal" tabindex="-1" aria-labelledby="videoModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="videoModalLabel">Video Preview</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <video id="videoPreview" width="100%" height="auto" controls>
-                                Your browser does not support the video tag.
-                            </video>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
+            {{-- Show Only Video/Audio Files --}}
+            @if ($FileDetails->whereIn('extension', ['mp4', 'asf', 'mp3'])->count() > 0)
+                <hr>
+                <div class="review-header text-center mt-4">
+                    <h4 class="review-title">Uploaded Video Files</h4>
+                    <p class="text-muted">Click filename to preview the file.</p>
+                </div>
+
+                <ul class="list-group mb-4">
+                    @foreach ($FileDetails->whereIn('extension', ['mp4', 'asf', 'mp3']) as $index => $file)
+                        <li class="list-group-item">
+                            <a href="javascript:void(0);" onclick="toggleMedia('media_{{ $index }}')">
+                                📁 {{ $file->file_name }}
+                            </a>
+                            <div id="media_{{ $index }}" style="display: none; margin-top: 10px;">
+                                @if (in_array($file->extension, ['mp4', 'asf']))
+                                    <video width="100%" controls>
+                                        <source src="{{ asset($file->file_path) }}" type="video/{{ $file->extension }}">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                @elseif($file->extension === 'mp3')
+                                    <audio controls style="width: 100%;">
+                                        <source src="{{ asset($file->file_path) }}" type="audio/mp3">
+                                        Your browser does not support the audio element.
+                                    </audio>
+                                @endif
+                                <p class="mt-2 mb-0"><strong>Remarks:</strong> {{ $file->file_remarks }}</p>
+                                <p><strong>Notes:</strong> {{ $file->file_notes }}</p>
+                            </div>
+                        </li>
+                    @endforeach
+                </ul>
+            @else
+                <p class="text-muted text-center mt-4">No uploaded videos for this job order.</p>
+            @endif
+            <hr>
+
+            {{-- Show Only Image Files --}}
             <!---- /Modal for Saving Video and File --->
+
             <section class="review-section professional-excellence">
                 <div class="review-header text-center">
                     <h3 class="review-title">Related Job Order</h3>
@@ -249,7 +223,6 @@
                             <table class="table table-bordered review-table mb-0" id="jobList">
                                 <thead>
                                     <tr>
-                                        <th style="width:40px;">#</th>
                                         <th>Bus name</th>
                                         <th>Type of Issue</th>
                                         <th>Status</th>
@@ -263,9 +236,8 @@
                                                 bus.</td>
                                         </tr>
                                     @else
-                                        @foreach ($relatedTasks as $index => $task)
+                                        @foreach ($relatedTasks as $task)
                                             <tr>
-                                                <td>{{ $index + 1 }}</td>
                                                 <td>{{ $task->job_name ?? '-' }}</td>
                                                 <td>{{ $task->job_type ?? '-' }}</td>
                                                 <td>
@@ -293,144 +265,78 @@
         @section('script')
             {{-- - Saving Files - --}}
             <script>
-                // Add Row Functionality
-                document.querySelector('.btn-add-row').addEventListener('click', function() {
-                    const tableBody = document.getElementById('table_alterations_tbody');
-                    const noDataRow = tableBody.querySelector('.no-data');
+document.addEventListener('DOMContentLoaded', function () {
+    const submitBtn = document.getElementById('submitBtn');
+    const progressBar = document.getElementById('uploadProgressBar');
+    const progressContainer = document.getElementById('uploadProgressContainer');
 
-                    if (noDataRow) {
-                        noDataRow.style.display = 'none';
-                    }
+    submitBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        const form = document.getElementById('uploadForm');
+        const formData = new FormData(form);
 
-                    const rowCount = tableBody.querySelectorAll('tr.data-row').length + 1;
-                    const newRow = document.createElement('tr');
-                    newRow.classList.add('data-row');
-                    newRow.innerHTML = `
-                    <td>${rowCount}</td>
-                        <td><input type="file" class="form-control" name="files[]" accept=".mp4, .mp3, .asf" required></td>
-                        <td><input type="text" class="form-control" name="remarks[]" required></td>
-                        <td><input type="text" class="form-control" name="notes[]" required></td>
-                        <td><button type="button" class="btn btn-danger btn-remove-row"><i class="fa fa-minus"></i></button></td>
-        `;
-                    tableBody.appendChild(newRow);
+        const hasFile = Array.from(form.querySelectorAll('input[type="file"]'))
+            .some(input => input.files.length > 0);
 
-                    newRow.querySelector('.btn-remove-row').addEventListener('click', function() {
-                        newRow.remove();
-                        if (tableBody.querySelectorAll('tr.data-row').length === 0 && noDataRow) {
-                            noDataRow.style.display = 'table-row';
-                        }
-                    });
-                });
+        if (!hasFile) {
+            alert('Please select at least one file.');
+            return;
+        }
 
-                // Upload with Progress
-                document.querySelector('.btn-add-row').addEventListener('click', function () {
-                const tbody = document.getElementById('table_alterations_tbody');
+        progressBar.style.width = '0%';
+        progressBar.innerText = '0%';
+        progressBar.setAttribute('aria-valuenow', 0);
+        progressBar.className = 'progress-bar bg-info';
+        progressContainer.style.display = 'block';
 
-                const noDataRow = tbody.querySelector('.no-data');
-                if (noDataRow) noDataRow.remove();
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", form.action, true);
+        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+        xhr.setRequestHeader("X-CSRF-TOKEN", '{{ csrf_token() }}');
 
-                const newRow = document.createElement('tr');
-                newRow.innerHTML = `
-                    <td>#</td>
-                    <td><input type="file" name="files[]" class="form-control file-input" required></td>
-                    <td><input type="text" name="remarks[]" class="form-control" required></td>
-                    <td><input type="text" name="notes[]" class="form-control"></td>
-                    <td><button type="button" class="btn btn-danger btn-sm remove-row"><i class="fa fa-trash"></i></button></td>
-                `;
-                tbody.appendChild(newRow);
-                updateRowNumbers();
-            });
-
-            function updateRowNumbers() {
-                document.querySelectorAll('#table_alterations_tbody tr').forEach((row, index) => {
-                    const cell = row.querySelector('td');
-                    if (cell) cell.textContent = index + 1;
-                });
+        xhr.upload.onprogress = function (event) {
+            if (event.lengthComputable) {
+                const percent = Math.round((event.loaded / event.total) * 100);
+                progressBar.style.width = percent + '%';
+                progressBar.innerText = percent + '%';
+                progressBar.setAttribute('aria-valuenow', percent);
             }
+        };
 
-            document.getElementById('table_alterations_tbody').addEventListener('click', function (e) {
-                if (e.target.closest('.remove-row')) {
-                    e.target.closest('tr').remove();
-                    updateRowNumbers();
-                }
-            });
-
-            // Upload with Progress
-            document.getElementById('submitBtn').addEventListener('click', function(e) {
-                e.preventDefault();
-
-                const form = document.getElementById('uploadForm');
-                const formData = new FormData(form);
-
-                const files = form.querySelectorAll('input[type="file"]');
-                let hasFile = false;
-                files.forEach(file => {
-                    if (file.files.length > 0) hasFile = true;
-                });
-
-                if (!hasFile) {
-                    alert('Please select at least one file.');
-                    return;
-                }
-
-                const progressBar = document.getElementById('uploadProgressBar');
-                const progressContainer = document.getElementById('uploadProgressContainer');
-                progressBar.style.width = '0%';
-                progressBar.innerText = '0%';
-                progressBar.setAttribute('aria-valuenow', 0);
-                progressBar.classList.remove('bg-success', 'bg-danger');
-                progressBar.classList.add('bg-info');
-                progressContainer.style.display = 'block';
-
-                const xhr = new XMLHttpRequest();
-                xhr.open("POST", form.action, true);
-                xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-
-                xhr.upload.onprogress = function(event) {
-                    if (event.lengthComputable) {
-                        const percent = Math.round((event.loaded / event.total) * 100);
-                        progressBar.style.width = percent + '%';
-                        progressBar.innerText = percent + '%';
-                        progressBar.setAttribute('aria-valuenow', percent);
-                    }
-                };
-
-                xhr.onload = function() {
-                    if (xhr.status === 200) {
-                        try {
-                            const response = JSON.parse(xhr.responseText);
-                            if (response.success) {
-                                progressBar.classList.remove('bg-info');
-                                progressBar.classList.add('bg-success');
-                                progressBar.innerText = 'Upload Complete';
-                                setTimeout(() => location.reload(), 1200);
-                            } else {
-                                throw new Error(response.message || 'Unknown error');
-                            }
-                        } catch (err) {
-                            progressBar.classList.remove('bg-info');
-                            progressBar.classList.add('bg-danger');
-                            progressBar.innerText = 'Upload Failed';
-                            console.error('Response parse error:', err.message);
-                        }
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        progressBar.className = 'progress-bar bg-success';
+                        progressBar.innerText = 'Upload Complete';
+                        setTimeout(() => location.reload(), 1500);
                     } else {
-                        progressBar.classList.remove('bg-info');
-                        progressBar.classList.add('bg-danger');
-                        progressBar.innerText = 'Upload Failed';
-                        console.error('Upload failed:', xhr.responseText);
+                        throw new Error(response.message);
                     }
-                };
+                } catch (err) {
+                    progressBar.className = 'progress-bar bg-danger';
+                    progressBar.innerText = 'Upload Failed';
+                    console.error('Response error:', err.message);
+                }
+            } else {
+                progressBar.className = 'progress-bar bg-danger';
+                progressBar.innerText = 'Upload Failed';
+                console.error('XHR failed:', xhr.responseText);
+            }
+        };
 
-                xhr.onerror = function() {
-                    progressBar.classList.remove('bg-info');
-                    progressBar.classList.add('bg-danger');
-                    progressBar.innerText = 'Upload Error';
-                    console.error('XHR Network error');
-                };
+        xhr.onerror = function () {
+            progressBar.className = 'progress-bar bg-danger';
+            progressBar.innerText = 'Network Error';
+            console.error('Network error');
+        };
 
-                xhr.send(formData);
-            });
-            </script>
+        xhr.send(formData);
+    });
+});
+</script>
+
 
 
             {{-- - Deleting Modal or Files -- --}}
@@ -478,7 +384,7 @@
                     link.addEventListener('click', function(event) {
                         event.preventDefault(); // Prevent the default link behavior
                         const filePath = this.getAttribute(
-                        'data-file-path'); // Get the file path from the data attribute
+                            'data-file-path'); // Get the file path from the data attribute
                         const modal = new bootstrap.Modal(document.getElementById('videoModal')); // Bootstrap modal
                         const videoElement = document.getElementById('videoPreview');
 
@@ -501,6 +407,13 @@
                     document.body.innerHTML = originalContents;
 
                     location.reload(); // Optional: restores page functionality
+                }
+            </script>
+
+            <script>
+                function toggleMedia(id) {
+                    const el = document.getElementById(id);
+                    el.style.display = (el.style.display === "none") ? "block" : "none";
                 }
             </script>
 
