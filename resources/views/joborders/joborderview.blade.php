@@ -137,35 +137,36 @@
             <!---- Modal for Saving Video and File --->
             <section class="review-section">
                 <div class="review-header text-center">
-                    <h3 class="review-title">Video Files / Documents Files</h3>
-                    <p class="text-muted">Allowed file types: MP4, MP3, ASF, JPG, PNG.</p>
+                    <h3 class="review-title">Video / Document Upload</h3>
+                    <p class="text-muted">Allowed types: MP4, MP3, ASF, JPG, PNG.</p>
                 </div>
 
                 <form id="uploadForm" method="POST" action="{{ route('job.files') }}" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="job_order_id" value="{{ $jobDetail->id }}">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>File</th>
-                                <th>Remarks</th>
-                                <th>Notes</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table_alterations_tbody">
-                            <tr>
-                                <td><input type="file" class="form-control" name="files[]" accept=".mp4,.mp3,.asf,.jpg,.jpeg,.png" required></td>
-                                <td><input type="text" class="form-control" name="remarks[]" placeholder="Remarks"></td>
-                                <td><input type="text" class="form-control" name="notes[]" placeholder="Notes"></td>
-                            </tr>
-                        </tbody>
-                    </table>
+
+                    <div class="mb-3">
+                        <label for="multiFiles">Select Files</label>
+                        <input type="file" class="form-control" name="files[]" id="multiFiles"
+                            accept=".mp4,.mp3,.asf,.jpg,.jpeg,.png" multiple required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Remarks</label>
+                        <input type="text" class="form-control" name="remarks" placeholder="Remarks for all files">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Notes</label>
+                        <input type="text" class="form-control" name="notes" placeholder="Notes for all files">
+                    </div>
 
                     <button type="submit" class="btn btn-primary" id="submitBtn">Upload</button>
 
                     <div id="uploadProgressContainer" class="mt-3" style="display: none;">
                         <div class="progress">
-                            <div class="progress-bar" id="uploadProgressBar" role="progressbar" style="width: 0%;">0%</div>
+                            <div class="progress-bar" id="uploadProgressBar" role="progressbar" style="width: 0%">0%
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -173,15 +174,15 @@
 
 
             {{-- Show Only Video/Audio Files --}}
-            @if ($FileDetails->whereIn('extension', ['mp4', 'asf', 'mp3'])->count() > 0)
+            @if ($FileDetails->whereIn('extension', ['mp4', 'asf', 'mp3', 'jpg', 'jpeg', 'png', 'gif'])->count() > 0)
                 <hr>
                 <div class="review-header text-center mt-4">
-                    <h4 class="review-title">Uploaded Video Files</h4>
+                    <h4 class="review-title">Uploaded Media Files</h4>
                     <p class="text-muted">Click filename to preview the file.</p>
                 </div>
 
                 <ul class="list-group mb-4">
-                    @foreach ($FileDetails->whereIn('extension', ['mp4', 'asf', 'mp3']) as $index => $file)
+                    @foreach ($FileDetails->whereIn('extension', ['mp4', 'asf', 'mp3', 'jpg', 'jpeg', 'png', 'gif']) as $index => $file)
                         <li class="list-group-item">
                             <a href="javascript:void(0);" onclick="toggleMedia('media_{{ $index }}')">
                                 📁 {{ $file->file_name }}
@@ -197,7 +198,11 @@
                                         <source src="{{ asset($file->file_path) }}" type="audio/mp3">
                                         Your browser does not support the audio element.
                                     </audio>
+                                @elseif(in_array($file->extension, ['jpg', 'jpeg', 'png', 'gif']))
+                                    <img src="{{ asset($file->file_path) }}" alt="Uploaded Image"
+                                        style="max-width: 100%; height: auto;">
                                 @endif
+
                                 <p class="mt-2 mb-0"><strong>Remarks:</strong> {{ $file->file_remarks }}</p>
                                 <p><strong>Notes:</strong> {{ $file->file_notes }}</p>
                             </div>
@@ -205,7 +210,7 @@
                     @endforeach
                 </ul>
             @else
-                <p class="text-muted text-center mt-4">No uploaded videos for this job order.</p>
+                <p class="text-muted text-center mt-4">No uploaded media for this job order.</p>
             @endif
             <hr>
 
@@ -265,79 +270,89 @@
         @section('script')
             {{-- - Saving Files - --}}
             <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const submitBtn = document.getElementById('submitBtn');
-    const progressBar = document.getElementById('uploadProgressBar');
-    const progressContainer = document.getElementById('uploadProgressContainer');
+                document.addEventListener('DOMContentLoaded', function() {
+                    const submitBtn = document.getElementById('submitBtn');
+                    const progressBar = document.getElementById('uploadProgressBar');
+                    const progressContainer = document.getElementById('uploadProgressContainer');
+                    const form = document.getElementById('uploadForm');
 
-    submitBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-        const form = document.getElementById('uploadForm');
-        const formData = new FormData(form);
+                    submitBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
 
-        const hasFile = Array.from(form.querySelectorAll('input[type="file"]'))
-            .some(input => input.files.length > 0);
+                        const fileInput = document.getElementById('multiFiles');
+                        const files = fileInput.files;
 
-        if (!hasFile) {
-            alert('Please select at least one file.');
-            return;
-        }
+                        if (files.length === 0) {
+                            alert('Please select at least one file.');
+                            return;
+                        }
 
-        progressBar.style.width = '0%';
-        progressBar.innerText = '0%';
-        progressBar.setAttribute('aria-valuenow', 0);
-        progressBar.className = 'progress-bar bg-info';
-        progressContainer.style.display = 'block';
+                        const formData = new FormData();
+                        formData.append('job_order_id', form.querySelector('input[name="job_order_id"]').value);
+                        formData.append('_token', '{{ csrf_token() }}');
+                        formData.append('remarks', form.querySelector('input[name="remarks"]').value);
+                        formData.append('notes', form.querySelector('input[name="notes"]').value);
 
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", form.action, true);
-        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-        xhr.setRequestHeader("X-CSRF-TOKEN", '{{ csrf_token() }}');
+                        for (let i = 0; i < files.length; i++) {
+                            formData.append('files[]', files[i]);
+                        }
 
-        xhr.upload.onprogress = function (event) {
-            if (event.lengthComputable) {
-                const percent = Math.round((event.loaded / event.total) * 100);
-                progressBar.style.width = percent + '%';
-                progressBar.innerText = percent + '%';
-                progressBar.setAttribute('aria-valuenow', percent);
-            }
-        };
+                        // Reset Progress UI
+                        progressBar.style.width = '0%';
+                        progressBar.innerText = '0%';
+                        progressBar.className = 'progress-bar bg-info';
+                        progressContainer.style.display = 'block';
 
-        xhr.onload = function () {
-            if (xhr.status === 200) {
-                try {
-                    const response = JSON.parse(xhr.responseText);
-                    if (response.success) {
-                        progressBar.className = 'progress-bar bg-success';
-                        progressBar.innerText = 'Upload Complete';
-                        setTimeout(() => location.reload(), 1500);
-                    } else {
-                        throw new Error(response.message);
-                    }
-                } catch (err) {
-                    progressBar.className = 'progress-bar bg-danger';
-                    progressBar.innerText = 'Upload Failed';
-                    console.error('Response error:', err.message);
-                }
-            } else {
-                progressBar.className = 'progress-bar bg-danger';
-                progressBar.innerText = 'Upload Failed';
-                console.error('XHR failed:', xhr.responseText);
-            }
-        };
+                        const xhr = new XMLHttpRequest();
+                        xhr.open("POST", form.action, true);
+                        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 
-        xhr.onerror = function () {
-            progressBar.className = 'progress-bar bg-danger';
-            progressBar.innerText = 'Network Error';
-            console.error('Network error');
-        };
+                        xhr.upload.onprogress = function(event) {
+                            if (event.lengthComputable) {
+                                const percent = Math.round((event.loaded / event.total) * 100);
+                                progressBar.style.width = percent + '%';
+                                progressBar.innerText = percent + '%';
+                                progressBar.setAttribute('aria-valuenow', percent);
+                            }
+                        };
 
-        xhr.send(formData);
-    });
-});
-</script>
+                        xhr.onload = function() {
+                            if (xhr.status === 200) {
+                                try {
+                                    const response = JSON.parse(xhr.responseText);
+                                    if (response.success) {
+                                        progressBar.classList.remove('bg-info');
+                                        progressBar.classList.add('bg-success');
+                                        progressBar.innerText = 'Upload Complete';
+                                        setTimeout(() => location.reload(), 1500);
+                                    } else {
+                                        throw new Error(response.message);
+                                    }
+                                } catch (err) {
+                                    progressBar.classList.remove('bg-info');
+                                    progressBar.classList.add('bg-danger');
+                                    progressBar.innerText = 'Upload Failed';
+                                    console.error('Response error:', err.message);
+                                }
+                            } else {
+                                progressBar.classList.remove('bg-info');
+                                progressBar.classList.add('bg-danger');
+                                progressBar.innerText = 'Upload Failed';
+                                console.error('XHR failed:', xhr.responseText);
+                            }
+                        };
 
+                        xhr.onerror = function() {
+                            progressBar.classList.remove('bg-info');
+                            progressBar.classList.add('bg-danger');
+                            progressBar.innerText = 'Network Error';
+                            console.error('Network error');
+                        };
 
+                        xhr.send(formData);
+                    });
+                });
+            </script>
 
             {{-- - Deleting Modal or Files -- --}}
             <script>
@@ -353,7 +368,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('confirm-delete-btn').addEventListener('click', function() {
                     if (fileIdToDelete) {
                         $.ajax({
-                            url: "{{ route('joborders.delete', ':id') }}".replace(':id', fileIdToDelete),
+                            url: "{{ route('joborders.delete', 'id') }}".replace('id', fileIdToDelete),
                             type: 'POST',
                             data: {
                                 _token: "{{ csrf_token() }}",

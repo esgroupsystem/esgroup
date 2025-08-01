@@ -98,7 +98,7 @@
                                                 <i class="fa fa-eye"></i>
                                             </a>
 
-                                            @if (Auth::user()->role_name === 'Admin' && $item->job_status !== 'Completed')
+                                            @if ((Auth::user()->role_name === 'Admin' || Auth::user()->role_name === 'IT') && $item->job_status !== 'Completed')
                                                 <a class="btn btn-sm btn-warning text-white edit_joborder" title="Edit"
                                                     href="#" data-id="{{ $item->id }}"
                                                     data-job_status="{{ $item->job_status }}"
@@ -107,7 +107,7 @@
                                                     <i class="fa fa-pencil"></i>
                                                 </a>
                                             @endif
-                                            @if (Auth::user()->role_name === 'Admin')
+                                            @if (Auth::user()->role_name === 'Admin' )
                                                 <a class="btn btn-sm btn-danger delete_order" title="Delete" href="#"
                                                     data-toggle="modal" data-target="#delete_order">
                                                     <i class="fa fa-trash"></i>
