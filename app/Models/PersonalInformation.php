@@ -10,9 +10,9 @@ class PersonalInformation extends Model
     use HasFactory;
     protected $fillable = [
         'user_id',
-        'passport_no',
-        'passport_expiry_date',
-        'tel',
+        'philhealth',
+        'sss',
+        'tin_no',
         'nationality',
         'religion',
         'marital_status',

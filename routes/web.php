@@ -173,18 +173,18 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
 
         Route::get('page/manage/resumes', 'manageResumesIndex')->name('page/manage/resumes');
         Route::get('page/shortlist/candidates', 'shortlistCandidatesIndex')->name('page/shortlist/candidates');
-        Route::get('page/interview/questions', 'interviewQuestionsIndex')->name('page/interview/questions'); // view page
-        Route::post('save/category', 'categorySave')->name('save/category'); // save record category
-        Route::post('save/questions', 'questionSave')->name('save/questions'); // save record questions
-        Route::post('questions/update', 'questionsUpdate')->name('questions/update'); // update question
-        Route::post('questions/delete', 'questionsDelete')->name('questions/delete'); // delete question
+        Route::get('page/interview/questions', 'interviewQuestionsIndex')->name('page/interview/questions');
+        Route::post('save/category', 'categorySave')->name('save/category');
+        Route::post('save/questions', 'questionSave')->name('save/questions');
+        Route::post('questions/update', 'questionsUpdate')->name('questions/update');
+        Route::post('questions/delete', 'questionsDelete')->name('questions/delete');
         Route::get('page/offer/approvals', 'offerApprovalsIndex')->name('page/offer/approvals');
         Route::get('page/experience/level', 'experienceLevelIndex')->name('page/experience/level');
         Route::get('page/candidates', 'candidatesIndex')->name('page/candidates');
         Route::get('page/schedule/timing', 'scheduleTimingIndex')->name('page/schedule/timing');
         Route::get('page/aptitude/result', 'aptituderesultIndex')->name('page/aptitude/result');
 
-        Route::post('jobtypestatus/update', 'jobTypeStatusUpdate')->name('jobtypestatus/update'); // update status job type ajax
+        Route::post('jobtypestatus/update', 'jobTypeStatusUpdate')->name('jobtypestatus/update');
 
     });
     
@@ -237,7 +237,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
         ->group(function () {
             Route::get('employee/profile/{user_id}', 'profileEmployee');
             Route::post('/employee/schedule/save', 'AdminScheduleSave')->name('schedule.save');
-
+            Route::post('/requirements/upload','uploadRequirement')->name('requirements.upload');
         });
 
     // ---------------------------- FORM HOLIDAY -----------------------------//
@@ -389,6 +389,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
     ->group(function () {
         Route::post('user/information/save', 'saveRecord')->name('user/information/save');
     });
+
 
     // ---------------------- bank information  -----------------------//
     Route::controller(BankInformationController::class)

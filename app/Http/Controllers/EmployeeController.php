@@ -11,13 +11,15 @@ use App\Models\Employee;
 use App\Models\User;
 use App\Models\designation;
 use App\Models\PersonalInfomation;
+use App\Models\Requirement;
+use App\Models\ProfileInformation;
+use App\Models\UserEmergencyContact;
 use Carbon\Carbon;
 use DB;
 use Auth;
 
 class EmployeeController extends Controller
 {
-
     public function viewProfile($id)
     {
         $user = Auth::user();
@@ -120,9 +122,9 @@ class EmployeeController extends Controller
                 ->leftJoin('designations', 'employees.designation_id', 'designations.id')
                 ->select(
                     'employees.*',
-                    'pi.passport_no',
-                    'pi.passport_expiry_date',
-                    'pi.tel',
+                    'pi.philhealth',
+                    'pi.sss',
+                    'pi.tin_no',
                     'pi.nationality',
                     'pi.religion',
                     'pi.marital_status',
@@ -150,13 +152,59 @@ class EmployeeController extends Controller
                 ->where('employees.id', $id)
                 ->first();
 
+            // Fetch all uploaded requirements by this employee
+            $uploadedRequirements = Requirement::where('employee_id', $employee->id)
+            ->get()
+            ->keyBy('title');
+
             $reportToList = DB::table('employees')->select('id', 'name')->get();
 
-            return view('employees.employeeprofile', compact('employee', 'reportToList'));
+            // Pass data to the view
+            return view('employees.employeeprofile', compact('employee', 'reportToList', 'uploadedRequirements'));
 
         } catch (\Exception $e) {
             \Log::error('Error loading employee profile: ' . $e->getMessage());
             flash()->error('Failed to load employee profile: ' . $e->getMessage());
+            return redirect()->back();
+        }
+    }
+
+    /** Upload Requirement */
+    public function uploadRequirement(Request $request)
+    {
+        try {
+            $request->validate([
+                'employee_id' => 'required|exists:employees,id',
+                'title' => 'required',
+                'document' => 'required|file|mimes:pdf,jpg,jpeg,png,doc,docx',
+            ]);
+
+            $employeeId = $request->employee_id;
+
+            // Save to public/assets/admin directory
+            $file = $request->file('document');
+            $filename = uniqid() . '.' . $file->getClientOriginalExtension();
+            $destinationPath = public_path('assets/admin');
+            $file->move($destinationPath, $filename);
+
+            $filePath = 'assets/admin/' . $filename; // This will be used in the asset() call
+
+            Requirement::updateOrCreate(
+                ['employee_id' => $employeeId, 'title' => $request->title],
+                [
+                    'file_path' => $filePath,
+                    'description' => $request->description,
+                    'expires_at' => $request->expires_at,
+                    'uploaded_at' => now(),
+                ]
+            );
+
+            flash()->success('Requirement uploaded successfully.');
+            return redirect()->back();
+
+        } catch (\Exception $e) {
+            \Log::error('Failed to upload requirement: ' . $e->getMessage());
+            flash()->error('Failed to upload requirement. Please try again.');
             return redirect()->back();
         }
     }
@@ -716,4 +764,23 @@ class EmployeeController extends Controller
     {
         return view('employees.overtime');
     }
+
+    public function AdminScheduleSave(Request $request)
+    {
+        foreach ($request->schedule as $entry) {
+            EmployeeSchedule::updateOrCreate(
+                [
+                    'employee_id' => $request->employee_id,
+                    'work_date' => $entry['date'],
+                ],
+                [
+                    'start_time' => $entry['start_time'],
+                    'end_time' => $entry['end_time'],
+                ]
+            );
+        }
+
+        return response()->json(['message' => 'Schedule saved successfully.']);
+    }
+
 }

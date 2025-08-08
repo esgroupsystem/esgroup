@@ -15,65 +15,90 @@
                     </div>
                 </div>
             </div>
-              
+
             <!-- /Page Header -->
             <div class="card mb-0">
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-12">
                             <div class="profile-view">
-                                <div class="profile-img-wrap">
+                                <div class="profile-img-wrap text-center mb-3">
                                     <div class="profile-img">
-                                        <a href="#"><img class="user-profile" alt="" src="{{ URL::to('/assets/employeepic/'. $employee->profile_picture) }}" alt="{{ $employee->name }}"></a>
+                                        <a href="#">
+                                            <img class="user-profile rounded-circle border" width="120" height="120"
+                                                src="{{ URL::to('/assets/employeepic/' . ($employee->profile_picture ?? 'default.png')) }}"
+                                                alt="{{ $employee->name }}">
+                                        </a>
                                     </div>
                                 </div>
+
                                 <div class="profile-basic">
                                     <div class="row">
+                                        <!-- LEFT COLUMN -->
                                         <div class="col-md-5">
                                             <div class="profile-info-left">
-                                                <h3 class="user-name m-t-0 mb-0">{{ $employee->name }}</h3>
-                                                <h6 class="text-muted"> {{ $employee->department }}</h6>
-                                                <small class="text-muted">{{ $employee->designation }}</small>
-                                                <div class="staff-id">Employee ID : {{ $employee->employee_id }}</div>
-                                                <div class="small doj text-muted">Date of Join : {{ $employee->date_hired }}</div>
-                                                <div class="staff-msg"><a class="btn btn-custom" href="chat.html">Send Message</a></div>
+                                                @php
+                                                    $status = strtolower($employee->status ?? 'inactive');
+                                                    $statusColors = [
+                                                        'active' => 'success',
+                                                        'inactive' => 'secondary',
+                                                        'on leave' => 'warning',
+                                                        'resigned' => 'danger',
+                                                    ];
+                                                    $badgeClass = 'bg-' . ($statusColors[$status] ?? 'secondary');
+                                                @endphp
+
+                                                <h3 class="user-name fw-bold mb-1 d-flex align-items-center">
+                                                    {{ $employee->name }}
+                                                    <span
+                                                        class="badge {{ $badgeClass }} px-3 py-1 rounded-pill text-capitalize"
+                                                        style="font-size: 0.75rem; margin-left: 1rem;">
+                                                        {{ $employee->status ?? 'Inactive' }}
+                                                    </span>
+                                                </h3>
+                                                <div class="staff-id mb-2 text-muted">Employee ID:
+                                                    {{ $employee->employee_id }}</div>
+
+                                                <div class="mb-2">
+                                                    <span class="badge bg-primary">{{ $employee->department }}</span>
+                                                    <span class="text-muted">({{ $employee->designation }})</span>
+                                                </div>
+
+                                                <div class="mb-2 text-muted">
+                                                    <i class="fas fa-building me-1"></i> {{ $employee->company }}
+                                                </div>
+
+                                                <div class="small text-muted mb-2">
+                                                    <i class="far fa-calendar-alt me-1"></i> Date Hired:
+                                                    {{ \Carbon\Carbon::parse($employee->date_hired)->format('F d, Y') }}
+                                                </div>
                                             </div>
                                         </div>
+
+                                        <!-- RIGHT COLUMN -->
                                         <div class="col-md-7">
-                                            <ul class="personal-info">
-                                                <li>
-                                                    <div class="title">Phone:</div>
-                                                    <div class="text">
-                                                        @if(!empty($employee->phone))
-                                                            <a>{{ $employee->phone }}</a>
-                                                        @else
-                                                            <a>N/A</a>
-                                                        @endif
-                                                    </div>
+                                            <ul class="personal-info list-unstyled">
+                                                <li class="mb-2">
+                                                    <strong>Phone:</strong>
+                                                    <span class="ms-2">{{ $employee->phone ?? 'N/A' }}</span>
                                                 </li>
-                                                <li>
-                                                    <div class="title">Email:</div>
-                                                    <div class="text">
-                                                        @if(!empty($employee->email))
-                                                        <a>{{ $employee->email }}</a>
-                                                        @else
-                                                            <a>N/A</a>
-                                                        @endif
-                                                    </div>
+                                                <li class="mb-2">
+                                                    <strong>Email:</strong>
+                                                    <span class="ms-2">{{ $employee->email ?? 'N/A' }}</span>
                                                 </li>
-                                                <li>
-                                                    <div class="title">Birthday:</div>
-                                                    <div class="text">
-                                                        @if(!empty($employee->birth_date))
-                                                            <a>{{ \Carbon\Carbon::parse($employee->birth_date)->format('F d, Y') }}</a>
+                                                <li class="mb-2">
+                                                    <strong>Birthday:</strong>
+                                                    <span class="ms-2">
+                                                        @if (!empty($employee->birth_date))
+                                                            {{ \Carbon\Carbon::parse($employee->birth_date)->format('F d, Y') }}
                                                         @else
-                                                            <a>N/A</a>
+                                                            N/A
                                                         @endif
-                                                    </div>
+                                                    </span>
                                                 </li>
-                                                <li>
-                                                    <div class="title">Address:</div>
-                                                    <div class="text">
+                                                <li class="mb-2">
+                                                    <strong>Address:</strong>
+                                                    <span class="ms-2">
                                                         @php
                                                             $addressParts = array_filter([
                                                                 $employee->address ?? null,
@@ -83,57 +108,48 @@
                                                             ]);
                                                         @endphp
 
-                                                        @if(count($addressParts))
-                                                            <a>{{ implode(', ', $addressParts) }}</a>
-                                                        @else
-                                                            <a>N/A</a>
-                                                        @endif
-                                                    </div>
+                                                        {{ count($addressParts) ? implode(', ', $addressParts) : 'N/A' }}
+                                                    </span>
                                                 </li>
-                                                <li>
-                                                    <div class="title">Gender:</div>
-                                                    <div class="text">
-                                                        @if(!empty($employee->gender))
-                                                        <a>{{ $employee->gender }}</a>
-                                                        @else
-                                                            <a>N/A</a>
-                                                        @endif
-                                                    </div>
+                                                <li class="mb-2">
+                                                    <strong>Gender:</strong>
+                                                    <span class="ms-2">{{ $employee->gender ?? 'N/A' }}</span>
                                                 </li>
-                                                {{-- <li>
-                                                    <div class="title">Reports to:</div>
-                                                    <div class="text">
-                                                        <div class="avatar-box">
-                                                            <div class="avatar avatar-xs">
-                                                                <img src="{{ URL::to('/assets/employeepic/'. $employee->profile_picture) }}" alt="{{ $employee->name }}">
-                                                            </div>
-                                                        </div>
-                                                        <a>{{ $employee->name }}</a>
-                                                    </div>
-                                                </li>  --}}
                                             </ul>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="pro-edit"><a data-target="#profile_info" data-toggle="modal" class="edit-icon" href="#"><i class="fa fa-pencil"></i></a></div>
+
+                                <div class="pro-edit position-absolute top-0 end-0 mt-3 me-3">
+                                    <a data-target="#profile_info" data-toggle="modal"
+                                        class="edit-icon text-decoration-none" href="#">
+                                        <i class="fa fa-pencil fa-lg text-secondary"></i>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-					
+
             <div class="card tab-box">
                 <div class="row user-tabs">
                     <div class="col-lg-12 col-md-12 col-sm-12 line-tabs">
                         <ul class="nav nav-tabs nav-tabs-bottom">
-                            <li class="nav-item"><a href="#emp_profile" data-toggle="tab" class="nav-link active">Profile</a></li>
-                            <li class="nav-item"><a href="#emp_projects" data-toggle="tab" class="nav-link">Projects</a></li>
-                            <li class="nav-item"><a href="#bank_statutory" data-toggle="tab" class="nav-link">Bank & Statutory <small class="text-danger">(Admin Only)</small></a></li>
+                            <li class="nav-item"><a href="#emp_profile" data-toggle="tab"
+                                    class="nav-link active">Profile</a></li>
+                            <li class="nav-item"><a href="#emp_projects" data-toggle="tab" class="nav-link">Required Files</a>
+                            </li>
+                            {{-- <li class="nav-item"><a href="#bank_statutory" data-toggle="tab" class="nav-link">Bank &
+                                    Statutory <small class="text-danger">(Admin Only)</small></a></li>
+                            <li class="nav-item"><a href="#bio_logs" data-toggle="tab" class="nav-link">Bio Logs</a></li>
+                            <li class="nav-item"><a href="#schedule" data-toggle="tab" class="nav-link">Schedule</a></li> --}}
                         </ul>
                     </div>
                 </div>
             </div>
-            
+
+            <!-- Tab Content -->
             <div class="tab-content">
                 <!-- Profile Info Tab -->
                 <div id="emp_profile" class="pro-overview tab-pane fade show active">
@@ -141,28 +157,30 @@
                         <div class="col-md-6 d-flex">
                             <div class="card profile-box flex-fill">
                                 <div class="card-body">
-                                    <h3 class="card-title">Personal Informations <a href="#" class="edit-icon" data-toggle="modal" data-target="#personal_info_modal"><i class="fa fa-pencil"></i></a></h3>
+                                    <h3 class="card-title">Personal Informations <a href="#" class="edit-icon"
+                                            data-toggle="modal" data-target="#personal_info_modal"><i
+                                                class="fa fa-pencil"></i></a></h3>
                                     <ul class="personal-info">
                                         <li>
-                                            <div class="title">Passport No.</div>
-                                            @if (!empty($employee->passport_no))
-                                                <div class="text">{{ $employee->passport_no }}</div>
+                                            <div class="title">PhilHealth</div>
+                                            @if (!empty($employee->philhealth))
+                                                <div class="text">{{ $employee->philhealth }}</div>
                                             @else
                                                 <div class="text">N/A</div>
                                             @endif
                                         </li>
                                         <li>
-                                            <div class="title">Passport Exp Date.</div>
-                                            @if (!empty($employee->passport_expiry_date))
-                                                <div class="text">{{ $employee->passport_expiry_date }}</div>
+                                            <div class="title">SSS</div>
+                                            @if (!empty($employee->sss))
+                                                <div class="text">{{ $employee->sss }}</div>
                                             @else
                                                 <div class="text">N/A</div>
                                             @endif
                                         </li>
                                         <li>
-                                            <div class="title">Tel</div>
-                                            @if (!empty($employee->tel))
-                                                <div class="text">{{ $employee->tel }}</div>
+                                            <div class="title">TIN No.</div>
+                                            @if (!empty($employee->tin_no))
+                                                <div class="text">{{ $employee->tin_no }}</div>
                                             @else
                                                 <div class="text">N/A</div>
                                             @endif
@@ -214,31 +232,34 @@
                         <div class="col-md-6 d-flex">
                             <div class="card profile-box flex-fill">
                                 <div class="card-body">
-                                    <h3 class="card-title">Emergency Contact <a href="#" class="edit-icon" data-toggle="modal" data-target="#emergency_contact_modal"><i class="fa fa-pencil"></i></a></h3>
+                                    <h3 class="card-title">Emergency Contact <a href="#" class="edit-icon"
+                                            data-toggle="modal" data-target="#emergency_contact_modal"><i
+                                                class="fa fa-pencil"></i></a></h3>
                                     <h5 class="section-title">Primary</h5>
                                     <ul class="personal-info">
                                         <li>
                                             <div class="title">Name</div>
                                             @if (!empty($employee->name_primary))
-                                            <div class="text">{{ $employee->name_primary }}</div>
+                                                <div class="text">{{ $employee->name_primary }}</div>
                                             @else
-                                            <div class="text">N/A</div>
+                                                <div class="text">N/A</div>
                                             @endif
                                         </li>
                                         <li>
                                             <div class="title">Relationship</div>
                                             @if (!empty($employee->relationship_primary))
-                                            <div class="text">{{ $employee->relationship_primary }}</div>
+                                                <div class="text">{{ $employee->relationship_primary }}</div>
                                             @else
-                                            <div class="text">N/A</div>
+                                                <div class="text">N/A</div>
                                             @endif
                                         </li>
                                         <li>
                                             <div class="title">Phone </div>
                                             @if (!empty($employee->phone_primary) && !empty($employee->phone_2_primary))
-                                            <div class="text">{{ $employee->phone_primary }},{{ $employee->phone_2_primary }}</div>
+                                                <div class="text">
+                                                    {{ $employee->phone_primary }},{{ $employee->phone_2_primary }}</div>
                                             @else
-                                            <div class="text">N/A</div>
+                                                <div class="text">N/A</div>
                                             @endif
                                         </li>
                                     </ul>
@@ -248,25 +269,27 @@
                                         <li>
                                             <div class="title">Name</div>
                                             @if (!empty($employee->name_secondary))
-                                            <div class="text">{{ $employee->name_secondary }}</div>
+                                                <div class="text">{{ $employee->name_secondary }}</div>
                                             @else
-                                            <div class="text">N/A</div>
+                                                <div class="text">N/A</div>
                                             @endif
                                         </li>
                                         <li>
                                             <div class="title">Relationship</div>
                                             @if (!empty($employee->relationship_secondary))
-                                            <div class="text">{{ $employee->relationship_secondary }}</div>
+                                                <div class="text">{{ $employee->relationship_secondary }}</div>
                                             @else
-                                            <div class="text">N/A</div>
+                                                <div class="text">N/A</div>
                                             @endif
                                         </li>
                                         <li>
                                             <div class="title">Phone </div>
                                             @if (!empty($employee->phone_secondary) && !empty($employee->phone_2_secondary))
-                                            <div class="text">{{ $employee->phone_secondary }},{{ $employee->phone_2_secondary }}</div>
+                                                <div class="text">
+                                                    {{ $employee->phone_secondary }},{{ $employee->phone_2_secondary }}
+                                                </div>
                                             @else
-                                            <div class="text">N/A</div>
+                                                <div class="text">N/A</div>
                                             @endif
                                         </li>
                                     </ul>
@@ -274,12 +297,13 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    {{-- <div class="row">
                         <div class="col-md-6 d-flex">
                             <div class="card profile-box flex-fill">
                                 <div class="card-body">
-                                    <h3 class="card-title">Bank information 
-                                        <a href="#" class="edit-icon" data-toggle="modal" data-target="#bank_information_modal">
+                                    <h3 class="card-title">Bank information
+                                        <a href="#" class="edit-icon" data-toggle="modal"
+                                            data-target="#bank_information_modal">
                                             <i class="fa fa-pencil"></i>
                                         </a>
                                     </h3>
@@ -307,7 +331,9 @@
                         <div class="col-md-6 d-flex">
                             <div class="card profile-box flex-fill">
                                 <div class="card-body">
-                                    <h3 class="card-title">Family Informations <a href="#" class="edit-icon" data-toggle="modal" data-target="#family_info_modal"><i class="fa fa-pencil"></i></a></h3>
+                                    <h3 class="card-title">Family Informations <a href="#" class="edit-icon"
+                                            data-toggle="modal" data-target="#family_info_modal"><i
+                                                class="fa fa-pencil"></i></a></h3>
                                     <div class="table-responsive">
                                         <table class="table table-nowrap">
                                             <thead>
@@ -327,10 +353,14 @@
                                                     <td>9876543210</td>
                                                     <td class="text-right">
                                                         <div class="dropdown dropdown-action">
-                                                            <a aria-expanded="false" data-toggle="dropdown" class="action-icon dropdown-toggle" href="#"><i class="material-icons">more_vert</i></a>
+                                                            <a aria-expanded="false" data-toggle="dropdown"
+                                                                class="action-icon dropdown-toggle" href="#"><i
+                                                                    class="material-icons">more_vert</i></a>
                                                             <div class="dropdown-menu dropdown-menu-right">
-                                                                <a href="#" class="dropdown-item"><i class="fa fa-pencil m-r-5"></i> Edit</a>
-                                                                <a href="#" class="dropdown-item"><i class="fa fa-trash-o m-r-5"></i> Delete</a>
+                                                                <a href="#" class="dropdown-item"><i
+                                                                        class="fa fa-pencil m-r-5"></i> Edit</a>
+                                                                <a href="#" class="dropdown-item"><i
+                                                                        class="fa fa-trash-o m-r-5"></i> Delete</a>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -341,12 +371,15 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
+
                     <div class="row">
                         <div class="col-md-6 d-flex">
                             <div class="card profile-box flex-fill">
                                 <div class="card-body">
-                                    <h3 class="card-title">Education Informations <a href="#" class="edit-icon" data-toggle="modal" data-target="#education_info"><i class="fa fa-pencil"></i></a></h3>
+                                    <h3 class="card-title">Education Informations <a href="#" class="edit-icon"
+                                            data-toggle="modal" data-target="#education_info"><i
+                                                class="fa fa-pencil"></i></a></h3>
                                     <div class="experience-box">
                                         <ul class="experience-list">
                                             <li>
@@ -355,7 +388,8 @@
                                                 </div>
                                                 <div class="experience-content">
                                                     <div class="timeline-content">
-                                                        <a href="#/" class="name">International College of Arts and Science (UG)</a>
+                                                        <a href="#/" class="name">International College of Arts and
+                                                            Science (UG)</a>
                                                         <div>Bsc Computer Science</div>
                                                         <span class="time">2000 - 2003</span>
                                                     </div>
@@ -367,7 +401,8 @@
                                                 </div>
                                                 <div class="experience-content">
                                                     <div class="timeline-content">
-                                                        <a href="#/" class="name">International College of Arts and Science (PG)</a>
+                                                        <a href="#/" class="name">International College of Arts and
+                                                            Science (PG)</a>
                                                         <div>Msc Computer Science</div>
                                                         <span class="time">2000 - 2003</span>
                                                     </div>
@@ -381,7 +416,9 @@
                         <div class="col-md-6 d-flex">
                             <div class="card profile-box flex-fill">
                                 <div class="card-body">
-                                    <h3 class="card-title">Experience <a href="#" class="edit-icon" data-toggle="modal" data-target="#experience_info"><i class="fa fa-pencil"></i></a></h3>
+                                    <h3 class="card-title">Experience <a href="#" class="edit-icon"
+                                            data-toggle="modal" data-target="#experience_info"><i
+                                                class="fa fa-pencil"></i></a></h3>
                                     <div class="experience-box">
                                         <ul class="experience-list">
                                             <li>
@@ -390,7 +427,8 @@
                                                 </div>
                                                 <div class="experience-content">
                                                     <div class="timeline-content">
-                                                        <a href="#/" class="name">Web Designer at Zen Corporation</a>
+                                                        <a href="#/" class="name">Web Designer at Zen
+                                                            Corporation</a>
                                                         <span class="time">Jan 2013 - Present (5 years 2 months)</span>
                                                     </div>
                                                 </div>
@@ -412,7 +450,8 @@
                                                 </div>
                                                 <div class="experience-content">
                                                     <div class="timeline-content">
-                                                        <a href="#/" class="name">Web Designer at Dalt Technology</a>
+                                                        <a href="#/" class="name">Web Designer at Dalt
+                                                            Technology</a>
                                                         <span class="time">Jan 2013 - Present (5 years 2 months)</span>
                                                     </div>
                                                 </div>
@@ -425,1257 +464,1158 @@
                     </div>
                 </div>
                 <!-- /Profile Info Tab -->
-                
-                <!-- Projects Tab -->
-                <div class="tab-pane fade" id="emp_projects">
-                    <div class="row">
-                        <div class="col-lg-4 col-sm-6 col-md-4 col-xl-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="dropdown profile-action">
-                                        <a aria-expanded="false" data-toggle="dropdown" class="action-icon dropdown-toggle" href="#"><i class="material-icons">more_vert</i></a>
-                                        <div class="dropdown-menu dropdown-menu-right">
-                                            <a data-target="#edit_project" data-toggle="modal" href="#" class="dropdown-item"><i class="fa fa-pencil m-r-5"></i> Edit</a>
-                                            <a data-target="#delete_project" data-toggle="modal" href="#" class="dropdown-item"><i class="fa fa-trash-o m-r-5"></i> Delete</a>
-                                        </div>
-                                    </div>
-                                    <h4 class="project-title"><a href="project-view.html">Office Management</a></h4>
-                                    <small class="block text-ellipsis m-b-15">
-                                        <span class="text-xs">1</span> <span class="text-muted">open tasks, </span>
-                                        <span class="text-xs">9</span> <span class="text-muted">tasks completed</span>
-                                    </small>
-                                    <p class="text-muted">Lorem Ipsum is simply dummy text of the printing and
-                                        typesetting industry. When an unknown printer took a galley of type and
-                                        scrambled it...
-                                    </p>
-                                    <div class="pro-deadline m-b-15">
-                                        <div class="sub-title">
-                                            Deadline:
-                                        </div>
-                                        <div class="text-muted">
-                                            17 Apr 2019
-                                        </div>
-                                    </div>
-                                    <div class="project-members m-b-15">
-                                        <div>Project Leader :</div>
-                                        <ul class="team-members">
-                                            <li>
-                                                <a href="#" data-toggle="tooltip" title="Jeffery Lalor"><img alt="" src="assets/employeepic/default.png"></a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="project-members m-b-15">
-                                        <div>Team :</div>
-                                        <ul class="team-members">
-                                            <li>
-                                                <a href="#" data-toggle="tooltip" title="John Doe"><img alt="" src="assets/employeepic/default.png"></a>
-                                            </li>
-                                            <li>
-                                                <a href="#" data-toggle="tooltip" title="Richard Miles"><img alt="" src="assets/employeepic/default.png"></a>
-                                            </li>
-                                            <li>
-                                                <a href="#" data-toggle="tooltip" title="John Smith"><img alt="" src="assets/employeepic/default.png"></a>
-                                            </li>
-                                            <li>
-                                                <a href="#" data-toggle="tooltip" title="Mike Litorus"><img alt="" src="assets/employeepic/default.png"></a>
-                                            </li>
-                                            <li>
-                                                <a href="#" class="all-users">+15</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <p class="m-b-5">Progress <span class="text-success float-right">40%</span></p>
-                                    <div class="progress progress-xs mb-0">
-                                        <div style="width: 40%" title="" data-toggle="tooltip" role="progressbar" class="progress-bar bg-success" data-original-title="40%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-lg-4 col-sm-6 col-md-4 col-xl-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="dropdown profile-action">
-                                        <a aria-expanded="false" data-toggle="dropdown" class="action-icon dropdown-toggle" href="#"><i class="material-icons">more_vert</i></a>
-                                        <div class="dropdown-menu dropdown-menu-right">
-                                            <a data-target="#edit_project" data-toggle="modal" href="#" class="dropdown-item"><i class="fa fa-pencil m-r-5"></i> Edit</a>
-                                            <a data-target="#delete_project" data-toggle="modal" href="#" class="dropdown-item"><i class="fa fa-trash-o m-r-5"></i> Delete</a>
-                                        </div>
-                                    </div>
-                                    <h4 class="project-title"><a href="project-view.html">Project Management</a></h4>
-                                    <small class="block text-ellipsis m-b-15">
-                                        <span class="text-xs">2</span> <span class="text-muted">open tasks, </span>
-                                        <span class="text-xs">5</span> <span class="text-muted">tasks completed</span>
-                                    </small>
-                                    <p class="text-muted">Lorem Ipsum is simply dummy text of the printing and
-                                        typesetting industry. When an unknown printer took a galley of type and
-                                        scrambled it...
-                                    </p>
-                                    <div class="pro-deadline m-b-15">
-                                        <div class="sub-title">
-                                            Deadline:
-                                        </div>
-                                        <div class="text-muted">
-                                            17 Apr 2019
-                                        </div>
-                                    </div>
-                                    <div class="project-members m-b-15">
-                                        <div>Project Leader :</div>
-                                        <ul class="team-members">
-                                            <li>
-                                                <a href="#" data-toggle="tooltip" title="Jeffery Lalor"><img alt="" src="assets/employeepic/default.png"></a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="project-members m-b-15">
-                                        <div>Team :</div>
-                                        <ul class="team-members">
-                                            <li>
-                                                <a href="#" data-toggle="tooltip" title="John Doe"><img alt="" src="assets/employeepic/default.png"></a>
-                                            </li>
-                                            <li>
-                                                <a href="#" data-toggle="tooltip" title="Richard Miles"><img alt="" src="assets/employeepic/default.png"></a>
-                                            </li>
-                                            <li>
-                                                <a href="#" data-toggle="tooltip" title="John Smith"><img alt="" src="assets/employeepic/default.png"></a>
-                                            </li>
-                                            <li>
-                                                <a href="#" data-toggle="tooltip" title="Mike Litorus"><img alt="" src="assets/employeepic/default.png"></a>
-                                            </li>
-                                            <li>
-                                                <a href="#" class="all-users">+15</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <p class="m-b-5">Progress <span class="text-success float-right">40%</span></p>
-                                    <div class="progress progress-xs mb-0">
-                                        <div style="width: 40%" title="" data-toggle="tooltip" role="progressbar" class="progress-bar bg-success" data-original-title="40%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-lg-4 col-sm-6 col-md-4 col-xl-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="dropdown profile-action">
-                                        <a aria-expanded="false" data-toggle="dropdown" class="action-icon dropdown-toggle" href="#"><i class="material-icons">more_vert</i></a>
-                                        <div class="dropdown-menu dropdown-menu-right">
-                                            <a data-target="#edit_project" data-toggle="modal" href="#" class="dropdown-item"><i class="fa fa-pencil m-r-5"></i> Edit</a>
-                                            <a data-target="#delete_project" data-toggle="modal" href="#" class="dropdown-item"><i class="fa fa-trash-o m-r-5"></i> Delete</a>
-                                        </div>
-                                    </div>
-                                    <h4 class="project-title"><a href="project-view.html">Video Calling App</a></h4>
-                                    <small class="block text-ellipsis m-b-15">
-                                        <span class="text-xs">3</span> <span class="text-muted">open tasks, </span>
-                                        <span class="text-xs">3</span> <span class="text-muted">tasks completed</span>
-                                    </small>
-                                    <p class="text-muted">Lorem Ipsum is simply dummy text of the printing and
-                                        typesetting industry. When an unknown printer took a galley of type and
-                                        scrambled it...
-                                    </p>
-                                    <div class="pro-deadline m-b-15">
-                                        <div class="sub-title">
-                                            Deadline:
-                                        </div>
-                                        <div class="text-muted">
-                                            17 Apr 2019
-                                        </div>
-                                    </div>
-                                    <div class="project-members m-b-15">
-                                        <div>Project Leader :</div>
-                                        <ul class="team-members">
-                                            <li>
-                                                <a href="#" data-toggle="tooltip" title="Jeffery Lalor"><img alt="" src="assets/employeepic/default.png"></a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="project-members m-b-15">
-                                        <div>Team :</div>
-                                        <ul class="team-members">
-                                            <li>
-                                                <a href="#" data-toggle="tooltip" title="John Doe"><img alt="" src="assets/employeepic/default.png"></a>
-                                            </li>
-                                            <li>
-                                                <a href="#" data-toggle="tooltip" title="Richard Miles"><img alt="" src="assets/employeepic/default.png"></a>
-                                            </li>
-                                            <li>
-                                                <a href="#" data-toggle="tooltip" title="John Smith"><img alt="" src="assets/employeepic/default.png"></a>
-                                            </li>
-                                            <li>
-                                                <a href="#" data-toggle="tooltip" title="Mike Litorus"><img alt="" src="assets/employeepic/default.png"></a>
-                                            </li>
-                                            <li>
-                                                <a href="#" class="all-users">+15</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <p class="m-b-5">Progress <span class="text-success float-right">40%</span></p>
-                                    <div class="progress progress-xs mb-0">
-                                        <div style="width: 40%" title="" data-toggle="tooltip" role="progressbar" class="progress-bar bg-success" data-original-title="40%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-lg-4 col-sm-6 col-md-4 col-xl-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="dropdown profile-action">
-                                        <a aria-expanded="false" data-toggle="dropdown" class="action-icon dropdown-toggle" href="#"><i class="material-icons">more_vert</i></a>
-                                        <div class="dropdown-menu dropdown-menu-right">
-                                            <a data-target="#edit_project" data-toggle="modal" href="#" class="dropdown-item"><i class="fa fa-pencil m-r-5"></i> Edit</a>
-                                            <a data-target="#delete_project" data-toggle="modal" href="#" class="dropdown-item"><i class="fa fa-trash-o m-r-5"></i> Delete</a>
-                                        </div>
-                                    </div>
-                                    <h4 class="project-title"><a href="project-view.html">Hospital Administration</a></h4>
-                                    <small class="block text-ellipsis m-b-15">
-                                        <span class="text-xs">12</span> <span class="text-muted">open tasks, </span>
-                                        <span class="text-xs">4</span> <span class="text-muted">tasks completed</span>
-                                    </small>
-                                    <p class="text-muted">Lorem Ipsum is simply dummy text of the printing and
-                                        typesetting industry. When an unknown printer took a galley of type and
-                                        scrambled it...
-                                    </p>
-                                    <div class="pro-deadline m-b-15">
-                                        <div class="sub-title">
-                                            Deadline:
-                                        </div>
-                                        <div class="text-muted">
-                                            17 Apr 2019
-                                        </div>
-                                    </div>
-                                    <div class="project-members m-b-15">
-                                        <div>Project Leader :</div>
-                                        <ul class="team-members">
-                                            <li>
-                                                <a href="#" data-toggle="tooltip" title="Jeffery Lalor"><img alt="" src="assets/employeepic/default.png"></a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="project-members m-b-15">
-                                        <div>Team :</div>
-                                        <ul class="team-members">
-                                            <li>
-                                                <a href="#" data-toggle="tooltip" title="John Doe"><img alt="" src="assets/employeepic/default.png"></a>
-                                            </li>
-                                            <li>
-                                                <a href="#" data-toggle="tooltip" title="Richard Miles"><img alt="" src="assets/employeepic/default.png"></a>
-                                            </li>
-                                            <li>
-                                                <a href="#" data-toggle="tooltip" title="John Smith"><img alt="" src="assets/employeepic/default.png"></a>
-                                            </li>
-                                            <li>
-                                                <a href="#" data-toggle="tooltip" title="Mike Litorus"><img alt="" src="assets/employeepic/default.png"></a>
-                                            </li>
-                                            <li>
-                                                <a href="#" class="all-users">+15</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <p class="m-b-5">Progress <span class="text-success float-right">40%</span></p>
-                                    <div class="progress progress-xs mb-0">
-                                        <div style="width: 40%" title="" data-toggle="tooltip" role="progressbar" class="progress-bar bg-success" data-original-title="40%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- /Projects Tab -->
-                
-                <!-- Bank Statutory Tab -->
-                <div class="tab-pane fade" id="bank_statutory">
-                    <div class="card">
-                        <div class="card-body">
-                            <h3 class="card-title"> Basic Salary Information</h3>
-                            <form>
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label class="col-form-label">Salary basis <span class="text-danger">*</span></label>
-                                            <select class="select">
-                                                <option>Select salary basis type</option>
-                                                <option>Hourly</option>
-                                                <option>Daily</option>
-                                                <option>Weekly</option>
-                                                <option>Monthly</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label class="col-form-label">Salary amount <small class="text-muted">per month</small></label>
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text">$</span>
-                                                </div>
-                                                <input type="text" class="form-control" placeholder="Type your salary amount" value="0.00">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label class="col-form-label">Payment type</label>
-                                            <select class="select">
-                                                <option>Select payment type</option>
-                                                <option>Bank transfer</option>
-                                                <option>Check</option>
-                                                <option>Cash</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <hr>
-                                <h3 class="card-title"> PF Information</h3>
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label class="col-form-label">PF contribution</label>
-                                            <select class="select">
-                                                <option>Select PF contribution</option>
-                                                <option>Yes</option>
-                                                <option>No</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label class="col-form-label">PF No. <span class="text-danger">*</span></label>
-                                            <select class="select">
-                                                <option>Select PF contribution</option>
-                                                <option>Yes</option>
-                                                <option>No</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label class="col-form-label">Employee PF rate</label>
-                                            <select class="select">
-                                                <option>Select PF contribution</option>
-                                                <option>Yes</option>
-                                                <option>No</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label class="col-form-label">Additional rate <span class="text-danger">*</span></label>
-                                            <select class="select">
-                                                <option>Select additional rate</option>
-                                                <option>0%</option>
-                                                <option>1%</option>
-                                                <option>2%</option>
-                                                <option>3%</option>
-                                                <option>4%</option>
-                                                <option>5%</option>
-                                                <option>6%</option>
-                                                <option>7%</option>
-                                                <option>8%</option>
-                                                <option>9%</option>
-                                                <option>10%</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label class="col-form-label">Total rate</label>
-                                            <input type="text" class="form-control" placeholder="N/A" value="11%">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label class="col-form-label">Employee PF rate</label>
-                                            <select class="select">
-                                                <option>Select PF contribution</option>
-                                                <option>Yes</option>
-                                                <option>No</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label class="col-form-label">Additional rate <span class="text-danger">*</span></label>
-                                            <select class="select">
-                                                <option>Select additional rate</option>
-                                                <option>0%</option>
-                                                <option>1%</option>
-                                                <option>2%</option>
-                                                <option>3%</option>
-                                                <option>4%</option>
-                                                <option>5%</option>
-                                                <option>6%</option>
-                                                <option>7%</option>
-                                                <option>8%</option>
-                                                <option>9%</option>
-                                                <option>10%</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label class="col-form-label">Total rate</label>
-                                            <input type="text" class="form-control" placeholder="N/A" value="11%">
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <hr>
-                                <h3 class="card-title"> ESI Information</h3>
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label class="col-form-label">ESI contribution</label>
-                                            <select class="select">
-                                                <option>Select ESI contribution</option>
-                                                <option>Yes</option>
-                                                <option>No</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label class="col-form-label">ESI No. <span class="text-danger">*</span></label>
-                                            <select class="select">
-                                                <option>Select ESI contribution</option>
-                                                <option>Yes</option>
-                                                <option>No</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label class="col-form-label">Employee ESI rate</label>
-                                            <select class="select">
-                                                <option>Select ESI contribution</option>
-                                                <option>Yes</option>
-                                                <option>No</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label class="col-form-label">Additional rate <span class="text-danger">*</span></label>
-                                            <select class="select">
-                                                <option>Select additional rate</option>
-                                                <option>0%</option>
-                                                <option>1%</option>
-                                                <option>2%</option>
-                                                <option>3%</option>
-                                                <option>4%</option>
-                                                <option>5%</option>
-                                                <option>6%</option>
-                                                <option>7%</option>
-                                                <option>8%</option>
-                                                <option>9%</option>
-                                                <option>10%</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label class="col-form-label">Total rate</label>
-                                            <input type="text" class="form-control" placeholder="N/A" value="11%">
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="submit-section">
-                                    <button class="btn btn-primary submit-btn" type="submit">Save</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <!-- /Bank Statutory Tab -->
-            </div>
-        </div>
-        <!-- /Page Content -->
 
-        <!-- Profile Modal -->
-        <div id="profile_info" class="modal custom-modal fade" role="dialog">
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Profile Information</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form action="{{ route('profile/information/save') }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="profile-img-wrap edit-img">
-                                        <img class="inline-block" src="{{ URL::to('/assets/employeepic/'. $employee->profile_picture) }}" alt="{{ $employee->name }}">
-                                        <div class="fileupload btn">
-                                            <span class="btn-text">edit</span>
-                                            <input class="upload" type="file" id="image" name="images">
-                                            @if(!empty($employee))
-                                            <input type="hidden" name="hidden_image" id="e_image" value="{{ $employee->profile_picture }}">
+                <!-- Requirements Tab -->
+                <div class="tab-pane fade" id="emp_projects">
+                        @php
+                            $requiredDocuments = [
+                                ['title' => 'NBI Clearance', 'description' => 'Uploaded copy of NBI clearance for record validation.'],
+                                ['title' => 'Police Clearance', 'description' => 'Recent police clearance for background check.'],
+                                ['title' => 'Birth Certificate', 'description' => 'Official PSA-issued birth certificate.'],
+                                ['title' => 'Resume / CV', 'description' => 'Latest resume submitted by the employee.'],
+                                ['title' => 'Barangay Clearance', 'description' => 'Proof of good moral standing within the community.'],
+                                ['title' => 'Diploma', 'description' => 'Graduation certificate from university or school.'],
+                                ['title' => 'Transcript of Records', 'description' => 'Complete academic record submitted for HR.'],
+                                ['title' => 'Pag-IBIG', 'description' => 'Membership record or form.'],
+                                ['title' => 'PhilHealth', 'description' => 'PhilHealth Member Data Record (MDR).'],
+                                ['title' => 'SSS', 'description' => 'Social Security System record or E-1 form.'],
+                                ['title' => 'TIN', 'description' => 'Tax Identification Number record or BIR Form 1902.'],
+                            ];
+                        @endphp
+
+                        <div class="row g-4">
+                            @foreach ($requiredDocuments as $doc)
+                                @php $uploaded = $uploadedRequirements[$doc['title']] ?? null; @endphp
+                                <div class="col-lg-4 col-sm-6 col-md-4 col-xl-3">
+                                    <div class="card h-100 d-flex flex-column justify-content-between">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between">
+                                                <h5 class="card-title">{{ $doc['title'] }}</h5>
+                                                @if ($uploaded)
+                                                    <div class="dropdown profile-action">
+                                                        <a class="action-icon dropdown-toggle" href="#" data-toggle="dropdown">
+                                                            <i class="material-icons">more_vert</i>
+                                                        </a>
+                                                        <div class="dropdown-menu dropdown-menu-right">
+                                                            <a class="dropdown-item upload-btn" href="#" data-title="{{ $doc['title'] }}">
+                                                                <i class="fa fa-pencil m-r-5"></i> Replace
+                                                            </a>
+                                                            <!-- You can implement delete functionality later -->
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            </div>
+
+                                            @if ($uploaded)
+                                                <p class="text-muted big mb-2">
+                                                    Uploaded: <strong>{{ \Carbon\Carbon::parse($uploaded->uploaded_at)->format('d M Y') }}</strong>
+                                                </p>
+                                                <p class="text-muted big mb-2">
+                                                    {{ $uploaded->description ?? $doc['description'] }}
+                                                </p>
+                                                <p class="text-muted big mb-2">
+                                                    Expiry: <strong>{{ $uploaded->expires_at ? \Carbon\Carbon::parse($uploaded->expires_at)->format('d M Y') : 'N/A' }}</strong>
+                                                </p>
+                                            @else
+                                                <p class="text-muted">{{ $doc['description'] }}</p>
                                             @endif
+                                        </div>
+
+                                        <div class="card-footer text-center">
+                                            @if ($uploaded && isset($uploaded->file_path))
+                                                <a href="{{ asset($uploaded->file_path) }}" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
+                                                <a href="{{ asset($uploaded->file_path) }}" download class="btn btn-sm btn-outline-success">Download</a>
+                                            @else
+                                                <span class="text-muted d-block mb-2">No file uploaded</span>
+                                            @endif
+
+                                            <button class="btn btn-sm btn-outline-{{ $uploaded && isset($uploaded->file_path) ? 'secondary' : 'primary' }} upload-btn"
+                                                data-title="{{ $doc['title'] }}">
+                                                {{ $uploaded && isset($uploaded->file_path) ? 'Replace File' : 'Upload' }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        <!-- /Requirements Tab -->
+                    </div>
+                </div>
+                <!-- /Page Content -->
+
+                <!-- Upload Requirement Modal -->
+                <div class="modal fade" id="uploadRequirementModal" tabindex="-1" role="dialog" aria-labelledby="uploadRequirementLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <form id="requirementUploadForm" method="POST" enctype="multipart/form-data" action="{{ route('requirements.upload') }}">
+                            @csrf
+                            <input type="hidden" name="title" id="requirementTitle">
+                            <input type="hidden" name="employee_id" value="{{ $employee->id }}">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Upload Requirement</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span>&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <label>Description (Optional)</label>
+                                        <input type="text" name="description" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Expiry Date (Optional)</label>
+                                        <input type="date" name="expires_at" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Upload File</label>
+                                        <input type="file" name="document" class="form-control-file" required>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary">Upload</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- /Upload Requirement Modal -->
+
+                <!-- Profile Modal -->
+                <div id="profile_info" class="modal custom-modal fade" role="dialog">
+                    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Profile Information</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="{{ route('profile/information/save') }}" method="POST"
+                                    enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="profile-img-wrap edit-img">
+                                                <img class="inline-block"
+                                                    src="{{ URL::to('/assets/employeepic/' . $employee->profile_picture) }}"
+                                                    alt="{{ $employee->name }}">
+                                                <div class="fileupload btn">
+                                                    <span class="btn-text">edit</span>
+                                                    <input class="upload" type="file" id="image" name="images">
+                                                    @if (!empty($employee))
+                                                        <input type="hidden" name="hidden_image" id="e_image"
+                                                            value="{{ $employee->profile_picture }}">
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label>Full Name</label>
+                                                        <input type="text" class="form-control" id="name"
+                                                            name="name" value="{{ $employee->name }}">
+                                                        <input type="hidden" class="form-control" id="user_id"
+                                                            name="user_id" value="{{ $employee->employee_id }}">
+                                                        <input type="hidden" class="form-control" id="email"
+                                                            name="email" value="{{ $employee->email }}">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Birth Date</label>
+                                                        <div class="cal-icon">
+                                                            @if (!empty($employee))
+                                                                <input class="form-control datetimepicker" type="text"
+                                                                    id="birthDate" name="birthDate"
+                                                                    value="{{ $employee->birth_date }}">
+                                                            @else
+                                                                <input class="form-control datetimepicker" type="text"
+                                                                    id="birthDate" name="birthDate">
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Gender</label>
+                                                        <select class="select form-control" id="gender"
+                                                            name="gender">
+                                                            @if (!empty($employee))
+                                                                <option value="{{ $employee->gender }}"
+                                                                    {{ $employee->gender == $employee->gender ? 'selected' : '' }}>
+                                                                    {{ $employee->gender }} </option>
+                                                                <option value="Male">Male</option>
+                                                                <option value="Female">Female</option>
+                                                            @else
+                                                                <option value="Male">Male</option>
+                                                                <option value="Female">Female</option>
+                                                            @endif
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label>Full Name</label>
-                                                <input type="text" class="form-control" id="name" name="name" value="{{ $employee->name }}">
-                                                <input type="hidden" class="form-control" id="user_id" name="user_id" value="{{ $employee->employee_id }}">
-                                                <input type="hidden" class="form-control" id="email" name="email" value="{{ $employee->email }}">
+                                                <label>Address</label>
+                                                @if (!empty($employee))
+                                                    <input type="text" class="form-control" id="address"
+                                                        name="address" value="{{ $employee->address }}">
+                                                @else
+                                                    <input type="text" class="form-control" id="address"
+                                                        name="address">
+                                                @endif
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label>Birth Date</label>
-                                                <div class="cal-icon">
-                                                    @if(!empty($employee))
-                                                        <input class="form-control datetimepicker" type="text" id="birthDate" name="birthDate" value="{{ $employee->birth_date }}">
+                                                <label>State</label>
+                                                @if (!empty($employee))
+                                                    <input type="text" class="form-control" id="state"
+                                                        name="state" value="{{ $employee->state }}">
+                                                @else
+                                                    <input type="text" class="form-control" id="state"
+                                                        name="state">
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Country</label>
+                                                @if (!empty($employee))
+                                                    <input type="text" class="form-control" id=""
+                                                        name="country" value="{{ $employee->country }}">
+                                                @else
+                                                    <input type="text" class="form-control" id=""
+                                                        name="country">
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Pin Code</label>
+                                                @if (!empty($employee))
+                                                    <input type="text" class="form-control" id="pin_code"
+                                                        name="pin_code" value="{{ $employee->pin_code }}">
+                                                @else
+                                                    <input type="text" class="form-control" id="pin_code"
+                                                        name="pin_code">
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Phone Number</label>
+                                                @if (!empty($employee))
+                                                    <input type="text" class="form-control" id="phoneNumber"
+                                                        name="phone_number" value="{{ $employee->phone_number }}">
+                                                @else
+                                                    <input type="text" class="form-control" id="phoneNumber"
+                                                        name="phone_number">
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Department <span class="text-danger">*</span></label>
+                                                <select class="select" id="department" name="department">
+                                                    @if (!empty($employee))
+                                                        <option value="{{ $employee->department }}"
+                                                            {{ $employee->department == $employee->department ? 'selected' : '' }}>
+                                                            {{ $employee->department }} </option>
+                                                        <option value="Web Development">Web Development</option>
+                                                        <option value="IT Management">IT Management</option>
+                                                        <option value="Marketing">Marketing</option>
                                                     @else
-                                                        <input class="form-control datetimepicker" type="text" id="birthDate" name="birthDate">
+                                                        <option value="Web Development">Web Development</option>
+                                                        <option value="IT Management">IT Management</option>
+                                                        <option value="Marketing">Marketing</option>
                                                     @endif
-                                                </div>
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label>Gender</label>
-                                                <select class="select form-control" id="gender" name="gender">
-                                                    @if(!empty($employee))
-                                                        <option value="{{ $employee->gender }}" {{ ( $employee->gender == $employee->gender) ? 'selected' : '' }}>{{ $employee->gender }} </option>
-                                                        <option value="Male">Male</option>
-                                                        <option value="Female">Female</option>
+                                                <label>Designation <span class="text-danger">*</span></label>
+                                                <select class="select" id="designation" name="designation">
+                                                    @if (!empty($employee))
+                                                        <option value="{{ $employee->designation }}"
+                                                            {{ $employee->designation == $employee->designation ? 'selected' : '' }}>
+                                                            {{ $employee->designation }} </option>
+                                                        <option value="Web Designer">Web Designer</option>
+                                                        <option value="Web Developer">Web Developer</option>
+                                                        <option value="Android Developer">Android Developer</option>
                                                     @else
-                                                        <option value="Male">Male</option>
-                                                        <option value="Female">Female</option>
+                                                        <option value="Web Designer">Web Designer</option>
+                                                        <option value="Web Developer">Web Developer</option>
+                                                        <option value="Android Developer">Android Developer</option>
                                                     @endif
                                                 </select>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                    <div class="submit-section">
+                                        <button type="submit" class="btn btn-primary submit-btn">Submit</button>
+                                    </div>
+                                </form>
                             </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label>Address</label>
-                                        @if(!empty($employee))
-                                            <input type="text" class="form-control" id="address" name="address" value="{{ $employee->address }}">
-                                        @else
-                                            <input type="text" class="form-control" id="address" name="address">
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>State</label>
-                                        @if(!empty($employee))
-                                            <input type="text" class="form-control" id="state" name="state" value="{{ $employee->state }}">
-                                        @else
-                                            <input type="text" class="form-control" id="state" name="state">
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Country</label>
-                                        @if(!empty($employee))
-                                            <input type="text" class="form-control" id="" name="country" value="{{ $employee->country }}">
-                                        @else
-                                            <input type="text" class="form-control" id="" name="country">
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Pin Code</label>
-                                        @if(!empty($employee))
-                                            <input type="text" class="form-control" id="pin_code" name="pin_code" value="{{ $employee->pin_code }}">
-                                        @else
-                                            <input type="text" class="form-control" id="pin_code" name="pin_code">
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Phone Number</label>
-                                        @if(!empty($employee))
-                                            <input type="text" class="form-control" id="phoneNumber" name="phone_number" value="{{ $employee->phone_number }}">
-                                        @else
-                                            <input type="text" class="form-control" id="phoneNumber" name="phone_number">
-                                        @endif
-                                    </div>
-                                </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /Profile Modal -->
 
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Department <span class="text-danger">*</span></label>
-                                        <select class="select" id="department" name="department">
-                                            @if(!empty($employee))
-                                                <option value="{{ $employee->department }}" {{ ( $employee->department == $employee->department) ? 'selected' : '' }}>{{ $employee->department }} </option>
-                                                <option value="Web Development">Web Development</option>
-                                                <option value="IT Management">IT Management</option>
-                                                <option value="Marketing">Marketing</option>
-                                            @else
-                                                <option value="Web Development">Web Development</option>
-                                                <option value="IT Management">IT Management</option>
-                                                <option value="Marketing">Marketing</option>
-                                            @endif
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Designation <span class="text-danger">*</span></label>
-                                        <select class="select" id="designation" name="designation">
-                                            @if(!empty($employee))
-                                                <option value="{{ $employee->designation }}" {{ ( $employee->designation == $employee->designation) ? 'selected' : '' }}>{{ $employee->designation }} </option>
-                                                <option value="Web Designer">Web Designer</option>
-                                                <option value="Web Developer">Web Developer</option>
-                                                <option value="Android Developer">Android Developer</option>
-                                            @else
-                                                <option value="Web Designer">Web Designer</option>
-                                                <option value="Web Developer">Web Developer</option>
-                                                <option value="Android Developer">Android Developer</option>
-                                            @endif
-                                        </select>
-                                    </div>
-                                </div>
-                                {{-- <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Reports To <span class="text-danger">*</span></label>
-                                        <select class="select" name="reports_to">
-                                            <option value="">-- Select Manager --</option>
-                                            @foreach ($reportsToList as $manager)
-                                                <option value="{{ $manager->id }}" 
-                                                    {{ ($employee->reports_to == $manager->id) ? 'selected' : '' }}>
-                                                    {{ $manager->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div> --}}
+                <!-- Personal Info Modal -->
+                <div id="personal_info_modal" class="modal custom-modal fade" role="dialog">
+                    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Personal Information</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
                             </div>
-                            <div class="submit-section">
-                                <button type="submit" class="btn btn-primary submit-btn">Submit</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- /Profile Modal -->
-    
-        <!-- Personal Info Modal -->
-        <div id="personal_info_modal" class="modal custom-modal fade" role="dialog">
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Personal Information</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form action="{{ route('user/information/save') }}" method="POST">
-                            @csrf
-                            <input type="hidden" class="form-control" name="user_id" value="{{ $employee->employee_id }}" readonly>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Passport No</label>
-                                        <input type="text" class="form-control @error('passport_no') is-invalid @enderror" name="passport_no" value="{{ $employee->passport_no }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Passport Expiry Date</label>
-                                        <div class="cal-icon">
-                                            <input class="form-control datetimepicker @error('passport_expiry_date') is-invalid @enderror" type="text" name="passport_expiry_date" value="{{ $employee->passport_expiry_date }}">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Tel</label>
-                                        <input class="form-control @error('tel') is-invalid @enderror" type="text" name="tel" value="{{ $employee->tel }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Nationality <span class="text-danger">*</span></label>
-                                        <input class="form-control @error('nationality') is-invalid @enderror" type="text" name="nationality" value="{{ $employee->nationality }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Religion</label>
-                                        <div class="form-group">
-                                            <input class="form-control @error('religion') is-invalid @enderror" type="text" name="religion" value="{{ $employee->religion }}">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Marital status <span class="text-danger">*</span></label>
-                                        <select class="select form-control @error('marital_status') is-invalid @enderror" name="marital_status">
-                                            <option value="{{ $employee->marital_status }}" {{ ( $employee->marital_status == $employee->marital_status) ? 'selected' : '' }}> {{ $employee->marital_status }} </option>
-                                            <option value="Single">Single</option>
-                                            <option value="Married">Married</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Employment of spouse</label>
-                                        <input class="form-control @error('employment_of_spouse') is-invalid @enderror" type="text" name="employment_of_spouse" value="{{ $employee->employment_of_spouse }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>No. of children </label>
-                                        <input class="form-control @error('children') is-invalid @enderror" type="text" name="children" value="{{ $employee->children }}">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="submit-section">
-                                <button type="submit" class="btn btn-primary submit-btn">Update</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- /Personal Info Modal -->
-
-        <!-- Bank information Modal -->
-        <div id="bank_information_modal" class="modal custom-modal fade" role="dialog">
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Bank Information</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form>
-                            @csrf
-                            <input type="hidden" class="form-control" name="user_id" value="{{ Session::get('employee_id') }}" readonly>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Bank name</label>
-                                        <input type="text" class="form-control @error('bank_name') is-invalid @enderror" name="bank_name" value="{{ old('bank_name') }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Bank account No</label>
-                                        <input type="text" class="form-control @error('bank_account_no') is-invalid @enderror" name="bank_account_no" oninput="this.value = this.value.replace(/[^0-9.]/g, ''); this.value = this.value.replace(/(\..*)\./g, '$1');" value="{{ old('bank_account_no') }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>IFSC Code</label>
-                                        <input type="text" class="form-control @error('ifsc_code') is-invalid @enderror" name="ifsc_code" value="{{ old('ifsc_code') }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>PAN No</label>
-                                        <input type="text" class="form-control @error('pan_no') is-invalid @enderror" name="pan_no" value="{{ old('pan_no') }}">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="submit-section">
-                                <button type="submit" class="btn btn-primary submit-btn">Update</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- /Bank information Modal -->
-        
-        <!-- Family Info Modal -->
-        <div id="family_info_modal" class="modal custom-modal fade" role="dialog">
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title"> Family Informations</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form>
-                            <div class="form-scroll">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h3 class="card-title">Family Member <a href="javascript:void(0);" class="delete-icon"><i class="fa fa-trash-o"></i></a></h3>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label>Name <span class="text-danger">*</span></label>
-                                                    <input class="form-control" type="text">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label>Relationship <span class="text-danger">*</span></label>
-                                                    <input class="form-control" type="text">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label>Date of birth <span class="text-danger">*</span></label>
-                                                    <input class="form-control" type="text">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label>Phone <span class="text-danger">*</span></label>
-                                                    <input class="form-control" type="text">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h3 class="card-title">Education Informations <a href="javascript:void(0);" class="delete-icon"><i class="fa fa-trash-o"></i></a></h3>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label>Name <span class="text-danger">*</span></label>
-                                                    <input class="form-control" type="text">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label>Relationship <span class="text-danger">*</span></label>
-                                                    <input class="form-control" type="text">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label>Date of birth <span class="text-danger">*</span></label>
-                                                    <input class="form-control" type="text">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label>Phone <span class="text-danger">*</span></label>
-                                                    <input class="form-control" type="text">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="add-more">
-                                            <a href="javascript:void(0);"><i class="fa fa-plus-circle"></i> Add More</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="submit-section">
-                                <button class="btn btn-primary submit-btn">Submit</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- /Family Info Modal -->
-        
-        <!-- Emergency Contact Modal -->
-        <div id="emergency_contact_modal" class="modal custom-modal fade" role="dialog">
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Personal Information</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="validation" action="{{ route('user/profile/emergency/contact/save') }}" method="POST">
-                            @csrf
-                            <input type="text" class="form-control" name="user_id" value="{{ $employee->employee_id }}">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h3 class="card-title">Primary Contact</h3>
+                            <div class="modal-body">
+                                <form action="{{ route('user/information/save') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" class="form-control" name="user_id"
+                                        value="{{ $employee->employee_id }}" readonly>
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label>Name <span class="text-danger">*</span></label>
-                                                @if (!empty($employee->name_primary))
-                                                <input type="text" class="form-control" name="name_primary" value="{{ $employee->name_primary }}">
-                                                @else
-                                                <input type="text" class="form-control" name="name_primary">
-                                                @endif
-                                            </li>
+                                                <label>PhilHealth</label>
+                                                <input type="text"
+                                                    class="form-control @error('philhealth') is-invalid @enderror"
+                                                    name="philhealth" value="{{ $employee->philhealth }}">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label>Relationship <span class="text-danger">*</span></label>
-                                                @if (!empty($employee->relationship_primary))
-                                                <input type="text" class="form-control" name="relationship_primary" value="{{ $employee->relationship_primary }}">
-                                                @else
-                                                <input type="text" class="form-control" name="relationship_primary">
-                                                @endif
+                                                <label>SSS</label>
+                                                <input class="form-control @error('sss') is-invalid @enderror"
+                                                    type="text" name="sss" value="{{ $employee->sss }}">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label>Phone <span class="text-danger">*</span></label>
-                                                @if (!empty($employee->phone_primary))
-                                                <input type="text" class="form-control" name="phone_primary" value="{{ $employee->phone_primary }}">
-                                                @else
-                                                <input type="text" class="form-control" name="phone_primary">
-                                                @endif
+                                                <label>TIN No</label>
+                                                <input class="form-control @error('tin_no') is-invalid @enderror"
+                                                    type="text" name="tin_no" value="{{ $employee->tin_no }}">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label>Phone 2</label>
-                                                @if (!empty($employee->phone_2_primary))
-                                                <input type="text" class="form-control" name="phone_2_primary" value="{{ $employee->phone_2_primary }}">
-                                                @else
-                                                <input type="text" class="form-control" name="phone_2_primary">
-                                                @endif
+                                                <label>Nationality <span class="text-danger">*</span></label>
+                                                <input class="form-control @error('nationality') is-invalid @enderror"
+                                                    type="text" name="nationality"
+                                                    value="{{ $employee->nationality }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Religion</label>
+                                                <div class="form-group">
+                                                    <input class="form-control @error('religion') is-invalid @enderror"
+                                                        type="text" name="religion"
+                                                        value="{{ $employee->religion }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Marital status <span class="text-danger">*</span></label>
+                                                <select
+                                                    class="select form-control @error('marital_status') is-invalid @enderror"
+                                                    name="marital_status">
+                                                    <option value="{{ $employee->marital_status }}"
+                                                        {{ $employee->marital_status == $employee->marital_status ? 'selected' : '' }}>
+                                                        {{ $employee->marital_status }} </option>
+                                                    <option value="Single">Single</option>
+                                                    <option value="Married">Married</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Employment of spouse</label>
+                                                <input
+                                                    class="form-control @error('employment_of_spouse') is-invalid @enderror"
+                                                    type="text" name="employment_of_spouse"
+                                                    value="{{ $employee->employment_of_spouse }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>No. of children </label>
+                                                <input class="form-control @error('children') is-invalid @enderror"
+                                                    type="text" name="children" value="{{ $employee->children }}">
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                    <div class="submit-section">
+                                        <button type="submit" class="btn btn-primary submit-btn">Update</button>
+                                    </div>
+                                </form>
                             </div>
-                            
-                            <div class="card">
-                                <div class="card-body">
-                                    <h3 class="card-title">Secondary Contact</h3>
+                        </div>
+                    </div>
+                </div>
+                <!-- /Personal Info Modal -->
+
+                <!-- Bank information Modal -->
+                <div id="bank_information_modal" class="modal custom-modal fade" role="dialog">
+                    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Bank Information</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form>
+                                    @csrf
+                                    <input type="hidden" class="form-control" name="user_id"
+                                        value="{{ Session::get('employee_id') }}" readonly>
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label>Name <span class="text-danger">*</span></label>
-                                                @if (!empty($employee->name_secondary))
-                                                <input type="text" class="form-control" name="name_secondary" value="{{ $employee->name_secondary }}">
-                                                @else
-                                                <input type="text" class="form-control" name="name_secondary">
-                                                @endif
+                                                <label>Bank name</label>
+                                                <input type="text"
+                                                    class="form-control @error('bank_name') is-invalid @enderror"
+                                                    name="bank_name" value="{{ old('bank_name') }}">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label>Relationship <span class="text-danger">*</span></label>
-                                                @if (!empty($employee->relationship_secondary))
-                                                <input type="text" class="form-control" name="relationship_secondary" value="{{ $employee->relationship_secondary }}">
-                                                @else
-                                                <input type="text" class="form-control" name="relationship_secondary">
-                                                @endif
+                                                <label>Bank account No</label>
+                                                <input type="text"
+                                                    class="form-control @error('bank_account_no') is-invalid @enderror"
+                                                    name="bank_account_no"
+                                                    oninput="this.value = this.value.replace(/[^0-9.]/g, ''); this.value = this.value.replace(/(\..*)\./g, '$1');"
+                                                    value="{{ old('bank_account_no') }}">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label>Phone <span class="text-danger">*</span></label>
-                                                @if (!empty($employee->phone_secondary))
-                                                <input type="text" class="form-control" name="phone_secondary" value="{{ $employee->phone_secondary }}">
-                                                @else
-                                                <input type="text" class="form-control" name="phone_secondary">
-                                                @endif
+                                                <label>IFSC Code</label>
+                                                <input type="text"
+                                                    class="form-control @error('ifsc_code') is-invalid @enderror"
+                                                    name="ifsc_code" value="{{ old('ifsc_code') }}">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label>Phone 2</label>
-                                                @if (!empty($employee->phone_2_secondary))
-                                                <input type="text" class="form-control" name="phone_2_secondary" value="{{ $employee->phone_2_secondary }}">
-                                                @else
-                                                <input type="text" class="form-control" name="phone_2_secondary">
-                                                @endif
+                                                <label>PAN No</label>
+                                                <input type="text"
+                                                    class="form-control @error('pan_no') is-invalid @enderror"
+                                                    name="pan_no" value="{{ old('pan_no') }}">
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                    <div class="submit-section">
+                                        <button type="submit" class="btn btn-primary submit-btn">Update</button>
+                                    </div>
+                                </form>
                             </div>
-                            <div class="submit-section">
-                                <button type="submit" class="btn btn-primary submit-btn">Submit</button>
-                            </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        <!-- /Emergency Contact Modal -->
-        
-        <!-- Education Modal -->
-        <div id="education_info" class="modal custom-modal fade" role="dialog">
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title"> Education Informations</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form>
-                            <div class="form-scroll">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h3 class="card-title">Education Informations <a href="javascript:void(0);" class="delete-icon"><i class="fa fa-trash-o"></i></a></h3>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group form-focus focused">
-                                                    <input type="text" value="Oxford University" class="form-control floating">
-                                                    <label class="focus-label">Institution</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group form-focus focused">
-                                                    <input type="text" value="Computer Science" class="form-control floating">
-                                                    <label class="focus-label">Subject</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group form-focus focused">
-                                                    <div class="cal-icon">
-                                                        <input type="text" value="01/06/2002" class="form-control floating datetimepicker">
+                <!-- /Bank information Modal -->
+
+                <!-- Family Info Modal -->
+                <div id="family_info_modal" class="modal custom-modal fade" role="dialog">
+                    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title"> Family Informations</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form>
+                                    <div class="form-scroll">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h3 class="card-title">Family Member <a href="javascript:void(0);"
+                                                        class="delete-icon"><i class="fa fa-trash-o"></i></a></h3>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Name <span class="text-danger">*</span></label>
+                                                            <input class="form-control" type="text">
+                                                        </div>
                                                     </div>
-                                                    <label class="focus-label">Starting Date</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group form-focus focused">
-                                                    <div class="cal-icon">
-                                                        <input type="text" value="31/05/2006" class="form-control floating datetimepicker">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Relationship <span class="text-danger">*</span></label>
+                                                            <input class="form-control" type="text">
+                                                        </div>
                                                     </div>
-                                                    <label class="focus-label">Complete Date</label>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Date of birth <span class="text-danger">*</span></label>
+                                                            <input class="form-control" type="text">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Phone <span class="text-danger">*</span></label>
+                                                            <input class="form-control" type="text">
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group form-focus focused">
-                                                    <input type="text" value="BE Computer Science" class="form-control floating">
-                                                    <label class="focus-label">Degree</label>
+                                        </div>
+
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h3 class="card-title">Education Informations <a
+                                                        href="javascript:void(0);" class="delete-icon"><i
+                                                            class="fa fa-trash-o"></i></a></h3>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Name <span class="text-danger">*</span></label>
+                                                            <input class="form-control" type="text">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Relationship <span class="text-danger">*</span></label>
+                                                            <input class="form-control" type="text">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Date of birth <span class="text-danger">*</span></label>
+                                                            <input class="form-control" type="text">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Phone <span class="text-danger">*</span></label>
+                                                            <input class="form-control" type="text">
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group form-focus focused">
-                                                    <input type="text" value="Grade A" class="form-control floating">
-                                                    <label class="focus-label">Grade</label>
+                                                <div class="add-more">
+                                                    <a href="javascript:void(0);"><i class="fa fa-plus-circle"></i> Add
+                                                        More</a>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h3 class="card-title">Education Informations <a href="javascript:void(0);" class="delete-icon"><i class="fa fa-trash-o"></i></a></h3>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group form-focus focused">
-                                                    <input type="text" value="Oxford University" class="form-control floating">
-                                                    <label class="focus-label">Institution</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group form-focus focused">
-                                                    <input type="text" value="Computer Science" class="form-control floating">
-                                                    <label class="focus-label">Subject</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group form-focus focused">
-                                                    <div class="cal-icon">
-                                                        <input type="text" value="01/06/2002" class="form-control floating datetimepicker">
-                                                    </div>
-                                                    <label class="focus-label">Starting Date</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group form-focus focused">
-                                                    <div class="cal-icon">
-                                                        <input type="text" value="31/05/2006" class="form-control floating datetimepicker">
-                                                    </div>
-                                                    <label class="focus-label">Complete Date</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group form-focus focused">
-                                                    <input type="text" value="BE Computer Science" class="form-control floating">
-                                                    <label class="focus-label">Degree</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group form-focus focused">
-                                                    <input type="text" value="Grade A" class="form-control floating">
-                                                    <label class="focus-label">Grade</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="add-more">
-                                            <a href="javascript:void(0);"><i class="fa fa-plus-circle"></i> Add More</a>
-                                        </div>
+                                    <div class="submit-section">
+                                        <button class="btn btn-primary submit-btn">Submit</button>
                                     </div>
-                                </div>
+                                </form>
                             </div>
-                            <div class="submit-section">
-                                <button class="btn btn-primary submit-btn">Submit</button>
-                            </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        <!-- /Education Modal -->
-        
-        <!-- Experience Modal -->
-        <div id="experience_info" class="modal custom-modal fade" role="dialog">
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Experience Informations</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form>
-                            <div class="form-scroll">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h3 class="card-title">Experience Informations <a href="javascript:void(0);" class="delete-icon"><i class="fa fa-trash-o"></i></a></h3>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group form-focus">
-                                                    <input type="text" class="form-control floating" value="Digital Devlopment Inc">
-                                                    <label class="focus-label">Company Name</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group form-focus">
-                                                    <input type="text" class="form-control floating" value="United States">
-                                                    <label class="focus-label">Location</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group form-focus">
-                                                    <input type="text" class="form-control floating" value="Web Developer">
-                                                    <label class="focus-label">Job Position</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group form-focus">
-                                                    <div class="cal-icon">
-                                                        <input type="text" class="form-control floating datetimepicker" value="01/07/2007">
+                <!-- /Family Info Modal -->
+
+                <!-- Emergency Contact Modal -->
+                <div id="emergency_contact_modal" class="modal custom-modal fade" role="dialog">
+                    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Personal Information</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="validation" action="{{ route('user/profile/emergency/contact/save') }}"
+                                    method="POST">
+                                    @csrf
+                                    <input type="text" class="form-control" name="user_id"
+                                        value="{{ $employee->employee_id }}">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h3 class="card-title">Primary Contact</h3>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Name <span class="text-danger">*</span></label>
+                                                        @if (!empty($employee->name_primary))
+                                                            <input type="text" class="form-control"
+                                                                name="name_primary"
+                                                                value="{{ $employee->name_primary }}">
+                                                        @else
+                                                            <input type="text" class="form-control"
+                                                                name="name_primary">
+                                                        @endif
+                                                        </li>
                                                     </div>
-                                                    <label class="focus-label">Period From</label>
                                                 </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group form-focus">
-                                                    <div class="cal-icon">
-                                                        <input type="text" class="form-control floating datetimepicker" value="08/06/2018">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Relationship <span class="text-danger">*</span></label>
+                                                        @if (!empty($employee->relationship_primary))
+                                                            <input type="text" class="form-control"
+                                                                name="relationship_primary"
+                                                                value="{{ $employee->relationship_primary }}">
+                                                        @else
+                                                            <input type="text" class="form-control"
+                                                                name="relationship_primary">
+                                                        @endif
                                                     </div>
-                                                    <label class="focus-label">Period To</label>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Phone <span class="text-danger">*</span></label>
+                                                        @if (!empty($employee->phone_primary))
+                                                            <input type="text" class="form-control"
+                                                                name="phone_primary"
+                                                                value="{{ $employee->phone_primary }}">
+                                                        @else
+                                                            <input type="text" class="form-control"
+                                                                name="phone_primary">
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Phone 2</label>
+                                                        @if (!empty($employee->phone_2_primary))
+                                                            <input type="text" class="form-control"
+                                                                name="phone_2_primary"
+                                                                value="{{ $employee->phone_2_primary }}">
+                                                        @else
+                                                            <input type="text" class="form-control"
+                                                                name="phone_2_primary">
+                                                        @endif
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h3 class="card-title">Experience Informations <a href="javascript:void(0);" class="delete-icon"><i class="fa fa-trash-o"></i></a></h3>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group form-focus">
-                                                    <input type="text" class="form-control floating" value="Digital Devlopment Inc">
-                                                    <label class="focus-label">Company Name</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group form-focus">
-                                                    <input type="text" class="form-control floating" value="United States">
-                                                    <label class="focus-label">Location</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group form-focus">
-                                                    <input type="text" class="form-control floating" value="Web Developer">
-                                                    <label class="focus-label">Job Position</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group form-focus">
-                                                    <div class="cal-icon">
-                                                        <input type="text" class="form-control floating datetimepicker" value="01/07/2007">
+
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h3 class="card-title">Secondary Contact</h3>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Name <span class="text-danger">*</span></label>
+                                                        @if (!empty($employee->name_secondary))
+                                                            <input type="text" class="form-control"
+                                                                name="name_secondary"
+                                                                value="{{ $employee->name_secondary }}">
+                                                        @else
+                                                            <input type="text" class="form-control"
+                                                                name="name_secondary">
+                                                        @endif
                                                     </div>
-                                                    <label class="focus-label">Period From</label>
                                                 </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group form-focus">
-                                                    <div class="cal-icon">
-                                                        <input type="text" class="form-control floating datetimepicker" value="08/06/2018">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Relationship <span class="text-danger">*</span></label>
+                                                        @if (!empty($employee->relationship_secondary))
+                                                            <input type="text" class="form-control"
+                                                                name="relationship_secondary"
+                                                                value="{{ $employee->relationship_secondary }}">
+                                                        @else
+                                                            <input type="text" class="form-control"
+                                                                name="relationship_secondary">
+                                                        @endif
                                                     </div>
-                                                    <label class="focus-label">Period To</label>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Phone <span class="text-danger">*</span></label>
+                                                        @if (!empty($employee->phone_secondary))
+                                                            <input type="text" class="form-control"
+                                                                name="phone_secondary"
+                                                                value="{{ $employee->phone_secondary }}">
+                                                        @else
+                                                            <input type="text" class="form-control"
+                                                                name="phone_secondary">
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Phone 2</label>
+                                                        @if (!empty($employee->phone_2_secondary))
+                                                            <input type="text" class="form-control"
+                                                                name="phone_2_secondary"
+                                                                value="{{ $employee->phone_2_secondary }}">
+                                                        @else
+                                                            <input type="text" class="form-control"
+                                                                name="phone_2_secondary">
+                                                        @endif
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="add-more">
-                                            <a href="javascript:void(0);"><i class="fa fa-plus-circle"></i> Add More</a>
                                         </div>
                                     </div>
-                                </div>
+                                    <div class="submit-section">
+                                        <button type="submit" class="btn btn-primary submit-btn">Submit</button>
+                                    </div>
+                                </form>
                             </div>
-                            <div class="submit-section">
-                                <button class="btn btn-primary submit-btn">Submit</button>
-                            </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
+                <!-- /Emergency Contact Modal -->
+
+                <!-- Education Modal -->
+                <div id="education_info" class="modal custom-modal fade" role="dialog">
+                    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title"> Education Informations</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form>
+                                    <div class="form-scroll">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h3 class="card-title">Education Informations <a
+                                                        href="javascript:void(0);" class="delete-icon"><i
+                                                            class="fa fa-trash-o"></i></a></h3>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group form-focus focused">
+                                                            <input type="text" value="Oxford University"
+                                                                class="form-control floating">
+                                                            <label class="focus-label">Institution</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group form-focus focused">
+                                                            <input type="text" value="Computer Science"
+                                                                class="form-control floating">
+                                                            <label class="focus-label">Subject</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group form-focus focused">
+                                                            <div class="cal-icon">
+                                                                <input type="text" value="01/06/2002"
+                                                                    class="form-control floating datetimepicker">
+                                                            </div>
+                                                            <label class="focus-label">Starting Date</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group form-focus focused">
+                                                            <div class="cal-icon">
+                                                                <input type="text" value="31/05/2006"
+                                                                    class="form-control floating datetimepicker">
+                                                            </div>
+                                                            <label class="focus-label">Complete Date</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group form-focus focused">
+                                                            <input type="text" value="BE Computer Science"
+                                                                class="form-control floating">
+                                                            <label class="focus-label">Degree</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group form-focus focused">
+                                                            <input type="text" value="Grade A"
+                                                                class="form-control floating">
+                                                            <label class="focus-label">Grade</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h3 class="card-title">Education Informations <a
+                                                        href="javascript:void(0);" class="delete-icon"><i
+                                                            class="fa fa-trash-o"></i></a></h3>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group form-focus focused">
+                                                            <input type="text" value="Oxford University"
+                                                                class="form-control floating">
+                                                            <label class="focus-label">Institution</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group form-focus focused">
+                                                            <input type="text" value="Computer Science"
+                                                                class="form-control floating">
+                                                            <label class="focus-label">Subject</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group form-focus focused">
+                                                            <div class="cal-icon">
+                                                                <input type="text" value="01/06/2002"
+                                                                    class="form-control floating datetimepicker">
+                                                            </div>
+                                                            <label class="focus-label">Starting Date</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group form-focus focused">
+                                                            <div class="cal-icon">
+                                                                <input type="text" value="31/05/2006"
+                                                                    class="form-control floating datetimepicker">
+                                                            </div>
+                                                            <label class="focus-label">Complete Date</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group form-focus focused">
+                                                            <input type="text" value="BE Computer Science"
+                                                                class="form-control floating">
+                                                            <label class="focus-label">Degree</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group form-focus focused">
+                                                            <input type="text" value="Grade A"
+                                                                class="form-control floating">
+                                                            <label class="focus-label">Grade</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="add-more">
+                                                    <a href="javascript:void(0);"><i class="fa fa-plus-circle"></i> Add
+                                                        More</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="submit-section">
+                                        <button class="btn btn-primary submit-btn">Submit</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /Education Modal -->
+
+                <!-- Experience Modal -->
+                <div id="experience_info" class="modal custom-modal fade" role="dialog">
+                    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Experience Informations</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form>
+                                    <div class="form-scroll">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h3 class="card-title">Experience Informations <a
+                                                        href="javascript:void(0);" class="delete-icon"><i
+                                                            class="fa fa-trash-o"></i></a></h3>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group form-focus">
+                                                            <input type="text" class="form-control floating"
+                                                                value="Digital Devlopment Inc">
+                                                            <label class="focus-label">Company Name</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group form-focus">
+                                                            <input type="text" class="form-control floating"
+                                                                value="United States">
+                                                            <label class="focus-label">Location</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group form-focus">
+                                                            <input type="text" class="form-control floating"
+                                                                value="Web Developer">
+                                                            <label class="focus-label">Job Position</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group form-focus">
+                                                            <div class="cal-icon">
+                                                                <input type="text"
+                                                                    class="form-control floating datetimepicker"
+                                                                    value="01/07/2007">
+                                                            </div>
+                                                            <label class="focus-label">Period From</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group form-focus">
+                                                            <div class="cal-icon">
+                                                                <input type="text"
+                                                                    class="form-control floating datetimepicker"
+                                                                    value="08/06/2018">
+                                                            </div>
+                                                            <label class="focus-label">Period To</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h3 class="card-title">Experience Informations <a
+                                                        href="javascript:void(0);" class="delete-icon"><i
+                                                            class="fa fa-trash-o"></i></a></h3>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group form-focus">
+                                                            <input type="text" class="form-control floating"
+                                                                value="Digital Devlopment Inc">
+                                                            <label class="focus-label">Company Name</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group form-focus">
+                                                            <input type="text" class="form-control floating"
+                                                                value="United States">
+                                                            <label class="focus-label">Location</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group form-focus">
+                                                            <input type="text" class="form-control floating"
+                                                                value="Web Developer">
+                                                            <label class="focus-label">Job Position</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group form-focus">
+                                                            <div class="cal-icon">
+                                                                <input type="text"
+                                                                    class="form-control floating datetimepicker"
+                                                                    value="01/07/2007">
+                                                            </div>
+                                                            <label class="focus-label">Period From</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group form-focus">
+                                                            <div class="cal-icon">
+                                                                <input type="text"
+                                                                    class="form-control floating datetimepicker"
+                                                                    value="08/06/2018">
+                                                            </div>
+                                                            <label class="focus-label">Period To</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="add-more">
+                                                    <a href="javascript:void(0);"><i class="fa fa-plus-circle"></i> Add
+                                                        More</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="submit-section">
+                                        <button class="btn btn-primary submit-btn">Submit</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /Experience Modal -->
+                <!-- /Page Content -->
             </div>
-        </div>
-        <!-- /Experience Modal -->
-    <!-- /Page Content -->
-    </div>
-    @section('script')
-    <script>
-        $('#validation').validate({  
-            rules: {  
-                name_primary: 'required',  
-                relationship_primary: 'required',  
-                phone_primary: 'required',  
-                phone_2_primary: 'required',  
-                name_secondary: 'required',  
-                relationship_secondary: 'required',  
-                phone_secondary: 'required',  
-                phone_2_secondary: 'required',  
-            },  
-            messages: {
-                name_primary: 'Please input name primary',  
-                relationship_primary: 'Please input relationship primary',  
-                phone_primary: 'Please input phone primary',  
-                phone_2_primary: 'Please input phone 2 primary',  
-                name_secondary: 'Please input name secondary',  
-                relationship_secondary: 'Please input relationship secondary',  
-                phone_secondaryr: 'Please input phone secondary',  
-                phone_2_secondary: 'Please input phone 2 secondary',  
-            },  
-            submitHandler: function(form) {  
-                form.submit();
-            }  
-        });  
-    </script>
+        @section('script')
+            <script>
+                $('#validation').validate({
+                    rules: {
+                        name_primary: 'required',
+                        relationship_primary: 'required',
+                        phone_primary: 'required',
+                        phone_2_primary: 'required',
+                        name_secondary: 'required',
+                        relationship_secondary: 'required',
+                        phone_secondary: 'required',
+                        phone_2_secondary: 'required',
+                    },
+                    messages: {
+                        name_primary: 'Please input name primary',
+                        relationship_primary: 'Please input relationship primary',
+                        phone_primary: 'Please input phone primary',
+                        phone_2_primary: 'Please input phone 2 primary',
+                        name_secondary: 'Please input name secondary',
+                        relationship_secondary: 'Please input relationship secondary',
+                        phone_secondaryr: 'Please input phone secondary',
+                        phone_2_secondary: 'Please input phone 2 secondary',
+                    },
+                    submitHandler: function(form) {
+                        form.submit();
+                    }
+                });
+            </script>
+
+            <script>
+                document.getElementById('scheduleForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const startDate = new Date(this.start_date.value);
+                    const endDate = new Date(this.end_date.value);
+                    const timeIn = this.time_in.value;
+                    const timeOut = this.time_out.value;
+                    const isRestDay = document.getElementById('restDayCheck').checked;
+
+                    if (startDate > endDate) {
+                        alert('Start date must be before or equal to end date');
+                        return;
+                    }
+
+                    let current = new Date(startDate);
+                    let scheduleRows = '';
+
+                    while (current <= endDate) {
+                        const dateStr = current.toISOString().split('T')[0];
+                        const dayName = current.toLocaleDateString('en-US', {
+                            weekday: 'long'
+                        });
+                        const displayDate = current.toLocaleDateString('en-US', {
+                            month: 'long',
+                            day: 'numeric',
+                            year: 'numeric'
+                        });
+
+                        scheduleRows += `<tr data-date="${dateStr}" data-rest="${isRestDay}" data-in="${timeIn}" data-out="${timeOut}">
+            <td>${displayDate}</td>
+            <td>${dayName}</td>`;
+
+                        if (isRestDay) {
+                            scheduleRows += `<td colspan="2" class="text-muted">Rest Day</td>`;
+                        } else {
+                            scheduleRows += `<td>${formatTime(timeIn)}</td><td>${formatTime(timeOut)}</td>`;
+                        }
+
+                        scheduleRows += `</tr>`;
+                        current.setDate(current.getDate() + 1);
+                    }
+
+                    document.querySelector('#scheduleTable tbody').insertAdjacentHTML('beforeend', scheduleRows);
+                    $('#plotScheduleModal').modal('hide');
+                    this.reset();
+                });
+
+                function formatTime(timeStr) {
+                    if (!timeStr) return '';
+                    const [h, m] = timeStr.split(':');
+                    const hour = parseInt(h);
+                    const ampm = hour >= 12 ? 'PM' : 'AM';
+                    const displayHour = hour % 12 || 12;
+                    return `${displayHour}:${m} ${ampm}`;
+                }
+
+                document.getElementById('restDayCheck').addEventListener('change', function() {
+                    const disabled = this.checked;
+                    document.getElementById('timeIn').disabled = disabled;
+                    document.getElementById('timeOut').disabled = disabled;
+                });
+            </script>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const uploadButtons = document.querySelectorAll('.upload-btn');
+                    uploadButtons.forEach(button => {
+                        button.addEventListener('click', function () {
+                            const title = this.getAttribute('data-title');
+                            document.getElementById('requirementTitle').value = title;
+                            $('#uploadRequirementModal').modal('show');
+                        });
+                    });
+                });
+            </script>
+
+            <style>
+                #emp_projects .card {
+                    background-color: #fdfdfd;
+                    border: 1px solid #e0e0e0;
+                    border-radius: 10px;
+                    padding: 24px;
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+                    transition: box-shadow 0.3s ease-in-out;
+                    min-height: 320px;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    position: relative;
+                }
+
+                #emp_projects .card:hover {
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+                }
+
+                #emp_projects .card-body {
+                    display: flex;
+                    flex-direction: column;
+                    flex-grow: 1;
+                    padding: 0;
+                }
+
+                #emp_projects .project-title {
+                    font-size: 16px;
+                    font-weight: 600;
+                    margin-bottom: 10px;
+                }
+
+                #emp_projects .text-muted {
+                    color: #6c757d !important;
+                }
+
+                #emp_projects small {
+                    font-size: 13px;
+                    margin-bottom: 10px;
+                    display: block;
+                }
+
+                #emp_projects .pro-deadline .sub-title {
+                    font-size: 13px;
+                    font-weight: 500;
+                }
+
+                #emp_projects .btn {
+                    padding: 4px 10px;
+                    font-size: 13px;
+                }
+
+                #emp_projects .card-footer {
+                    margin-top: auto;
+                    text-align: center;
+                }
+
+                #emp_projects .card-footer .btn+.btn {
+                    margin-left: 8px;
+                }
+
+                #emp_projects .dropdown.profile-action {
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                }
+                #emp_projects .row > [class*='col-'] {
+                    margin-bottom: 20px;
+                    padding-left: 10px;
+                    padding-right: 10px;
+                }
+                #emp_projects .row {
+                    margin-left: -10px;
+                    margin-right: -10px;
+                }
+            </style>
+        @endsection
     @endsection
-@endsection

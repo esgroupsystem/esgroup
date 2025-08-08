@@ -27,35 +27,44 @@ use Auth;
 class JobOrderController extends Controller
 {
 
-        /** Display All Holidays */
-        public function jobordersIndex()
-        {
-            $joborderview = Joborder::all(); // Let DataTables sort
-        
+    /** Display All Holidays */
+    public function jobordersIndex()
+    {
+        try {
+            $joborderview = Joborder::all();
             $users = User::whereIn('role_name', ['IT', 'Safety Office', 'Admin'])->get();
-        
             return view('joborders.joborder', compact('joborderview', 'users'));
+        } catch (\Exception $e) {
+            Log::error('Job Order Index Error: ' . $e->getMessage());
+            flash()->error('Failed to load job orders.');
+            return redirect()->back();
         }
+    }
         
         /** Page Create Jobs */
-        public function createJobOrderIndex()
-        {
+    public function createJobOrderIndex()
+    {
+        try {
             $loggedUser = Auth::user();
             $busList = DB::table('bus_details')
-                ->selectRaw("id as cat_id, name as cat_name, body_number as cat_busnum, 
-                            CONCAT(name, ' - (', body_number, ') - ', plate_number) as full_name")
+                ->selectRaw("id as cat_id, name as cat_name, body_number as cat_busnum, CONCAT(name, ' - (', body_number, ') - ', plate_number) as full_name")
                 ->get();
 
             return view('joborders.createjoborder', compact('busList', 'loggedUser'));
+        } catch (\Exception $e) {
+            Log::error('Create Job Order Page Error: ' . $e->getMessage());
+            flash()->error('Failed to load create job order page.');
+            return redirect()->back();
         }
+    }
 
         /** For View of Job Order */
-        public function viewSpecificDetails($encryptedId)
-        {
+    public function viewSpecificDetails($encryptedId)
+    {
+        try {
             $id = Crypt::decryptString($encryptedId);
             $jobDetail = Joborder::findOrFail($id);
 
-            // Get all files and attach file extension
             $FileDetails = JobFiles::where('job_id', $id)->get()->map(function ($file) {
                 $file->extension = strtolower(pathinfo($file->file_path, PATHINFO_EXTENSION));
                 return $file;
@@ -66,136 +75,124 @@ class JobOrderController extends Controller
                 ->get();
 
             return view('joborders.joborderview', compact('jobDetail', 'id', 'FileDetails', 'relatedTasks'));
+        } catch (\Exception $e) {
+            Log::error('View Job Order Details Error: ' . $e->getMessage());
+            flash()->error('Failed to load job order details.');
+            return redirect()->back();
         }
+    }
+
 
         /** Save Record */
-        public function saveRecordJoborders(Request $request)
-        {
-            $request->validate([
-                'job_name'             => 'required|string|max:255',
-                'job_type'             => 'required|string|max:255',
-                'job_datestart',
-                'job_time_start',
-                'job_time_end',
-                'job_sitNumber',
-                'job_remarks',
-                'job_status',
-                'job_assign_person',
-                'job_date_filled',
-                'job_creator',
+    public function saveRecordJoborders(Request $request)
+    {
+        $request->validate([
+            'job_name' => 'required|string|max:255',
+            'job_type' => 'required|string|max:255',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $jobOrder = Joborder::create([
+                'job_name' => $request->job_name,
+                'job_type' => $request->job_type,
+                'job_datestart' => $request->job_datestart,
+                'job_time_start' => Carbon::parse($request->job_time_start)->format('H:i:s'),
+                'job_time_end' => Carbon::parse($request->job_time_end)->format('H:i:s'),
+                'job_sitNumber' => $request->job_sitNumber,
+                'job_remarks' => $request->job_remarks,
+                'job_status' => 'New',
+                'job_assign_person' => 'Not assigned',
+                'job_date_filled' => now(),
+                'job_creator' => $request->user()->name,
             ]);
 
-            DB::beginTransaction();
-            try {
-                $jobOrder = Joborder::create([
-                    'job_name'          => $request->job_name,
-                    'job_type'          => $request->job_type,
-                    'job_datestart'     => $request->job_datestart,
-                    'job_time_start'    => Carbon::parse($request->job_time_start)->format('H:i:s'),
-                    'job_time_end'      => Carbon::parse($request->job_time_end)->format('H:i:s'),
-                    'job_sitNumber'     => $request->job_sitNumber,
-                    'job_remarks'       => $request->job_remarks,
-                    'job_status'        => 'New',
-                    'job_assign_person' => 'Not assigned',
-                    'job_date_filled'   => now(),
-                    'job_creator'       => $request->user()->name,
-                ]);
+            $itUsers = User::whereIn('role_name', ['IT', 'Admin'])->get();
+            foreach ($itUsers as $user) {
+                $user->notify(new GlobalUserNotification(
+                    'New Job Order Created',
+                    'A new job order "' . $jobOrder->job_name . '" was created by ' . $jobOrder->job_creator,
+                    route('view/details', ['id' => $jobOrder->id])
+                ));
 
-                // 🔔 Notify and Email Only IT and Admin Users
-                $itUsers = User::whereIn('role_name', ['IT', 'Admin'])->get();
-                foreach ($itUsers as $user) {
-                    // In-app notification
-                    $user->notify(new GlobalUserNotification(
-                        'New Job Order Created',
-                        'A new job order "' . $jobOrder->job_name . '" was created by ' . $jobOrder->job_creator,
-                        route('view/details', ['id' => $jobOrder->id])
-                    ));
-
-                    // Email notification (queued)
-                    try {
-                        Mail::to($user->email)->queue(new JobOrderNotification($jobOrder));
-                    } catch (\Exception $e) {
-                        \Log::error("Failed to queue email for {$user->email}: " . $e->getMessage());
-                    }
+                try {
+                    Mail::to($user->email)->queue(new JobOrderNotification($jobOrder));
+                } catch (\Exception $e) {
+                    Log::error("Failed to queue email for {$user->email}: " . $e->getMessage());
                 }
-
-                DB::commit();
-                flash()->success('Created new job order successfully :)');
-                return redirect()->route('form/joborders/page');
-
-            } catch (\Exception $e) {
-                DB::rollBack();
-                \Log::error('Job Order Save Error: ' . $e->getMessage());
-                flash()->error('Failed to add job order :)');
-                return redirect()->back();
             }
+
+            DB::commit();
+            flash()->success('Created new job order successfully :)');
+            return redirect()->route('form/joborders/page');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Job Order Save Error: ' . $e->getMessage());
+            flash()->error('Failed to add job order :)');
+            return redirect()->back();
         }
+    }
 
         /** Update Record */
-        public function updateRecordJoborders(Request $request)
-        {
+    public function updateRecordJoborders(Request $request)
+    {
+        try {
             if ($request->ajax()) {
                 $request->validate([
-                    'id'         => 'required|exists:joborders,id',
+                    'id' => 'required|exists:joborders,id',
                     'job_status' => 'required|string|max:255',
                 ]);
 
-                try {
-                    DB::beginTransaction();
-                    $jobOrder = Joborder::find($request->id);
-                    $jobOrder->job_status = $request->job_status;
-                    $jobOrder->save();
+                DB::beginTransaction();
+                $jobOrder = Joborder::find($request->id);
+                $jobOrder->job_status = $request->job_status;
+                $jobOrder->save();
+                DB::commit();
 
-                    DB::commit();
-                    return response()->json(['success' => true, 'message' => 'Job Status updated successfully']);
-                } catch (\Exception $e) {
-                    DB::rollback();
-                    return response()->json(['success' => false, 'message' => 'Failed to update Job Status']);
-                }
+                return response()->json(['success' => true, 'message' => 'Job Status updated successfully']);
             } else {
                 $request->validate([
-                    'id'                    => 'required|exists:joborders,id',
-                    'job_status'            => 'required|string|max:255',
-                    'job_assign_person'     => 'required|string|max:255',
+                    'id' => 'required|exists:joborders,id',
+                    'job_status' => 'required|string|max:255',
+                    'job_assign_person' => 'required|string|max:255',
                 ]);
 
                 DB::beginTransaction();
-                try {
-                    Joborder::where('id', $request->id)->update([
-                        'job_status'        => $request->job_status,
-                        'job_assign_person' => $request->job_assign_person,
-                    ]);
-                    DB::commit();
-                    flash()->success('Job Order updated successfully :)');
-                    return redirect()->back();
-                } catch (\Exception $e) {
-                    DB::rollback();
-                    flash()->error('Failed to update Job Order :)');
-                    return redirect()->back();
-                }
+                Joborder::where('id', $request->id)->update([
+                    'job_status' => $request->job_status,
+                    'job_assign_person' => $request->job_assign_person,
+                ]);
+                DB::commit();
+
+                flash()->success('Job Order updated successfully :)');
+                return redirect()->back();
             }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Update Job Order Error: ' . $e->getMessage());
+            flash()->error('Failed to update Job Order :)');
+            return redirect()->back();
         }
+    }
         
     /** Delete Record */
     public function deleteRecordJoborders(Request $request)
     {
-        $request->validate(['id' => 'required|integer']);
-
         try {
+            $request->validate(['id' => 'required|integer']);
             Joborder::destroy($request->id);
             flash()->success('Job Order deleted successfully :)');
             return redirect()->back();
         } catch (\Exception $e) {
-            \Log::error($e);
+            Log::error('Delete Job Order Error: ' . $e->getMessage());
             flash()->error('Failed to delete Job Order :)');
             return redirect()->back();
         }
     }
 
-   public function Job_Files(Request $request)
+    public function Job_Files(Request $request)
     {
         DB::beginTransaction();
-
         try {
             if ($request->hasFile('files')) {
                 foreach ($request->file('files') as $index => $file) {
@@ -222,11 +219,10 @@ class JobOrderController extends Controller
             }
 
             DB::commit();
-
             return response()->json(['success' => true, 'message' => 'Files uploaded successfully.']);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Upload error', ['error' => $e->getMessage()]);
+            Log::error('Upload error: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Upload failed: ' . $e->getMessage()], 500);
         }
     }
@@ -235,31 +231,23 @@ class JobOrderController extends Controller
     public function deleteVideoFiles($id)
     {
         DB::beginTransaction();
-        
         try {
             $file = JobFiles::findOrFail($id);
 
             if (Storage::exists($file->file_path)) {
-                Storage::delete($file->file_path); 
+                Storage::delete($file->file_path);
             }
-        
+
             $file->delete();
-            
             DB::commit();
+
             flash()->success('File deleted successfully :)');
-            return response()->json([
-                'success' => true,
-                'flash' => true,
-            ]);
-            
+            return response()->json(['success' => true, 'flash' => true]);
         } catch (\Exception $e) {
-            DB::rollback();
+            DB::rollBack();
+            Log::error('Delete File Error: ' . $e->getMessage());
             flash()->error('Failed to delete the file :)');
-            return response()->json([
-                'success' => false,
-                'flash' => true,
-            ], 500);
+            return response()->json(['success' => false, 'flash' => true], 500);
         }
-    }
-        
+    }     
 }
