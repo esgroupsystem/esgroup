@@ -238,6 +238,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
             Route::get('employee/profile/{user_id}', 'profileEmployee');
             Route::post('/employee/schedule/save', 'AdminScheduleSave')->name('schedule.save');
             Route::post('/requirements/upload','uploadRequirement')->name('requirements.upload');
+            Route::post('/profile/info/save','profileInformation')->name('profile/save');
         });
 
     // ---------------------------- FORM HOLIDAY -----------------------------//

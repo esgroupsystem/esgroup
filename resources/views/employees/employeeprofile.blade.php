@@ -77,46 +77,50 @@
 
                                         <!-- RIGHT COLUMN -->
                                         <div class="col-md-7">
-                                            <ul class="personal-info list-unstyled">
-                                                <li class="mb-2">
-                                                    <strong>Phone:</strong>
-                                                    <span class="ms-2">{{ $employee->phone ?? 'N/A' }}</span>
-                                                </li>
-                                                <li class="mb-2">
-                                                    <strong>Email:</strong>
-                                                    <span class="ms-2">{{ $employee->email ?? 'N/A' }}</span>
-                                                </li>
-                                                <li class="mb-2">
-                                                    <strong>Birthday:</strong>
-                                                    <span class="ms-2">
-                                                        @if (!empty($employee->birth_date))
-                                                            {{ \Carbon\Carbon::parse($employee->birth_date)->format('F d, Y') }}
-                                                        @else
-                                                            N/A
-                                                        @endif
-                                                    </span>
-                                                </li>
-                                                <li class="mb-2">
-                                                    <strong>Address:</strong>
-                                                    <span class="ms-2">
-                                                        @php
-                                                            $addressParts = array_filter([
-                                                                $employee->address ?? null,
-                                                                $employee->state ?? null,
-                                                                $employee->country ?? null,
-                                                                $employee->pin_code ?? null,
-                                                            ]);
-                                                        @endphp
-
-                                                        {{ count($addressParts) ? implode(', ', $addressParts) : 'N/A' }}
-                                                    </span>
-                                                </li>
-                                                <li class="mb-2">
-                                                    <strong>Gender:</strong>
-                                                    <span class="ms-2">{{ $employee->gender ?? 'N/A' }}</span>
-                                                </li>
-                                            </ul>
-                                        </div>
+                                        <ul class="personal-info list-unstyled">
+                                            <li class="mb-2">
+                                                <i class="fas fa-phone-alt me-2 text-secondary"></i>
+                                                <strong>Phone:</strong>
+                                                <span class="ms-2">{{ $employee->phone ?? 'N/A' }}</span>
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="fas fa-envelope me-2 text-secondary"></i>
+                                                <strong>Email:</strong>
+                                                <span class="ms-2">{{ $employee->email ?? 'N/A' }}</span>
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="fas fa-birthday-cake me-2 text-secondary"></i>
+                                                <strong>Birthday:</strong>
+                                                <span class="ms-2">
+                                                    @if (!empty($employee->birth_date))
+                                                        {{ \Carbon\Carbon::parse($employee->birth_date)->format('F d, Y') }}
+                                                    @else
+                                                        N/A
+                                                    @endif
+                                                </span>
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="fas fa-venus-mars me-2 text-secondary"></i>
+                                                <strong>Gender:</strong>
+                                                <span class="ms-2">{{ $employee->gender ?? 'N/A' }}</span>
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="fas fa-map-marker-alt me-2 text-secondary"></i>
+                                                <strong>Address:</strong>
+                                                <span class="ms-2">
+                                                    @php
+                                                        $addressParts = array_filter([
+                                                            $employee->address ?? null,
+                                                            $employee->state ?? null,
+                                                            $employee->country ?? null,
+                                                            $employee->pin_code ?? null,
+                                                        ]);
+                                                    @endphp
+                                                    {{ count($addressParts) ? implode(', ', $addressParts) : 'N/A' }}
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
                                     </div>
                                 </div>
 
@@ -591,19 +595,29 @@
                                 </button>
                             </div>
                             <div class="modal-body">
-                                <form action="{{ route('profile/information/save') }}" method="POST"
+                                <form action="{{ route('profile/save') }}" method="POST"
                                     enctype="multipart/form-data">
                                     @csrf
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="profile-img-wrap edit-img">
                                                 <img class="inline-block"
-                                                    src="{{ URL::to('/assets/employeepic/' . $employee->profile_picture) }}"
-                                                    alt="{{ $employee->name }}">
+                                                    src="{{ !empty($employee->profile_picture) 
+                                                            ? asset('assets/employeepic/' . $employee->profile_picture) 
+                                                            : asset('assets/employeepic/default.png') }}"
+                                                    alt="{{ $employee->name ?? 'No Name' }}">
+
                                                 <div class="fileupload btn">
-                                                    <span class="btn-text">edit</span>
+                                                    <span class="btn-text">Edit</span>
+                                                    
+                                                    {{-- Match controller: send employee_id --}}
+                                                    <input type="hidden" name="employee_id" value="{{ $employee->id ?? '' }}">
+
+                                                    {{-- File input --}}
                                                     <input class="upload" type="file" id="image" name="images">
-                                                    @if (!empty($employee))
+
+                                                    {{-- Preserve old image --}}
+                                                    @if (!empty($employee->profile_picture))
                                                         <input type="hidden" name="hidden_image" id="e_image"
                                                             value="{{ $employee->profile_picture }}">
                                                     @endif

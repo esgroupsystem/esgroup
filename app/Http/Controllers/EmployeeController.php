@@ -130,8 +130,6 @@ class EmployeeController extends Controller
                     'pi.marital_status',
                     'pi.employment_of_spouse',
                     'pi.children',
-                    'pr.birth_date',
-                    'pr.gender',
                     'pr.address',
                     'pr.country',
                     'pr.state',
@@ -168,6 +166,57 @@ class EmployeeController extends Controller
             return redirect()->back();
         }
     }
+
+    public function profileInformation(Request $request)
+{
+    DB::beginTransaction();
+
+    try {
+        // ✅ Get employee record
+        $employee = Employee::findOrFail($request->employee_id);
+
+        // ✅ Handle profile picture upload
+        if ($request->hasFile('images')) {
+            $image      = $request->file('images');
+            $image_name = uniqid() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('assets/employeepic'), $image_name);
+
+            // Save new image to employee
+            $employee->profile_picture = $image_name;
+            $employee->save(); // << Important: Save changes to employee
+        }
+
+        // ✅ Save/Update Profile Information
+        $information = ProfileInformation::updateOrCreate(
+            ['user_id' => $request->user_id]
+        );
+
+        $information->name         = $request->name;
+        $information->user_id      = $request->user_id;
+        $information->email        = $request->email;
+        $information->birth_date   = $request->birthDate;
+        $information->gender       = $request->gender;
+        $information->address      = $request->address;
+        $information->state        = $request->state;
+        $information->country      = $request->country;
+        $information->pin_code     = $request->pin_code;
+        $information->phone_number = $request->phone_number;
+        $information->department   = $request->department;
+        $information->designation  = $request->designation;
+        $information->reports_to   = $request->reports_to;
+        $information->save();
+
+        DB::commit();
+        flash()->success('Profile updated successfully.');
+        return redirect()->back();
+
+    } catch (\Exception $e) {
+        DB::rollback();
+        \Log::error('Profile update failed: ' . $e->getMessage());
+        flash()->error('Profile update failed.');
+        return redirect()->back();
+    }
+}
 
     /** Upload Requirement */
     public function uploadRequirement(Request $request)
