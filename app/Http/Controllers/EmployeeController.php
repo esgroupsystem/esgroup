@@ -22,92 +22,117 @@ class EmployeeController extends Controller
 {
     public function viewProfile($id)
     {
-        $user = Auth::user();
+        try {
+            $user = Auth::user();
 
-        if ($user->role_name === 'Admin') {
-            return $this->profileEmployee($id);
+            if ($user->role_name === 'Admin') {
+                return $this->profileEmployee($id);
+            }
+
+            $approval = DB::table('employee_view_approvals')
+                ->where('employee_id', $id)
+                ->where('requested_by', $user->id)
+                ->where('status', 'approved')
+                ->where('approved_until', '>=', now())
+                ->first();
+
+            if ($approval) {
+                return $this->profileEmployee($id);
+            }
+
+            return redirect()->back()->with('error', 'Access denied. Please request admin approval.');
+        } catch (\Exception $e) {
+            Log::error("Error in viewProfile: " . $e->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while trying to view the profile.');
         }
-
-        $approval = DB::table('employee_view_approvals')
-            ->where('employee_id', $id)
-            ->where('requested_by', $user->id)
-            ->where('status', 'approved')
-            ->where('approved_until', '>=', now())
-            ->first();
-
-        if ($approval) {
-            return $this->profileEmployee($id);
-        }
-
-        return redirect()->back()->with('error', 'Access denied. Please request admin approval.');
     }
-    
+
     public function requestApproval($employeeId)
     {
-        $user = Auth::user();
+        try {
+            $user = Auth::user();
 
-        $existing = DB::table('employee_view_approvals')
-            ->where('employee_id', $employeeId)
-            ->where('requested_by', $user->id)
-            ->whereIn('status', ['pending', 'approved'])
-            ->where(function($q) {
-                $q->whereNull('approved_until')
-                ->orWhere('approved_until', '>=', now());
-            })
-            ->first();
+            $existing = DB::table('employee_view_approvals')
+                ->where('employee_id', $employeeId)
+                ->where('requested_by', $user->id)
+                ->whereIn('status', ['pending', 'approved'])
+                ->where(function($q) {
+                    $q->whereNull('approved_until')
+                    ->orWhere('approved_until', '>=', now());
+                })
+                ->first();
 
-        if ($existing) {
-            return redirect()->back()->with('info', 'You already have a pending or active approval for this employee.');
+            if ($existing) {
+                return redirect()->back()->with('info', 'You already have a pending or active approval for this employee.');
+            }
+
+            DB::table('employee_view_approvals')->insert([
+                'employee_id' => $employeeId,
+                'requested_by' => $user->id,
+                'status' => 'pending',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            return redirect()->back()->with('success', 'Access request sent to Admin.');
+        } catch (\Exception $e) {
+            Log::error("Error in requestApproval: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to send access request.');
         }
-
-        DB::table('employee_view_approvals')->insert([
-            'employee_id' => $employeeId,
-            'requested_by' => $user->id,
-            'status' => 'pending',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        return redirect()->back()->with('success', 'Access request sent to Admin.');
     }
 
     public function viewRequests()
     {
-        $requests = DB::table('employee_view_approvals')
-            ->join('employees', 'employee_view_approvals.employee_id', '=', 'employees.id')
-            ->join('users as hr', 'employee_view_approvals.requested_by', '=', 'hr.id')
-            ->select('employee_view_approvals.*', 'employees.name as employee_name', 'hr.name as hr_name')
-            ->where('employee_view_approvals.status', 'pending')
-            ->get();
+        try {
+            $requests = DB::table('employee_view_approvals')
+                ->join('employees', 'employee_view_approvals.employee_id', '=', 'employees.id')
+                ->join('users as hr', 'employee_view_approvals.requested_by', '=', 'hr.id')
+                ->select('employee_view_approvals.*', 'employees.name as employee_name', 'hr.name as hr_name')
+                ->where('employee_view_approvals.status', 'pending')
+                ->get();
 
-        return view('employees.employee_requests', compact('requests'));
+            return view('employees.employee_requests', compact('requests'));
+        } catch (\Exception $e) {
+            Log::error("Error in viewRequests: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to load requests.');
+        }
     }
 
     public function approveRequest(Request $request, $id)
     {
-        DB::table('employee_view_approvals')
-            ->where('id', $id)
-            ->update([
-                'status' => 'approved',
-                'approved_by' => Auth::id(),
-                'approved_until' => $request->approved_until,
-                'updated_at' => now(),
-            ]);
+        try {
+            DB::table('employee_view_approvals')
+                ->where('id', $id)
+                ->update([
+                    'status' => 'approved',
+                    'approved_by' => Auth::id(),
+                    'approved_until' => $request->approved_until,
+                    'updated_at' => now(),
+                ]);
 
-        return redirect()->back()->with('success', 'Request approved.');
+            return redirect()->back()->with('success', 'Request approved.');
+        } catch (\Exception $e) {
+            Log::error("Error in approveRequest: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to approve request.');
+        }
     }
 
     public function rejectRequest($id)
     {
-        DB::table('employee_view_approvals')
-            ->where('id', $id)
-            ->update([
-                'status' => 'rejected',
-                'approved_by' => Auth::id(),
-                'updated_at' => now(),
-            ]);
+        try {
+            DB::table('employee_view_approvals')
+                ->where('id', $id)
+                ->update([
+                    'status' => 'rejected',
+                    'approved_by' => Auth::id(),
+                    'updated_at' => now(),
+                ]);
 
-        return redirect()->back()->with('success', 'Request rejected.');
+            return redirect()->back()->with('success', 'Request rejected.');
+        } catch (\Exception $e) {
+            Log::error("Error in rejectRequest: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to reject request.');
+        }
     }
 
     /** Employee profile */
@@ -168,55 +193,55 @@ class EmployeeController extends Controller
     }
 
     public function profileInformation(Request $request)
-{
-    DB::beginTransaction();
+    {
+        DB::beginTransaction();
 
-    try {
-        // ✅ Get employee record
-        $employee = Employee::findOrFail($request->employee_id);
+        try {
+            // ✅ Get employee record
+            $employee = Employee::findOrFail($request->employee_id);
 
-        // ✅ Handle profile picture upload
-        if ($request->hasFile('images')) {
-            $image      = $request->file('images');
-            $image_name = uniqid() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('assets/employeepic'), $image_name);
+            // ✅ Handle profile picture upload
+            if ($request->hasFile('images')) {
+                $image      = $request->file('images');
+                $image_name = uniqid() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('assets/employeepic'), $image_name);
 
-            // Save new image to employee
-            $employee->profile_picture = $image_name;
-            $employee->save(); // << Important: Save changes to employee
+                // Save new image to employee
+                $employee->profile_picture = $image_name;
+                $employee->save(); // << Important: Save changes to employee
+            }
+
+            // ✅ Save/Update Profile Information
+            $information = ProfileInformation::updateOrCreate(
+                ['user_id' => $request->user_id]
+            );
+
+            $information->name         = $request->name;
+            $information->user_id      = $request->user_id;
+            $information->email        = $request->email;
+            $information->birth_date   = $request->birthDate;
+            $information->gender       = $request->gender;
+            $information->address      = $request->address;
+            $information->state        = $request->state;
+            $information->country      = $request->country;
+            $information->pin_code     = $request->pin_code;
+            $information->phone_number = $request->phone_number;
+            $information->department   = $request->department;
+            $information->designation  = $request->designation;
+            $information->reports_to   = $request->reports_to;
+            $information->save();
+
+            DB::commit();
+            flash()->success('Profile updated successfully.');
+            return redirect()->back();
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            \Log::error('Profile update failed: ' . $e->getMessage());
+            flash()->error('Profile update failed.');
+            return redirect()->back();
         }
-
-        // ✅ Save/Update Profile Information
-        $information = ProfileInformation::updateOrCreate(
-            ['user_id' => $request->user_id]
-        );
-
-        $information->name         = $request->name;
-        $information->user_id      = $request->user_id;
-        $information->email        = $request->email;
-        $information->birth_date   = $request->birthDate;
-        $information->gender       = $request->gender;
-        $information->address      = $request->address;
-        $information->state        = $request->state;
-        $information->country      = $request->country;
-        $information->pin_code     = $request->pin_code;
-        $information->phone_number = $request->phone_number;
-        $information->department   = $request->department;
-        $information->designation  = $request->designation;
-        $information->reports_to   = $request->reports_to;
-        $information->save();
-
-        DB::commit();
-        flash()->success('Profile updated successfully.');
-        return redirect()->back();
-
-    } catch (\Exception $e) {
-        DB::rollback();
-        \Log::error('Profile update failed: ' . $e->getMessage());
-        flash()->error('Profile update failed.');
-        return redirect()->back();
     }
-}
 
     /** Upload Requirement */
     public function uploadRequirement(Request $request)
@@ -304,59 +329,69 @@ class EmployeeController extends Controller
             return redirect()->back();
         }
     }
-    
+
     public function cardAllEmployee(Request $request)
     {
-        $employees = DB::table('employees')
-            ->leftJoin('departments', 'employees.department_id', 'departments.id')
-            ->leftJoin('designations', 'employees.designation_id', 'designations.id')
-            ->select(
-                'employees.id',
-                'employees.name',
-                'employees.email',
-                'employees.phone',
-                'employees.birth_date',
-                'employees.gender',
-                'employees.employee_id',
-                'employees.company',
-                'employees.garage',
-                'employees.date_hired',
-                'employees.end_date',
-                'employees.status',
-                'employees.profile_picture',
-                'departments.department as department',
-                'designations.designation as designation'
-            )
-            ->get();
-    
-        $departments = department::all();
-        $designations = designation::all();
-        $approvals = DB::table('employee_view_approvals')
-        ->where('requested_by', Auth::id())
-        ->where('status', 'approved')
-        ->where('approved_until', '>=', now())
-        ->pluck('employee_id')
-        ->toArray();
+        try {
+            $employees = DB::table('employees')
+                ->leftJoin('departments', 'employees.department_id', 'departments.id')
+                ->leftJoin('designations', 'employees.designation_id', 'designations.id')
+                ->select(
+                    'employees.id',
+                    'employees.name',
+                    'employees.email',
+                    'employees.phone',
+                    'employees.birth_date',
+                    'employees.gender',
+                    'employees.employee_id',
+                    'employees.company',
+                    'employees.garage',
+                    'employees.date_hired',
+                    'employees.end_date',
+                    'employees.status',
+                    'employees.profile_picture',
+                    'departments.department as department',
+                    'designations.designation as designation'
+                )
+                ->get();
 
-    
-        return view('employees.allemployeecard', compact(
-            'employees',
-            'departments',
-            'designations', 
-            'approvals'
-        ));
-    }    
+            $departments = department::all();
+            $designations = designation::all();
+            $approvals = DB::table('employee_view_approvals')
+                ->where('requested_by', Auth::id())
+                ->where('status', 'approved')
+                ->where('approved_until', '>=', now())
+                ->pluck('employee_id')
+                ->toArray();
+
+            return view('employees.allemployeecard', compact(
+                'employees',
+                'departments',
+                'designations',
+                'approvals'
+            ));
+        } catch (\Exception $e) {
+            Log::error("Error in cardAllEmployee: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to load employee cards.');
+        }
+    }
 
     /** All Employee List */
     public function listAllEmployee()
     {
-        $users = DB::table('users')
-                    ->join('employees','users.user_id', 'employees.employee_id')
-                    ->select('users.*','employees.birth_date','employees.gender','employees.company')
-                    ->get();
-        $userList = DB::table('users')->get();
-        $permission_lists = DB::table('permission_lists')->get();
-        return view('employees.employeelist',compact('users','userList','permission_lists'));
+        try {
+            $users = DB::table('users')
+                        ->join('employees','users.user_id', 'employees.employee_id')
+                        ->select('users.*','employees.birth_date','employees.gender','employees.company')
+                        ->get();
+            $userList = DB::table('users')->get();
+            $permission_lists = DB::table('permission_lists')->get();
+
+            return view('employees.employeelist',compact('users','userList','permission_lists'));
+        } catch (\Exception $e) {
+            Log::error("Error in listAllEmployee: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to load employee list.');
+        }
     }
 
     /** Save Data Employee */
@@ -428,23 +463,30 @@ class EmployeeController extends Controller
     /** Edit Record */
     public function viewRecord($employee_id)
     {
-        $employees = DB::table('employees')
-            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
-            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
-            ->select(
-                'employees.*',
-                'departments.department as department',
-                'designations.designation as designation'
-            )
-            ->where('employees.employee_id', $employee_id)
-            ->first();
-        $permission = DB::table('module_permissions')
-            ->where('employee_id', $employee_id)
-            ->get();
-        $departments = department::all();
-        $designations = designation::all();
-    
-        return view('employees.edit.editemployee', compact('employees', 'permission', 'departments', 'designations'));
+        try {
+            $employees = DB::table('employees')
+                ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+                ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+                ->select(
+                    'employees.*',
+                    'departments.department as department',
+                    'designations.designation as designation'
+                )
+                ->where('employees.employee_id', $employee_id)
+                ->first();
+
+            $permission = DB::table('module_permissions')
+                ->where('employee_id', $employee_id)
+                ->get();
+
+            $departments = department::all();
+            $designations = designation::all();
+
+            return view('employees.edit.editemployee', compact('employees', 'permission', 'departments', 'designations'));
+        } catch (\Exception $e) {
+            Log::error("Error in viewRecord: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to load employee record.');
+        }
     }
 
     /** Update Record */

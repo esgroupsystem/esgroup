@@ -34,7 +34,6 @@ class JobOrderController extends Controller
             $joborderview = Joborder::all();
             $users = User::whereIn('role_name', ['IT', 'Safety Office', 'Admin'])->get();
             return view('joborders.joborder', compact('joborderview', 'users'));
-
         } catch (\Exception $e) {
             Log::error('Job Order Index Error: ' . $e->getMessage());
             flash()->error('Failed to load job orders.');
@@ -42,7 +41,7 @@ class JobOrderController extends Controller
         }
     }
         
-    /** Page Create Jobs */
+        /** Page Create Jobs */
     public function createJobOrderIndex()
     {
         try {
@@ -102,7 +101,7 @@ class JobOrderController extends Controller
                 'job_time_end' => Carbon::parse($request->job_time_end)->format('H:i:s'),
                 'job_sitNumber' => $request->job_sitNumber,
                 'job_remarks' => $request->job_remarks,
-                'job_status' => 'Pending',
+                'job_status' => 'New',
                 'job_assign_person' => 'Not assigned',
                 'job_date_filled' => now(),
                 'job_creator' => $request->user()->name,

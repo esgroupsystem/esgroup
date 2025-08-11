@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Log;
 use App\Models\UserEmergencyContact;
 use App\Models\PersonalInformation;
 use App\Models\ProfileInformation;
@@ -17,203 +18,226 @@ use Session;
 use Hash;
 use Auth;
 use DB;
+use Exception;
+
 
 class UserManagementController extends Controller
 {
     /** Index page */
     public function index()
     {
-        if (Session::get('role_name') == 'Admin')
-        {
-            $result      = DB::table('users')->get();
-            $role_name   = DB::table('role_type_users')->get();
-            $position    = DB::table('position_types')->get();
-            $department  = DB::table('departments')->get();
-            $status_user = DB::table('user_types')->get();
-            return view('usermanagement.user_control',compact('result','role_name','position','department','status_user'));
-        } else {
-            return redirect()->route('home');
+        try {
+            if (Session::get('role_name') == 'Admin') {
+                $result      = DB::table('users')->get();
+                $role_name   = DB::table('role_type_users')->get();
+                $position    = DB::table('position_types')->get();
+                $department  = DB::table('departments')->get();
+                $status_user = DB::table('user_types')->get();
+                return view('usermanagement.user_control',compact('result','role_name','position','department','status_user'));
+            } else {
+                return redirect()->route('home');
+            }
+        } catch (Exception $e) {
+            \Log::error('Index page load failed: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to load user management page.');
         }
     }
 
     /** Get list data and search */
     public function getUsersData(Request $request) 
     {
-        $draw            = $request->get('draw');
-        $start           = $request->get("start");
-        $rowPerPage      = $request->get("length"); // total number of rows per page
-        $columnIndex_arr = $request->get('order');
-        $columnName_arr  = $request->get('columns');
-        $order_arr       = $request->get('order');
-        $search_arr      = $request->get('search');
+        try {
+            $draw            = $request->get('draw');
+            $start           = $request->get("start");
+            $rowPerPage      = $request->get("length"); // total number of rows per page
+            $columnIndex_arr = $request->get('order');
+            $columnName_arr  = $request->get('columns');
+            $order_arr       = $request->get('order');
+            $search_arr      = $request->get('search');
 
-        $columnIndex     = $columnIndex_arr[0]['column']; // Column index
-        $columnName      = $columnName_arr[$columnIndex]['data']; // Column name
-        $columnSortOrder = $order_arr[0]['dir']; // asc or desc
-        $searchValue     = $search_arr['value']; // Search value
+            $columnIndex     = $columnIndex_arr[0]['column']; // Column index
+            $columnName      = $columnName_arr[$columnIndex]['data']; // Column name
+            $columnSortOrder = $order_arr[0]['dir']; // asc or desc
+            $searchValue     = $search_arr['value']; // Search value
 
-        $users =  DB::table('users');
-        $totalRecords = $users->count();
+            $users =  DB::table('users');
+            $totalRecords = $users->count();
 
-        /** search*/
-        $filters = [
-            'name'      => $request->user_name,
-            'role_name' => $request->type_role,
-            'status'    => $request->type_status,
-        ];
-        
-        foreach ($filters as $field => $value) {
-            if (!empty($value)) {
-                $users->where($field, 'like', "%$value%");
+            /** search*/
+            $filters = [
+                'name'      => $request->user_name,
+                'role_name' => $request->type_role,
+                'status'    => $request->type_status,
+            ];
+            
+            foreach ($filters as $field => $value) {
+                if (!empty($value)) {
+                    $users->where($field, 'like', "%$value%");
+                }
             }
-        }
 
-        $searchColumns = [
-            'name', 
-            'user_id', 
-            'email', 
-            'position', 
-            'phone_number', 
-            'join_date', 
-            'role_name', 
-            'status', 
-            'department'
-        ];
-        
-        // Apply search filter and get the total records with filter
-        $totalRecordsWithFilter = $users->where(function ($query) use ($searchValue, $searchColumns) {
-            foreach ($searchColumns as $column) {
-                $query->orWhere($column, 'like', '%' . $searchValue . '%');
-            }
-            })->count();
-        
-        // Retrieve filtered and sorted records
-        $records = $users->orderBy($columnName, $columnSortOrder)
-            ->where(function ($query) use ($searchValue, $searchColumns) {
+            $searchColumns = [
+                'name', 
+                'user_id', 
+                'email', 
+                'position', 
+                'phone_number', 
+                'join_date', 
+                'role_name', 
+                'status', 
+                'department'
+            ];
+            
+            // Apply search filter and get the total records with filter
+            $totalRecordsWithFilter = $users->where(function ($query) use ($searchValue, $searchColumns) {
                 foreach ($searchColumns as $column) {
                     $query->orWhere($column, 'like', '%' . $searchValue . '%');
                 }
-            })->skip($start)->take($rowPerPage)->get();
-        
-        $data_arr = [];
-        
-        $roleBadges = [
-            'Admin'       => 'bg-inverse-danger',
-            'Maintenance' => 'bg-inverse-warning',
-            'Super Admin' => 'bg-inverse-warning',
-            'Normal User' => 'bg-inverse-info',
-            'Client'      => 'bg-inverse-success',
-            'HR' => 'bg-inverse-warning',
-            'IT' => 'bg-inverse-info',
-            'Safety Officer'      => 'bg-inverse-success',
-            'Employee'    => 'bg-inverse-dark',
-        ];
-        
-        $statusBadges = [
-            'Active'   => 'text-success',
-            'Inactive' => 'text-info',
-            'Disable'  => 'text-danger',
-        ];
-        
-        foreach ($records as $key => $record) {
-            $record->name = '
-                <h2 class="table-avatar">
-                    <a href="'.url('employee/profile/' . $record->user_id).'">
-                        <img class="avatar" data-avatar="'.$record->avatar.'" src="'.url('/assets/images/'.$record->avatar).'">
-                        '.$record->name.'
-                         <span class="name" hidden>'.$record->name.'</span>
-                    </a>
-                </h2>';
+            })->count();
             
-            $role_name = isset($roleBadges[$record->role_name])
-                ? '<span class="badge '.$roleBadges[$record->role_name].' role_name">'.$record->role_name.'</span>'
-                : 'NULL';
-        
-            $full_status = '
-                <div class="dropdown-menu dropdown-menu-right">
-                    <a class="dropdown-item"><i class="fa fa-dot-circle-o text-success"></i> Active </a>
-                    <a class="dropdown-item"><i class="fa fa-dot-circle-o text-warning"></i> Inactive </a>
-                    <a class="dropdown-item"><i class="fa fa-dot-circle-o text-danger"></i> Disable </a>
-                </div>';
-        
-            $status = '
-                <a class="btn btn-white btn-sm btn-rounded dropdown-toggle" href="#" data-toggle="dropdown" aria-expanded="false">
-                    <i class="fa fa-dot-circle-o '.($statusBadges[$record->status] ?? 'text-dark').'"></i>
-                    <span class="status_s">'.$record->status.'</span>
-                </a>
-                '.$full_status;
-        
-            $action = '
-                <div class="dropdown dropdown-action">
-                    <a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="material-icons">more_vert</i></a>
-                    <div class="dropdown-menu dropdown-menu-right">
-                        <a href="#" class="dropdown-item userUpdate" data-toggle="modal" data-id="'.$record->id.'" data-target="#edit_user"><i class="fa fa-pencil m-r-5"></i> Edit</a>
-                        <a href="#" class="dropdown-item userDelete" data-toggle="modal" data-id="'.$record->id.'" data-target="#delete_user"><i class="fa fa-trash-o m-r-5"></i> Delete</a>
-                    </div>
-                </div>';
-        
-            $last_login = Carbon::parse($record->last_login)->diffForHumans();
-        
-            $data_arr[] = [
-                "no"           => '<span class="id" data-id="'.$record->id.'">'.($start + $key + 1).'</span>',
-                "name"         => $record->name,
-                "user_id"      => '<span class="user_id">'.$record->user_id.'</span>',
-                "email"        => '<span class="email">'.$record->email.'</span>',
-                "position"     => '<span class="position">'.$record->position.'</span>',
-                "phone_number" => '<span class="phone_number">'.$record->phone_number.'</span>',
-                "join_date"    => $record->join_date,
-                "last_login"   => $last_login,
-                "role_name"    => $role_name,
-                "status"       => $status,
-                "department"   => '<span class="department">'.$record->department.'</span>',
-                "action"       => $action,
+            // Retrieve filtered and sorted records
+            $records = $users->orderBy($columnName, $columnSortOrder)
+                ->where(function ($query) use ($searchValue, $searchColumns) {
+                    foreach ($searchColumns as $column) {
+                        $query->orWhere($column, 'like', '%' . $searchValue . '%');
+                    }
+                })->skip($start)->take($rowPerPage)->get();
+            
+            $data_arr = [];
+            
+            $roleBadges = [
+                'Admin'       => 'bg-inverse-danger',
+                'Maintenance' => 'bg-inverse-warning',
+                'Super Admin' => 'bg-inverse-warning',
+                'Normal User' => 'bg-inverse-info',
+                'Client'      => 'bg-inverse-success',
+                'HR' => 'bg-inverse-warning',
+                'IT' => 'bg-inverse-info',
+                'Safety Officer'      => 'bg-inverse-success',
+                'Employee'    => 'bg-inverse-dark',
             ];
+            
+            $statusBadges = [
+                'Active'   => 'text-success',
+                'Inactive' => 'text-info',
+                'Disable'  => 'text-danger',
+            ];
+            
+            foreach ($records as $key => $record) {
+                $record->name = '
+                    <h2 class="table-avatar">
+                        <a href="'.url('employee/profile/' . $record->user_id).'">
+                            <img class="avatar" data-avatar="'.$record->avatar.'" src="'.url('/assets/images/'.$record->avatar).'">
+                            '.$record->name.'
+                             <span class="name" hidden>'.$record->name.'</span>
+                        </a>
+                    </h2>';
+                
+                $role_name = isset($roleBadges[$record->role_name])
+                    ? '<span class="badge '.$roleBadges[$record->role_name].' role_name">'.$record->role_name.'</span>'
+                    : 'NULL';
+            
+                $full_status = '
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item"><i class="fa fa-dot-circle-o text-success"></i> Active </a>
+                        <a class="dropdown-item"><i class="fa fa-dot-circle-o text-warning"></i> Inactive </a>
+                        <a class="dropdown-item"><i class="fa fa-dot-circle-o text-danger"></i> Disable </a>
+                    </div>';
+            
+                $status = '
+                    <a class="btn btn-white btn-sm btn-rounded dropdown-toggle" href="#" data-toggle="dropdown" aria-expanded="false">
+                        <i class="fa fa-dot-circle-o '.($statusBadges[$record->status] ?? 'text-dark').'"></i>
+                        <span class="status_s">'.$record->status.'</span>
+                    </a>
+                    '.$full_status;
+            
+                $action = '
+                    <div class="dropdown dropdown-action">
+                        <a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="material-icons">more_vert</i></a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a href="#" class="dropdown-item userUpdate" data-toggle="modal" data-id="'.$record->id.'" data-target="#edit_user"><i class="fa fa-pencil m-r-5"></i> Edit</a>
+                            <a href="#" class="dropdown-item userDelete" data-toggle="modal" data-id="'.$record->id.'" data-target="#delete_user"><i class="fa fa-trash-o m-r-5"></i> Delete</a>
+                        </div>
+                    </div>';
+            
+                $last_login = Carbon::parse($record->last_login)->diffForHumans();
+            
+                $data_arr[] = [
+                    "no"           => '<span class="id" data-id="'.$record->id.'">'.($start + $key + 1).'</span>',
+                    "name"         => $record->name,
+                    "user_id"      => '<span class="user_id">'.$record->user_id.'</span>',
+                    "email"        => '<span class="email">'.$record->email.'</span>',
+                    "position"     => '<span class="position">'.$record->position.'</span>',
+                    "phone_number" => '<span class="phone_number">'.$record->phone_number.'</span>',
+                    "join_date"    => $record->join_date,
+                    "last_login"   => $last_login,
+                    "role_name"    => $role_name,
+                    "status"       => $status,
+                    "department"   => '<span class="department">'.$record->department.'</span>',
+                    "action"       => $action,
+                ];
+            }
+        
+            $response = [
+                "draw"                 => intval($draw),
+                "iTotalRecords"        => $totalRecords,
+                "iTotalDisplayRecords" => $totalRecordsWithFilter,
+                "aaData"               => $data_arr
+            ];
+            return response()->json($response);
+        } catch (Exception $e) {
+            \Log::error('Failed to get users data: ' . $e->getMessage());
+            return response()->json([
+                "draw" => 0,
+                "iTotalRecords" => 0,
+                "iTotalDisplayRecords" => 0,
+                "aaData" => [],
+                "error" => "Failed to fetch data."
+            ]);
         }
-     
-        $response = [
-            "draw"                 => intval($draw),
-            "iTotalRecords"        => $totalRecords,
-            "iTotalDisplayRecords" => $totalRecordsWithFilter,
-            "aaData"               => $data_arr
-        ];
-        return response()->json($response);
     }
 
     /** Profile User */
     public function profile()
     {
-        $profile = Session::get('user_id'); // Get the user ID from session
+        try {
+            $profile = Session::get('user_id'); // Get the user ID from session
 
-        // Eager load all necessary data in one go
-        $userInformation  = PersonalInformation::where('user_id', $profile)->first();
-        $bankInformation  = BankInformation::where('user_id', $profile)->first();
-        $emergencyContact = UserEmergencyContact::where('user_id', $profile)->first();
-        $users            = DB::table('users')->get();
-        $employeeProfile = DB::table('profile_information')->where('user_id', $profile)->first();
+            // Eager load all necessary data in one go
+            $userInformation  = PersonalInformation::where('user_id', $profile)->first();
+            $bankInformation  = BankInformation::where('user_id', $profile)->first();
+            $emergencyContact = UserEmergencyContact::where('user_id', $profile)->first();
+            $users            = DB::table('users')->get();
+            $employeeProfile  = DB::table('profile_information')->where('user_id', $profile)->first();
 
-        // Check if employee profile exists
-        if ($employeeProfile) {
-            // Profile exists, return with all the data
-            return view('usermanagement.profile_user', [
-                'information'       => $employeeProfile,
-                'user'              => $users,
-                'userInformation'   => $userInformation,
-                'emergencyContact'  => $emergencyContact,
-                'bankInformation'   => $bankInformation
-            ]);
-        } else {
-            // No employee profile, return only the basic information
-            return view('usermanagement.profile_user', [
-                'information'       => null,
-                'user'              => $users,
-                'userInformation'   => $userInformation
-            ]);
+            // Check if employee profile exists
+            if ($employeeProfile) {
+                // Profile exists, return with all the data
+                return view('usermanagement.profile_user', [
+                    'information'       => $employeeProfile,
+                    'user'              => $users,
+                    'userInformation'   => $userInformation,
+                    'emergencyContact'  => $emergencyContact,
+                    'bankInformation'   => $bankInformation
+                ]);
+            } else {
+                // No employee profile, return only the basic information
+                return view('usermanagement.profile_user', [
+                    'information'       => null,
+                    'user'              => $users,
+                    'userInformation'   => $userInformation
+                ]);
+            }
+        } catch (Exception $e) {
+            \Log::error('Failed to load profile page: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to load profile.');
         }
     }
 
     /** Save Profile Information */
     public function profileInformation(Request $request)
     {
+        DB::beginTransaction();
         try {
             if(!empty($request->images))
             {
@@ -261,9 +285,9 @@ class UserManagementController extends Controller
             DB::commit();
             flash()->success('Profile Information successfully :)');
             return redirect()->back();
-        }catch(\Exception $e){
+        } catch(\Exception $e){
             DB::rollback();
-            \Log::error('Failed: ' . $e->getMessage());
+            \Log::error('Failed to save profile information: ' . $e->getMessage());
             flash()->error('Add Profile Information fail :)');
             return redirect()->back();
         }
@@ -272,21 +296,21 @@ class UserManagementController extends Controller
     /** Save new user */
     public function addNewUserSave(Request $request)
     {
-        $request->validate([
-            'name'      => 'required|string|max:255',
-            'email'     => 'required|string|email|max:255|unique:users',
-            'phone'     => 'required|min:11|numeric',
-            'role_name' => 'required|string|max:255',
-            'position'  => 'required|string|max:255',
-            'department'=> 'required|string|max:255',
-            'status'    => 'required|string|max:255',
-            'image'     => 'required|file',
-            'password'  => 'required|string|min:5|confirmed',
-            'password_confirmation' => 'required',
-        ]);
-
         DB::beginTransaction();
         try {
+            $request->validate([
+                'name'      => 'required|string|max:255',
+                'email'     => 'required|string|email|max:255|unique:users',
+                'phone'     => 'required|min:11|numeric',
+                'role_name' => 'required|string|max:255',
+                'position'  => 'required|string|max:255',
+                'department'=> 'required|string|max:255',
+                'status'    => 'required|string|max:255',
+                'image'     => 'required|file',
+                'password'  => 'required|string|min:5|confirmed',
+                'password_confirmation' => 'required',
+            ]);
+
             $todayDate = Carbon::now()->toDayDateTimeString();
 
             $imageName = time().'.'.$request->image->extension();  
@@ -305,13 +329,14 @@ class UserManagementController extends Controller
             $user->avatar       = $imageName;
             $user->password     = Hash::make($request->password);
             $user->save();
+
             DB::commit();
 
             flash()->success('Created new account successfully!');
             return redirect()->route('userManagement');
         } catch (\Exception $e) {
             DB::rollback();
-            \Log::error('Failed to create new account', ['error' => $e->getMessage()]);
+            \Log::error('Failed to create new account: ' . $e->getMessage());
             flash()->error('Failed to create new account. Please try again.');
             return redirect()->back()->withInput();
         }
@@ -452,7 +477,7 @@ class UserManagementController extends Controller
     {
         return view('settings.changepassword');
     }
-    
+
     /** change password in db */
     public function changePasswordDB(Request $request)
     {
@@ -462,16 +487,17 @@ class UserManagementController extends Controller
             'new_confirm_password' => ['same:new_password'],
         ]);
 
+        DB::beginTransaction();
         try {
             $user = Auth::user();
             $user->update(['password' => Hash::make($request->new_password)]);
-
             DB::commit();
+
             flash()->success('Password changed successfully :)');
             return redirect()->intended('home');
-
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Password change error: ' . $e->getMessage());
             flash()->error('An error occurred while changing the password. Please try again.');
             return redirect()->back();
         }
@@ -492,8 +518,7 @@ class UserManagementController extends Controller
         ]);
 
         try {
-    
-            $saveRecord = UserEmergencyContact::updateOrCreate(
+            UserEmergencyContact::updateOrCreate(
                 ['user_id' => $request->user_id],
                 [
                     'name_primary'           => $request->name_primary,
@@ -506,12 +531,12 @@ class UserManagementController extends Controller
                     'phone_2_secondary'      => $request->phone_2_secondary,
                 ]
             );
-
             flash()->success('Emergency contact updated successfully :)');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
+            \Log::error('Failed to update emergency contact: ' . $e->getMessage());
             flash()->error('Failed to update emergency contact');
         }
-        // Redirect back
+
         return redirect()->back();
     }
 } 
