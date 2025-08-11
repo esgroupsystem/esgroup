@@ -45,7 +45,7 @@
                     <div class="form-group form-focus select-focus">
                         <select id="status_filter" class="select floating">
                             <option value="">All Status</option>
-                            <option value="New">New</option>
+                            <option value="Pending">Pending</option>
                             <option value="Completed">Completed</option>
                         </select>
                         <label class="focus-label">Status</label>
