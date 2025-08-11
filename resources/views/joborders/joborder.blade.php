@@ -46,7 +46,7 @@
                         <select id="status_filter" class="select floating">
                             <option value="">All Status</option>
                             <option value="New">New</option>
-                            <option value="Complete">Complete</option>
+                            <option value="Completed">Completed</option>
                         </select>
                         <label class="focus-label">Status</label>
                     </div>
