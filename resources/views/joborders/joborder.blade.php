@@ -107,7 +107,7 @@
                                                     <i class="fa fa-pencil"></i>
                                                 </a>
                                             @endif
-                                            @if (Auth::user()->role_name === 'Admin' )
+                                            @if (Auth::user()->role_name === 'Admin')
                                                 <a class="btn btn-sm btn-danger delete_order" title="Delete" href="#"
                                                     data-toggle="modal" data-target="#delete_order">
                                                     <i class="fa fa-trash"></i>
@@ -221,24 +221,35 @@
                 }]
             });
 
-            // Custom Status Filter
+            // 🔹 Set default filter to show only Pending on load
+            $('#status_filter').val('Pending');
+            table.column(4).search('Pending').draw();
+
+            // 🔹 Custom Status Filter
             $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
                 const selectedStatus = $('#status_filter').val();
                 const rowStatus = data[4].trim();
                 return selectedStatus === "" || rowStatus === selectedStatus;
             });
 
+            // 🔹 Search button click event
             $('.btn_search').on('click', function() {
-                table.draw();
+                const selectedStatus = $('#status_filter').val();
+
+                if (selectedStatus) {
+                    table.column(4).search(selectedStatus).draw();
+                } else {
+                    table.column(4).search('').draw();
+                }
             });
 
-            // Delete Order Modal
+            // 🔹 Delete Order Modal
             $(document).on('click', '.delete_order', function() {
                 const id = $(this).closest('tr').find('.id').text().trim();
                 $('.e_id').val(id);
             });
 
-            // Edit Order Modal
+            // 🔹 Edit Order Modal
             $(document).on('click', '.edit_joborder', function() {
                 $('#e_id').val($(this).data('id'));
                 $('select[name="job_status"]').val($(this).data('job_status'));
