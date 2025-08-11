@@ -57,68 +57,72 @@
             </div>
             <!-- /Search Filter -->
 
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-bordered mb-0" id="jobList" style="width: 100%">
-                            <thead class="thead-dark">
+        <!-- Job Orders Table -->
+        <div class="card border-0 shadow-sm rounded-3 mt-4">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle" id="jobList" style="width: 100%">
+                        <thead class="table-light">
+                            <tr>
+                                <th hidden>ID</th>
+                                <th>Bus Number</th>
+                                <th>Type</th>
+                                <th>Date Issue</th>
+                                <th>Status</th>
+                                <th>Reported by</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($joborderview as $item)
                                 <tr>
-                                    <th hidden>ID</th>
-                                    <th>Bus Number</th>
-                                    <th>Type</th>
-                                    <th>Date Issue</th>
-                                    <th>Status</th>
-                                    <th>Reported by</th>
-                                    <th class="text-right">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($joborderview as $item)
-                                    <tr>
-                                        <td hidden class="id">{{ $item->id }}</td>
-                                        <td class="j_name font-weight-bold text-primary">{{ $item->job_name }}</td>
-                                        <td class="j_type">{{ $item->job_type }}</td>
-                                        <td class="j_filled" data-order="{{ $item->job_date_filled }}">
-                                            {{ date('j M Y (h:i A)', strtotime($item->job_date_filled)) }}
-                                        </td>
-                                        <td class="text-center">
-                                            <span
-                                                class="badge px-4 py-2 fs-5 fw-bold rounded-pill
-                                        @if ($item->job_status == 'New') badge-primary
-                                        @elseif($item->job_status == 'Completed' || $item->job_status == 'Extracted') badge-success
-                                        @elseif($item->job_status == 'Pending') badge-warning
-                                        @else badge-warning @endif">
-                                                {{ $item->job_status }}
-                                            </span>
-                                        </td>
-                                        <td class="j_name">{{ $item->job_creator }}</td>
-                                        <td class="text-center">
-                                            <a class="btn btn-sm btn-info view_joborder" title="View"
-                                                href="{{ route('view/details', ['id' => \Illuminate\Support\Facades\Crypt::encryptString($item->id)]) }}">
-                                                <i class="fa fa-eye"></i>
+                                    <td hidden>{{ $item->id }}</td>
+                                    <td class="fw-semibold text-primary">{{ $item->job_name }}</td>
+                                    <td>{{ $item->job_type }}</td>
+                                    <td data-order="{{ $item->job_date_filled }}">
+                                        {{ date('j M Y (h:i A)', strtotime($item->job_date_filled)) }}
+                                    </td>
+                                    <td>
+                                        <span class="badge rounded-pill px-3 py-2 fs-6 
+                                            @if ($item->job_status == 'New') bg-primary
+                                            @elseif($item->job_status == 'Completed' || $item->job_status == 'Extracted') bg-success
+                                            @elseif($item->job_status == 'Pending') bg-warning text-dark
+                                            @else bg-secondary @endif">
+                                            {{ $item->job_status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ $item->job_creator }}</td>
+                                    <td class="text-end">
+                                        <a class="btn btn-outline-info btn-sm" title="View"
+                                           href="{{ route('view/details', ['id' => Crypt::encryptString($item->id)]) }}">
+                                            <i class="fa fa-eye"></i>
+                                        </a>
+                                        @if ((Auth::user()->role_name === 'Admin' || Auth::user()->role_name === 'IT') && $item->job_status !== 'Completed')
+                                            <a class="btn btn-outline-warning btn-sm edit_joborder text-dark" 
+                                               title="Edit"
+                                               href="#"
+                                               data-id="{{ $item->id }}"
+                                               data-job_status="{{ $item->job_status }}"
+                                               data-job_assign-person="{{ $item->job_assign_person }}"
+                                               data-bs-toggle="modal" 
+                                               data-bs-target="#edit_joborder">
+                                                <i class="fa fa-pencil"></i>
                                             </a>
-
-                                            @if ((Auth::user()->role_name === 'Admin' || Auth::user()->role_name === 'IT') && $item->job_status !== 'Completed')
-                                                <a class="btn btn-sm btn-warning text-white edit_joborder" title="Edit"
-                                                    href="#" data-id="{{ $item->id }}"
-                                                    data-job_status="{{ $item->job_status }}"
-                                                    data-job_assign-person="{{ $item->job_assign_person }}"
-                                                    data-toggle="modal" data-target="#edit_joborder">
-                                                    <i class="fa fa-pencil"></i>
-                                                </a>
-                                            @endif
-                                            @if (Auth::user()->role_name === 'Admin')
-                                                <a class="btn btn-sm btn-danger delete_order" title="Delete" href="#"
-                                                    data-toggle="modal" data-target="#delete_order">
-                                                    <i class="fa fa-trash"></i>
-                                                </a>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                                        @endif
+                                        @if (Auth::user()->role_name === 'Admin')
+                                            <a class="btn btn-outline-danger btn-sm delete_order" 
+                                               title="Delete"
+                                               href="#"
+                                               data-bs-toggle="modal" 
+                                               data-bs-target="#delete_order">
+                                                <i class="fa fa-trash"></i>
+                                            </a>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
