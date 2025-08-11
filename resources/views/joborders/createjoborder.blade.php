@@ -88,7 +88,7 @@
                             <div class="col-sm-6 col-md-3">
                                 <div class="form-group">
                                     <label>Status <span class="text-danger">*</span></label>
-                                        <input class="form-control" type="text" id="j_status" name="j_status" value="New" placeholder="New" disabled>
+                                        <input class="form-control" type="text" id="j_status" name="j_status" value="Pending" placeholder="New" disabled>
                                 </div>
                             </div>
                             <div class="col-sm-6 col-md-3">
