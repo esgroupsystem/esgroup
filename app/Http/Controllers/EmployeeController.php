@@ -14,9 +14,11 @@ use App\Models\PersonalInfomation;
 use App\Models\Requirement;
 use App\Models\ProfileInformation;
 use App\Models\UserEmergencyContact;
+use App\Models\EmployeeViolation;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use DB;
-use Auth;
+use Illuminate\Support\Facades\Validator;
 
 class EmployeeController extends Controller
 {
@@ -135,6 +137,31 @@ class EmployeeController extends Controller
         }
     }
 
+    /** Save Violation */
+    public function violationSave(Request $request)
+    {
+        $request->validate([
+            'employee_id'     => 'required|exists:employees,id',
+            'violation_type'  => 'required|string|max:255',
+            'description'     => 'nullable|string',
+            'date_committed'  => 'required|date',
+        ]);
+
+        try {
+
+            EmployeeViolation::create($request->all());
+
+            DB::commit();
+            
+            flash()->success('Violation submitted successfully.');
+            return redirect()->back();
+        } catch (\Exception $e) {
+            \Log::error('Violation Save Error: ' . $e->getMessage());
+            flash()->error('Failed to upload requirement. Please try again.');
+            return redirect()->back();
+        }
+    }
+
     /** Employee profile */
     public function profileEmployee($id)
     {
@@ -175,15 +202,27 @@ class EmployeeController extends Controller
                 ->where('employees.id', $id)
                 ->first();
 
-            // Fetch all uploaded requirements by this employee
+            // Fetch all uploaded requirements
             $uploadedRequirements = Requirement::where('employee_id', $employee->id)
-            ->get()
-            ->keyBy('title');
+                ->get()
+                ->keyBy('title');
 
+            // Fetch violations for this employee
+            $violations = DB::table('employee_violations')
+                ->where('employee_id', $employee->id)
+                ->orderBy('date_committed', 'desc')
+                ->get();
+
+            // Fetch report-to list
             $reportToList = DB::table('employees')->select('id', 'name')->get();
 
-            // Pass data to the view
-            return view('employees.employeeprofile', compact('employee', 'reportToList', 'uploadedRequirements'));
+            // Pass to view
+            return view('employees.employeeprofile', compact(
+                'employee',
+                'reportToList',
+                'uploadedRequirements',
+                'violations'
+            ));
 
         } catch (\Exception $e) {
             \Log::error('Error loading employee profile: ' . $e->getMessage());

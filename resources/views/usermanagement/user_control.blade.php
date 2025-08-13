@@ -66,15 +66,11 @@
                                 <tr>
                                     <th>No</th>
                                     <th>Name</th>
-                                    <th>User ID</th>
                                     <th>Email</th>
-                                    <th>Position</th>
-                                    <th>Phone</th>
                                     <th>Join Date</th>
                                     <th>Last Login</th>
                                     <th>Role</th>
                                     <th>Status</th>
-                                    <th>Departement</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -334,15 +330,11 @@
                 columns: [
                     { data: 'no' },
                     { data: 'name' },
-                    { data: 'user_id' },
                     { data: 'email' },
-                    { data: 'position' },
-                    { data: 'phone_number' },
                     { data: 'join_date' },
                     { data: 'last_login' },
                     { data: 'role_name' },
                     { data: 'status' },
-                    { data: 'department' },
                     { data: 'action' }
                 ]
             });

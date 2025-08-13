@@ -6,12 +6,17 @@
             <!-- Page Header -->
             <div class="page-header">
                 <div class="row">
-                    <div class="col-sm-12">
-                        <h3 class="page-title">Profile</h3>
-                        <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Profile</li>
-                        </ul>
+                    <div class="col-sm-12 d-flex align-items-center justify-content-between">
+                        <div>
+                            <h3 class="page-title">Profile</h3>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
+                                <li class="breadcrumb-item active">Profile</li>
+                            </ul>
+                        </div>
+                        <a href="{{ url('/all/employee/card') }}" class="btn btn-outline-primary">
+                            <i class="fa fa-arrow-left me-1"></i> Back
+                        </a>
                     </div>
                 </div>
             </div>
@@ -143,11 +148,10 @@
                             <li class="nav-item"><a href="#emp_profile" data-toggle="tab"
                                     class="nav-link active">Profile</a></li>
                             <li class="nav-item"><a href="#emp_projects" data-toggle="tab" class="nav-link">Required Files</a>
+                                <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#emp_violations">Violation Committed</a>
                             </li>
-                            {{-- <li class="nav-item"><a href="#bank_statutory" data-toggle="tab" class="nav-link">Bank &
-                                    Statutory <small class="text-danger">(Admin Only)</small></a></li>
-                            <li class="nav-item"><a href="#bio_logs" data-toggle="tab" class="nav-link">Bio Logs</a></li>
-                            <li class="nav-item"><a href="#schedule" data-toggle="tab" class="nav-link">Schedule</a></li> --}}
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -471,80 +475,160 @@
 
                 <!-- Requirements Tab -->
                 <div class="tab-pane fade" id="emp_projects">
-                        @php
-                            $requiredDocuments = [
-                                ['title' => 'NBI Clearance', 'description' => 'Uploaded copy of NBI clearance for record validation.'],
-                                ['title' => 'Police Clearance', 'description' => 'Recent police clearance for background check.'],
-                                ['title' => 'Birth Certificate', 'description' => 'Official PSA-issued birth certificate.'],
-                                ['title' => 'Resume / CV', 'description' => 'Latest resume submitted by the employee.'],
-                                ['title' => 'Barangay Clearance', 'description' => 'Proof of good moral standing within the community.'],
-                                ['title' => 'Diploma', 'description' => 'Graduation certificate from university or school.'],
-                                ['title' => 'Transcript of Records', 'description' => 'Complete academic record submitted for HR.'],
-                                ['title' => 'Pag-IBIG', 'description' => 'Membership record or form.'],
-                                ['title' => 'PhilHealth', 'description' => 'PhilHealth Member Data Record (MDR).'],
-                                ['title' => 'SSS', 'description' => 'Social Security System record or E-1 form.'],
-                                ['title' => 'TIN', 'description' => 'Tax Identification Number record or BIR Form 1902.'],
-                            ];
-                        @endphp
+                    @php
+                        $requiredDocuments = [
+                            ['title' => 'NBI Clearance', 'description' => 'Uploaded copy of NBI clearance for record validation.'],
+                            ['title' => 'Police Clearance', 'description' => 'Recent police clearance for background check.'],
+                            ['title' => 'Barangay Clearance', 'description' => 'Proof of good moral standing within the community.'],
+                            ['title' => 'Diploma', 'description' => 'Graduation certificate from university or school.'],
+                            ['title' => 'Birth Certificate', 'description' => 'Official PSA-issued birth certificate.'],
+                            ['title' => 'Conductor/Driver License', 'description' => 'Valid professional or conductor’s driver license.'],
+                            ['title' => 'MMDA Clearance', 'description' => 'MMDA clearance certificate for drivers/conductors.'],
+                            ['title' => 'COE', 'description' => 'Certificate of Employment from previous employer.'],
+                            ['title' => 'Medical', 'description' => 'Medical examination certificate for fitness to work.'],
+                            ['title' => 'Drug Test', 'description' => 'Latest drug test result from an accredited clinic.'],
+                        ];
+                    @endphp
 
-                        <div class="row g-4">
-                            @foreach ($requiredDocuments as $doc)
-                                @php $uploaded = $uploadedRequirements[$doc['title']] ?? null; @endphp
-                                <div class="col-lg-4 col-sm-6 col-md-4 col-xl-3">
-                                    <div class="card h-100 d-flex flex-column justify-content-between">
-                                        <div class="card-body">
-                                            <div class="d-flex justify-content-between">
-                                                <h5 class="card-title">{{ $doc['title'] }}</h5>
-                                                @if ($uploaded)
-                                                    <div class="dropdown profile-action">
-                                                        <a class="action-icon dropdown-toggle" href="#" data-toggle="dropdown">
-                                                            <i class="material-icons">more_vert</i>
-                                                        </a>
-                                                        <div class="dropdown-menu dropdown-menu-right">
-                                                            <a class="dropdown-item upload-btn" href="#" data-title="{{ $doc['title'] }}">
-                                                                <i class="fa fa-pencil m-r-5"></i> Replace
-                                                            </a>
-                                                            <!-- You can implement delete functionality later -->
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                            </div>
-
+                    <div class="row g-4">
+                        @foreach ($requiredDocuments as $doc)
+                            @php $uploaded = $uploadedRequirements[$doc['title']] ?? null; @endphp
+                            <div class="col-lg-4 col-sm-6 col-md-4 col-xl-3">
+                                <div class="card h-100 d-flex flex-column justify-content-between">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between">
+                                            <h5 class="card-title">{{ $doc['title'] }}</h5>
                                             @if ($uploaded)
-                                                <p class="text-muted big mb-2">
-                                                    Uploaded: <strong>{{ \Carbon\Carbon::parse($uploaded->uploaded_at)->format('d M Y') }}</strong>
-                                                </p>
-                                                <p class="text-muted big mb-2">
-                                                    {{ $uploaded->description ?? $doc['description'] }}
-                                                </p>
-                                                <p class="text-muted big mb-2">
-                                                    Expiry: <strong>{{ $uploaded->expires_at ? \Carbon\Carbon::parse($uploaded->expires_at)->format('d M Y') : 'N/A' }}</strong>
-                                                </p>
-                                            @else
-                                                <p class="text-muted">{{ $doc['description'] }}</p>
+                                                <div class="dropdown profile-action">
+                                                    <a class="action-icon dropdown-toggle" href="#" data-toggle="dropdown">
+                                                        <i class="material-icons">more_vert</i>
+                                                    </a>
+                                                    <div class="dropdown-menu dropdown-menu-right">
+                                                        <a class="dropdown-item upload-btn" href="#" data-title="{{ $doc['title'] }}">
+                                                            <i class="fa fa-pencil m-r-5"></i> Replace
+                                                        </a>
+                                                    </div>
+                                                </div>
                                             @endif
                                         </div>
 
-                                        <div class="card-footer text-center">
-                                            @if ($uploaded && isset($uploaded->file_path))
-                                                <a href="{{ asset($uploaded->file_path) }}" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
-                                                <a href="{{ asset($uploaded->file_path) }}" download class="btn btn-sm btn-outline-success">Download</a>
-                                            @else
-                                                <span class="text-muted d-block mb-2">No file uploaded</span>
-                                            @endif
+                                        @if ($uploaded)
+                                            <p class="text-muted big mb-2">
+                                                Uploaded: <strong>{{ \Carbon\Carbon::parse($uploaded->uploaded_at)->format('d M Y') }}</strong>
+                                            </p>
+                                            <p class="text-muted big mb-2">
+                                                {{ $uploaded->description ?? $doc['description'] }}
+                                            </p>
+                                            <p class="text-muted big mb-2">
+                                                Expiry: <strong>{{ $uploaded->expires_at ? \Carbon\Carbon::parse($uploaded->expires_at)->format('d M Y') : 'N/A' }}</strong>
+                                            </p>
+                                        @else
+                                            <p class="text-muted">{{ $doc['description'] }}</p>
+                                        @endif
+                                    </div>
 
-                                            <button class="btn btn-sm btn-outline-{{ $uploaded && isset($uploaded->file_path) ? 'secondary' : 'primary' }} upload-btn"
-                                                data-title="{{ $doc['title'] }}">
-                                                {{ $uploaded && isset($uploaded->file_path) ? 'Replace File' : 'Upload' }}
-                                            </button>
-                                        </div>
+                                    <div class="card-footer text-center">
+                                        @if ($uploaded && isset($uploaded->file_path))
+                                            <a href="{{ asset($uploaded->file_path) }}" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
+                                            <a href="{{ asset($uploaded->file_path) }}" download class="btn btn-sm btn-outline-success">Download</a>
+                                        @else
+                                            <span class="text-muted d-block mb-2">No file uploaded</span>
+                                        @endif
+
+                                        <button class="btn btn-sm btn-outline-{{ $uploaded && isset($uploaded->file_path) ? 'secondary' : 'primary' }} upload-btn"
+                                            data-title="{{ $doc['title'] }}">
+                                            {{ $uploaded && isset($uploaded->file_path) ? 'Replace File' : 'Upload' }}
+                                        </button>
                                     </div>
                                 </div>
-                            @endforeach
-                        <!-- /Requirements Tab -->
+                            </div>
+                        @endforeach
                     </div>
                 </div>
                 <!-- /Page Content -->
+
+                <!-- Violation Tab -->
+                <div class="tab-pane fade" id="emp_violations">
+                    <div class="row">
+                        <div class="col-md-12 d-flex">
+                            <div class="card profile-box flex-fill">
+                                <div class="card-body">
+                                    <h3 class="card-title">
+                                        Violations Committed
+                                        <a href="#" class="edit-icon" data-toggle="modal" data-target="#add_violation">
+                                            <i class="fa fa-plus"></i>
+                                        </a>
+                                    </h3>
+
+                                    <div class="experience-box">
+                                        <ul class="experience-list">
+                                            @forelse ($violations as $violation)
+                                                <li>
+                                                    <div class="experience-user">
+                                                        <div class="before-circle"></div>
+                                                    </div>
+                                                    <div class="experience-content">
+                                                        <div class="timeline-content">
+                                                            <a href="#/" class="name">{{ $violation->violation_type }}</a>
+                                                            <div>{{ $violation->description }}</div>
+                                                            <span class="time">
+                                                                {{ \Carbon\Carbon::parse($violation->date_committed)->format('F d, Y') }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            @empty
+                                                <li>
+                                                    <div class="experience-content">
+                                                        <div class="timeline-content">
+                                                            <div class="text-muted">No violations recorded.</div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            @endforelse
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /Violation Tab -->
+
+                <!-- Add Violation Modal -->
+                <div id="add_violation" class="modal custom-modal fade" role="dialog">
+                    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Add Violation</h5>
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            </div>
+                            <form action="{{ route('violation/save') }}" method="POST">
+                                @csrf
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <label>Violation Type</label>
+                                        <input type="text" name="violation_type" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Description</label>
+                                        <textarea name="description" class="form-control" rows="3"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Date Committed</label>
+                                        <input type="date" name="date_committed" class="form-control" required>
+                                    </div>
+                                    <input type="hidden" name="employee_id" value="{{ $employee->id }}">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary">Save Violation</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- /Requirements Tab -->
 
                 <!-- Upload Requirement Modal -->
                 <div class="modal fade" id="uploadRequirementModal" tabindex="-1" role="dialog" aria-labelledby="uploadRequirementLabel" aria-hidden="true">

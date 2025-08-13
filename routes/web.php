@@ -239,6 +239,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
             Route::post('/employee/schedule/save', 'AdminScheduleSave')->name('schedule.save');
             Route::post('/requirements/upload','uploadRequirement')->name('requirements.upload');
             Route::post('/profile/info/save','profileInformation')->name('profile/save');
+            Route::post('/violation/save', 'violationSave')->name('violation/save');
         });
 
     // ---------------------------- FORM HOLIDAY -----------------------------//
