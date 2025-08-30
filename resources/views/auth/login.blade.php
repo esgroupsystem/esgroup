@@ -34,7 +34,7 @@
     <header id="header" class="header d-flex align-items-center fixed-top">
         <div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
     
-          <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
+          <a href="{{ route('mainPages') }}" class="logo d-flex align-items-center me-auto me-xl-0">
             <!-- Uncomment the line below if you also wish to use an image logo -->
             <img src="{{ URL::to('assets/img/ESGroup-Logo.png') }}" alt="">
           </a>
@@ -65,7 +65,7 @@
           <h1>Sign in</h1>
           <nav class="breadcrumbs">
             <ol>
-              <li><a href="index.html">Home</a></li>
+              <li><a href="{{ route('mainPages') }}">Home</a></li>
                 <li class="current">Admin Page</li>
                 <!-- Start Login Pages -->
                     <div class="container d-flex justify-content-center align-items-center" style="height: 50vh;">

@@ -26,43 +26,31 @@
 
   <!-- Main CSS File -->
   <link href="{{ URL::to('assets/css/main.css') }}" rel="stylesheet">
-
-  <!-- =======================================================
-  * Template Name: iLanding
-  * Template URL: https://bootstrapmade.com/ilanding-bootstrap-landing-page-template/
-  * Updated: Nov 12 2024 with Bootstrap v5.3.3
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
+  <link href="{{ URL::to('assets/css/custom.css') }}" rel="stylesheet">
 </head>
 
 <body class="index-page">
 
-  <header id="header" class="header d-flex align-items-center fixed-top">
-    <div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+<header id="header" class="header d-flex align-items-center fixed-top">
+  <div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
 
-      <a href="{{ route('mainPages') }}" class="logo d-flex align-items-center me-auto me-xl-0">
-        <!-- Uncomment the line below if you also wish to use an image logo -->
-        <img src="{{ URL::to('assets/img/ESGroup-Logo.png') }}" alt="">
-      </a>
+    <a href="{{ route('mainPages') }}" class="logo d-flex align-items-center me-auto me-xl-0">
+      <img src="{{ URL::to('assets/img/ESGroup-Logo.png') }}" alt="">
+    </a>
 
-      <nav id="navmenu" class="navmenu pe-4">
-        <ul>
-          <li><a href="#hero" class="active">Home</a></li>
-          <li><a href="#about">About</a></li>
-          {{-- <li><a href="#features">Features</a></li> --}}
-          <li><a href="#services">Services</a></li>
-          {{-- <li><a href="#pricing">Pricing</a></li> --}}
-          <li><a href="#contact">Contact</a></li>
-        </ul>
-        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
-      </nav>
+    <nav id="navmenu" class="navmenu pe-4">
+      <ul>
+        <li><a href="#hero" class="active">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+    </nav>
 
-      {{-- <a class="btn-getstarted" href="{{ route('login') }}">Login</a> --}}
 
-    </div>
-  </header>
-
+  </div>
+</header>
   <main class="main">
 
     <!-- Hero Section -->
@@ -88,10 +76,10 @@
 
               <div class="hero-buttons">
                 <a href="#about" class="btn btn-primary me-0 me-sm-2 mx-1">Get Started</a>
-                <a href="https://www.youtube.com/watch?v=Y7f98aduVJ8" class="btn btn-link mt-2 mt-sm-0 glightbox">
+                {{-- <a href="https://www.youtube.com/watch?v=Y7f98aduVJ8" class="btn btn-link mt-2 mt-sm-0 glightbox">
                   <i class="bi bi-play-circle me-1"></i>
                   Play Video
-                </a>
+                </a> --}}
               </div>
             </div>
           </div>
@@ -1073,7 +1061,7 @@
                 </div>
                 <div class="content">
                   <h4>Our Location</h4>
-                  <p>14 Mirasol Stree, San Roque, Murphy Cubao</p>
+                  <p>14 Mirasol Street, San Roque, Murphy Cubao</p>
                   <p>Quezon City, Metro Manila, Philippines, 1109</p>
                 </div>
               </div>
@@ -1238,6 +1226,29 @@
 
   <!-- Main JS File -->
   <script src="{{ URL::to('assets/js/main.js') }}"></script>
+
+<style>
+.apply-now-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #0d83fd;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.apply-now-btn:hover {
+  background: #0d83fd;
+}
+
+.apply-now-btn i {
+  font-size: 1.2rem;
+}
+</style>
 
 </body>
 
