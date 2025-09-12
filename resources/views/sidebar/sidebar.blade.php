@@ -162,6 +162,133 @@
                         <li>{!! privilege_link('form/overtime/page', ['HR', 'Admin', 'DPO'], 'Overtime', set_active(['form/overtime/page'])) !!}</li>
                     </ul>
                 </li>
+                                <!--*
+                    *
+                    * ---------------- ADMINISTRATION LISTING -------------
+                    *
+                    *-->
+                <li class="menu-title"> <span>Administration</span> </li>
+                <li
+                    class="{{ set_active([
+                        'user/dashboard/index',
+                        'jobs/dashboard/index',
+                        'user/dashboard/all',
+                        'user/dashboard/applied/jobs',
+                        'user/dashboard/interviewing',
+                        'user/dashboard/offered/jobs',
+                        'user/dashboard/visited/jobs',
+                        'user/dashboard/archived/jobs',
+                        'user/dashboard/save',
+                        'jobs',
+                        'job/applicants',
+                        'job/details',
+                        'page/manage/resumes',
+                        'page/shortlist/candidates',
+                        'page/interview/questions',
+                        'page/offer/approvals',
+                        'page/experience/level',
+                        'page/candidates',
+                        'page/schedule/timing',
+                        'page/aptitude/result',
+                    ]) }} submenu">
+
+                    <a href="#"
+                        class="{{ set_active([
+                            'user/dashboard/index',
+                            'jobs/dashboard/index',
+                            'user/dashboard/all',
+                            'user/dashboard/save',
+                            'jobs',
+                            'job/applicants',
+                            'job/details',
+                        ])
+                            ? 'noti-dot'
+                            : '' }}">
+                        <i class="la la-briefcase"></i>
+                        <span> Jobs </span> <span class="menu-arrow"></span>
+                    </a>
+
+                    <ul
+                        style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }} {{ request()->is('job/applicants/*') ? 'display: block;' : 'display: none;' }}">
+                        <li>{!! privilege_link(
+                            'user/dashboard/index',
+                            ['Admin', 'HR', 'DPO'],
+                            'User Dashboard',
+                            set_active([
+                                'user/dashboard/index',
+                                'user/dashboard/all',
+                                'user/dashboard/applied/jobs',
+                                'user/dashboard/interviewing',
+                                'user/dashboard/offered/jobs',
+                                'user/dashboard/visited/jobs',
+                                'user/dashboard/archived/jobs',
+                                'user/dashboard/save',
+                            ]),
+                        ) !!}</li>
+                        <li>{!! privilege_link(
+                            'jobs/dashboard/index',
+                            ['Admin', 'HR', 'DPO'],
+                            'Jobs Dashboard',
+                            set_active(['jobs/dashboard/index']),
+                        ) !!}</li>
+                        <li>{!! privilege_link(
+                            'jobs',
+                            ['Admin', 'HR', 'DPO'],
+                            'Manage Jobs',
+                            set_active(['jobs', 'job/applicants', 'job/details']) .
+                                ' ' .
+                                (request()->is('job/applicants/*', 'job/details/*') ? 'active' : ''),
+                        ) !!}</li>
+                        <li>{!! privilege_link(
+                            'page/manage/resumes',
+                            ['Admin', 'HR', 'DPO'],
+                            'Manage Resumes',
+                            set_active(['page/manage/resumes']),
+                        ) !!}</li>
+                        <li>{!! privilege_link(
+                            'page/shortlist/candidates',
+                            ['Admin', 'HR', 'DPO'],
+                            'Shortlist Candidates',
+                            set_active(['page/shortlist/candidates']),
+                        ) !!}</li>
+                        <li>{!! privilege_link(
+                            'page/interview/questions',
+                            ['Admin', 'HR', 'DPO'],
+                            'Interview Questions',
+                            set_active(['page/interview/questions']),
+                        ) !!}</li>
+                        <li>{!! privilege_link(
+                            'page/offer/approvals',
+                            ['Admin', 'HR', 'DPO'],
+                            'Offer Approvals',
+                            set_active(['page/offer/approvals']),
+                        ) !!}</li>
+                        <li>{!! privilege_link(
+                            'page/experience/level',
+                            ['Admin', 'HR', 'DPO'],
+                            'Experience Level',
+                            set_active(['page/experience/level']),
+                        ) !!}</li>
+                        <li>{!! privilege_link(
+                            'page/candidates',
+                            ['Admin', 'HR', 'DPO'],
+                            'Candidates List',
+                            set_active(['page/candidates']),
+                        ) !!}</li>
+                        <li>{!! privilege_link(
+                            'page/schedule/timing',
+                            ['Admin', 'HR', 'DPO'],
+                            'Schedule Timing',
+                            set_active(['page/schedule/timing']),
+                        ) !!}</li>
+                        <li>{!! privilege_link(
+                            'page/aptitude/result',
+                            ['Admin', 'HR', 'DPO'],
+                            'Aptitude Results',
+                            set_active(['page/aptitude/result']),
+                        ) !!}</li>
+                    </ul>
+                </li>
 
                 <li class="menu-title"> <span>HR</span> </li>
                 <li
@@ -372,133 +499,6 @@
                                 set_active(['/stocks/Mirasol']),
                             ) !!}
                         </li>
-                    </ul>
-                </li>
-                <!--*
-                    *
-                    * ---------------- ADMINISTRATION LISTING -------------
-                    *
-                    *-->
-                <li class="menu-title"> <span>Administration</span> </li>
-                <li
-                    class="{{ set_active([
-                        'user/dashboard/index',
-                        'jobs/dashboard/index',
-                        'user/dashboard/all',
-                        'user/dashboard/applied/jobs',
-                        'user/dashboard/interviewing',
-                        'user/dashboard/offered/jobs',
-                        'user/dashboard/visited/jobs',
-                        'user/dashboard/archived/jobs',
-                        'user/dashboard/save',
-                        'jobs',
-                        'job/applicants',
-                        'job/details',
-                        'page/manage/resumes',
-                        'page/shortlist/candidates',
-                        'page/interview/questions',
-                        'page/offer/approvals',
-                        'page/experience/level',
-                        'page/candidates',
-                        'page/schedule/timing',
-                        'page/aptitude/result',
-                    ]) }} submenu">
-
-                    <a href="#"
-                        class="{{ set_active([
-                            'user/dashboard/index',
-                            'jobs/dashboard/index',
-                            'user/dashboard/all',
-                            'user/dashboard/save',
-                            'jobs',
-                            'job/applicants',
-                            'job/details',
-                        ])
-                            ? 'noti-dot'
-                            : '' }}">
-                        <i class="la la-briefcase"></i>
-                        <span> Jobs </span> <span class="menu-arrow"></span>
-                    </a>
-
-                    <ul
-                        style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }} {{ request()->is('job/applicants/*') ? 'display: block;' : 'display: none;' }}">
-                        <li>{!! privilege_link(
-                            'user/dashboard/index',
-                            ['Admin', 'HR', 'DPO'],
-                            'User Dashboard',
-                            set_active([
-                                'user/dashboard/index',
-                                'user/dashboard/all',
-                                'user/dashboard/applied/jobs',
-                                'user/dashboard/interviewing',
-                                'user/dashboard/offered/jobs',
-                                'user/dashboard/visited/jobs',
-                                'user/dashboard/archived/jobs',
-                                'user/dashboard/save',
-                            ]),
-                        ) !!}</li>
-                        <li>{!! privilege_link(
-                            'jobs/dashboard/index',
-                            ['Admin', 'HR', 'DPO'],
-                            'Jobs Dashboard',
-                            set_active(['jobs/dashboard/index']),
-                        ) !!}</li>
-                        <li>{!! privilege_link(
-                            'jobs',
-                            ['Admin', 'HR', 'DPO'],
-                            'Manage Jobs',
-                            set_active(['jobs', 'job/applicants', 'job/details']) .
-                                ' ' .
-                                (request()->is('job/applicants/*', 'job/details/*') ? 'active' : ''),
-                        ) !!}</li>
-                        <li>{!! privilege_link(
-                            'page/manage/resumes',
-                            ['Admin', 'HR', 'DPO'],
-                            'Manage Resumes',
-                            set_active(['page/manage/resumes']),
-                        ) !!}</li>
-                        <li>{!! privilege_link(
-                            'page/shortlist/candidates',
-                            ['Admin', 'HR', 'DPO'],
-                            'Shortlist Candidates',
-                            set_active(['page/shortlist/candidates']),
-                        ) !!}</li>
-                        <li>{!! privilege_link(
-                            'page/interview/questions',
-                            ['Admin', 'HR', 'DPO'],
-                            'Interview Questions',
-                            set_active(['page/interview/questions']),
-                        ) !!}</li>
-                        <li>{!! privilege_link(
-                            'page/offer/approvals',
-                            ['Admin', 'HR', 'DPO'],
-                            'Offer Approvals',
-                            set_active(['page/offer/approvals']),
-                        ) !!}</li>
-                        <li>{!! privilege_link(
-                            'page/experience/level',
-                            ['Admin', 'HR', 'DPO'],
-                            'Experience Level',
-                            set_active(['page/experience/level']),
-                        ) !!}</li>
-                        <li>{!! privilege_link(
-                            'page/candidates',
-                            ['Admin', 'HR', 'DPO'],
-                            'Candidates List',
-                            set_active(['page/candidates']),
-                        ) !!}</li>
-                        <li>{!! privilege_link(
-                            'page/schedule/timing',
-                            ['Admin', 'HR', 'DPO'],
-                            'Schedule Timing',
-                            set_active(['page/schedule/timing']),
-                        ) !!}</li>
-                        <li>{!! privilege_link(
-                            'page/aptitude/result',
-                            ['Admin', 'HR', 'DPO'],
-                            'Aptitude Results',
-                            set_active(['page/aptitude/result']),
-                        ) !!}</li>
                     </ul>
                 </li>
                 <!--*

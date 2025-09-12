@@ -48,6 +48,10 @@
       <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
     </nav>
 
+    {{-- <!-- Apply Now Button -->
+  <a href="{{ route('form/job/hiring/page') }}" class="apply-now-btn">
+    <i class="bi bi-hand-index-thumb-fill"></i> Apply Now
+  </a> --}}
 
   </div>
 </header>

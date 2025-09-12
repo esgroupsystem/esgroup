@@ -5,29 +5,25 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\LeavesController;
 use Illuminate\Support\Facades\Artisan;
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
 
 // ----------- Public Routes -------------- //
 Route::get('/', function () {
     return view('main.landing');
 });
 
+Route::get('/hiring', function () {
+    return view('main.hiring');
+})->name('hiring');
+
 // --------- Authenticated Routes ---------- //
 Route::middleware('auth')->group(function () {
     Route::get('home', function () {
-        return view('home');
+        return view('dashboard.dashboard');
     });
 });
+// ----------- Artisan Commands ------------- //
 
 Auth::routes();
 
@@ -186,6 +182,8 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
 
         Route::post('jobtypestatus/update', 'jobTypeStatusUpdate')->name('jobtypestatus/update');
 
+        Route::get('/download/resume/{filename}', 'downloadResume') ->name('resume.download');
+
     });
     
 // ---------------------------- FORM EMPLOYEE ----------------------------//
@@ -241,6 +239,16 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
             Route::post('/profile/info/save','profileInformation')->name('profile/save');
             Route::post('/violation/save', 'violationSave')->name('violation/save');
         });
+
+    Route::controller(JobHiringController::class)
+        ->group(function () {
+            Route::get('form/job/hiring/page', 'index')->name('form/job/hiring/page');
+            Route::get('/jobs/{id}', 'showJobDetails')->name('form/job/details/page');
+            Route::post('form/job/hiring/save', 'saveRecord')->name('form/job/hiring/save');
+            Route::post('form/job/hiring/update', 'updateRecord')->name('form/job/hiring/update');
+            Route::post('form/job/hiring/delete', 'deleteRecord')->name('form/job/hiring/delete');
+        });
+        
 
     // ---------------------------- FORM HOLIDAY -----------------------------//
     Route::controller(HolidayController::class)

@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Response;
 use Illuminate\Http\Request;
 use App\Models\ApplyForJob;
 use App\Models\Category;
 use App\Models\Question;
 use App\Models\AddJob;
 use Carbon\Carbon;
-use Response;
 use DB;
+
 
 class JobController extends Controller
 {
@@ -39,8 +40,22 @@ class JobController extends Controller
     }
 
     /** Jobs Dashboard */
-    public function jobsDashboard() {
-        return view('job.jobsdashboard');
+    public function jobsDashboard()
+    {
+        $applications = ApplyForJob::with('job')->get();
+        // You can also filter or paginate the applications if needed   
+        return view('job.jobsdashboard', compact('applications'));
+    }
+
+    public function downloadResume($filename)
+    {
+        $path = public_path('assets/resume/' . $filename);
+
+        if (file_exists($path)) {
+            return response()->download($path, $filename);
+        } else {
+            return back()->with('error', 'File not found.');
+        }
     }
 
     /** User All Job */

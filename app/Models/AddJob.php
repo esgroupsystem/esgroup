@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\ApplyForJob;
 
 class AddJob extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'job_title',
         'department',
@@ -22,5 +24,11 @@ class AddJob extends Model
         'start_date',
         'expired_date',
         'description',
+        'views',
     ];
+
+    public function applications()
+    {
+        return $this->hasMany(ApplyForJob::class, 'job_id', 'id');
+    }
 }
