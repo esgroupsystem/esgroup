@@ -80,7 +80,7 @@
                                     <td hidden>{{ $item->id }}</td>
                                     <td class="fw-semibold text-primary">{{ $item->job_name }}</td>
                                     <td>{{ $item->job_type }}</td>
-                                    <td data-order="{{ $item->job_datestart }}">
+                                    <td data-order="{{ $item->job_date_filled }}">
                                         {{ date('j M Y (h:i A)', strtotime($item->job_date_filled)) }}
                                     </td>
                                     <td>
@@ -93,7 +93,7 @@
                                         </span>
                                     </td>
                                     <td>{{ $item->job_creator }}</td>
-                                    <td>{{ $item->job_date_filled ? date('j M Y (h:i A)', strtotime($item->job_date_filled)) : 'N/A' }}</td>
+                                    <td>{{ $item->job_created_at->format('j M Y (h:i A)') }}</td>
                                     <td class="text-end">
                                         <a class="btn btn-outline-info btn-sm" title="View"
                                            href="{{ route('view/details', ['id' => Crypt::encryptString($item->id)]) }}">
