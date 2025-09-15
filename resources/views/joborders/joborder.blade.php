@@ -93,7 +93,7 @@
                                         </span>
                                     </td>
                                     <td>{{ $item->job_creator }}</td>
-                                    <td>{{ $item->job_date_created ? date('j M Y (h:i A)', strtotime($item->job_date_created)) : 'N/A' }}</td>
+                                    <td>{{ $item->job_date_filled ? date('j M Y (h:i A)', strtotime($item->job_date_filled)) : 'N/A' }}</td>
                                     <td class="text-end">
                                         <a class="btn btn-outline-info btn-sm" title="View"
                                            href="{{ route('view/details', ['id' => Crypt::encryptString($item->id)]) }}">
