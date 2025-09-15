@@ -70,6 +70,7 @@
                                 <th>Date Issue</th>
                                 <th>Status</th>
                                 <th>Reported by</th>
+                                <th>Date Filled</th>
                                 <th class="text-end">Action</th>
                             </tr>
                         </thead>
@@ -92,6 +93,7 @@
                                         </span>
                                     </td>
                                     <td>{{ $item->job_creator }}</td>
+                                    <td>{{ $item->job_date_created ? date('j M Y (h:i A)', strtotime($item->job_date_created)) : 'N/A' }}</td>
                                     <td class="text-end">
                                         <a class="btn btn-outline-info btn-sm" title="View"
                                            href="{{ route('view/details', ['id' => Crypt::encryptString($item->id)]) }}">
