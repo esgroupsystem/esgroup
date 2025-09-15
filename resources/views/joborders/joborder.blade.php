@@ -80,7 +80,7 @@
                                     <td hidden>{{ $item->id }}</td>
                                     <td class="fw-semibold text-primary">{{ $item->job_name }}</td>
                                     <td>{{ $item->job_type }}</td>
-                                    <td data-order="{{ $item->job_date_filled }}">
+                                    <td data-order="{{ $item->job_datestart }}">
                                         {{ date('j M Y (h:i A)', strtotime($item->job_date_filled)) }}
                                     </td>
                                     <td>
