@@ -93,7 +93,7 @@
                                         </span>
                                     </td>
                                     <td>{{ $item->job_creator }}</td>
-                                    <td>{{ $item->created_at->format('j M Y (h:i A)') }}</td>
+                                    <td>{{ $item->created_at }}</td>
                                     <td class="text-end">
                                         <a class="btn btn-outline-info btn-sm" title="View"
                                            href="{{ route('view/details', ['id' => Crypt::encryptString($item->id)]) }}">
