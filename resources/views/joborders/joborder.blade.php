@@ -94,7 +94,7 @@
                                     </td>
                                     <td>{{ $item->job_creator }}</td>
                                     <td data-order="{{ $item->created_at }}">
-                                        {{ date('j M Y (h:i A)' (h:i A), strtotime($item->created_at)) }}
+                                        {{ date('j M Y (h:i A)', strtotime($item->created_at)) }}
                                     </td>
                                     <td class="text-end">
                                         <a class="btn btn-outline-info btn-sm" title="View"
