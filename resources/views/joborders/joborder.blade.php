@@ -81,7 +81,7 @@
                                     <td class="fw-semibold text-primary">{{ $item->job_name }}</td>
                                     <td>{{ $item->job_type }}</td>
                                     <td data-order="{{ $item->job_datestart }}">
-                                        {{ date('j M Y (h:i A)', strtotime($item->job_datestart)) }}
+                                        {{ date('j M Y', strtotime($item->job_datestart)) }}
                                     </td>
                                     <td>
                                         <span class="badge rounded-pill px-3 py-2 fs-6 
