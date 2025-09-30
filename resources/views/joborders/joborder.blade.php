@@ -93,7 +93,9 @@
                                         </span>
                                     </td>
                                     <td>{{ $item->job_creator }}</td>
-                                    <td>{{ $item->created_at }}</td>
+                                    <td data-order="{{ $item->created_at }}">
+                                        {{ date('j M Y', strtotime($item->created_at)) }}
+                                    </td>
                                     <td class="text-end">
                                         <a class="btn btn-outline-info btn-sm" title="View"
                                            href="{{ route('view/details', ['id' => Crypt::encryptString($item->id)]) }}">
