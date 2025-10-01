@@ -67,7 +67,7 @@
                                 <th hidden>ID</th>
                                 <th>Bus Number</th>
                                 <th>Type</th>
-                                <th>Date Issue</th>
+                                <th>Date Incident</th>
                                 <th>Status</th>
                                 <th>Reported by</th>
                                 <th>Date Filled</th>
