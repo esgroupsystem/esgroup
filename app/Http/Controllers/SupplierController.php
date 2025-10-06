@@ -15,7 +15,7 @@ class SupplierController extends Controller
    {
        $supplierview = Supplier::all();
 
-       return view('supplier.supplier', compact('supplierview'));
+       return view('Supplier.supplier', compact('supplierview'));
    }
 
    public function saveSupplier(Request $request){
