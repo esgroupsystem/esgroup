@@ -6,6 +6,7 @@
                 <li class="menu-title">
                     <span>Main</span>
                 </li>
+
                 <!--*
                     *
                     * DASHBOARD
@@ -18,31 +19,40 @@
                         <span> Dashboard</span> <span class="menu-arrow"></span>
                     </a>
                     <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">
-                        <li>
-                            {!! privilege_link('home', ['HR', 'Admin', 'DPO'], 'Admin Dashboard', set_active(['home'])) !!}
-                        </li>
-                        <li>
-                            {!! privilege_link('em/dashboard', ['HR', 'Admin', 'DPO'], 'Employee Dashboard', set_active(['em/dashboard'])) !!}
-                        </li>
-                        <li>
-                            {!! privilege_link(
-                                'stock/dashboard',
-                                ['Maintenance', 'Admin', 'StockManager'],
-                                'Stocks Dashboard',
-                                set_active(['stock/dashboard']),
-                            ) !!}
-                        </li>
-                        <li>
-                            {!! privilege_link(
-                                'dashboard/joborders',
-                                ['IT', 'Admin'],
-                                'Job Orders Dashboard',
-                                set_active(['dashboard/joborders']),
-                            ) !!}
-                        </li>
+
+                        @if(in_array(Auth::user()->role_name, ['HR','Admin']))
+                            <li>
+                                {!! privilege_link('home', ['HR', 'Admin', 'DPO'], 'Admin Dashboard', set_active(['home'])) !!}
+                            </li>
+                        @endif
+
+                        @if(in_array(Auth::user()->role_name, ['HR','Admin','DPO']))
+                            <li>
+                                {!! privilege_link('em/dashboard', ['HR', 'Admin', 'DPO'], 'Employee Dashboard', set_active(['em/dashboard'])) !!}
+                            </li>
+                        @endif
+
+                        @if(in_array(Auth::user()->role_name, ['Admin','Maintenance']))
+                            <li>
+                                {!! privilege_link('stock/dashboard', ['Maintenance', 'Admin'],'Stocks Dashboard', set_active(['stock/dashboard']),) !!}
+                            </li>
+                        @endif
+
+                        @if(in_array(Auth::user()->role_name, ['Admin','IT']))
+                            <li>
+                                {!! privilege_link('dashboard/joborders',['IT', 'Admin'],'Job Orders Dashboard',set_active(['dashboard/joborders']),) !!}
+                            </li>
+                        @endif
+
                     </ul>
                 </li>
 
+                <!--*
+                    *
+                    * IT DEPARTMENT
+                    *
+                    *-->
+                @if(in_array(Auth::user()->role_name, ['Admin','IT']))
                 <li class="menu-title"><span>IT Department</span></li>
                 <li
                     class="{{ set_active(['form/joborders/page', 'form/joborders/save', 'form/joborders/update', 'form/joborders/delete']) }} submenu">
@@ -61,7 +71,15 @@
                         </li>
                     </ul>
                 </li>
+                @endif
 
+                <!--*
+                    *
+                    * EMPLOYEE LISTING
+                    *
+                    *-->
+
+                @if(in_array(Auth::user()->role_name, ['HR','Admin','DPO']))
                 <li class="menu-title"> <span>Employees</span> </li>
                 <li
                     class="{{ set_active([
@@ -162,11 +180,14 @@
                         <li>{!! privilege_link('form/overtime/page', ['HR', 'Admin', 'DPO'], 'Overtime', set_active(['form/overtime/page'])) !!}</li>
                     </ul>
                 </li>
-                                <!--*
+                @endif
+
+                <!--*
                     *
                     * ---------------- ADMINISTRATION LISTING -------------
                     *
                     *-->
+                @if(in_array(Auth::user()->role_name, ['HR','Admin','DPO']))
                 <li class="menu-title"> <span>Administration</span> </li>
                 <li
                     class="{{ set_active([
@@ -425,6 +446,9 @@
                         ) !!}</li>
                     </ul>
                 </li>
+                @endif
+
+                @if(in_array(Auth::user()->role_name, ['Admin','Maintenance']))
                 <!--*
                     *
                     * PURCHASE ORDER LISTING
@@ -557,6 +581,9 @@
                         <li>{!! privilege_link('supplier/list', ['Maintenance', 'Admin'], 'List', set_active(['supplier/list'])) !!}</li>
                     </ul>
                 </li>
+                @endif
+
+                @if(in_array(Auth::user()->role_name, ['Admin',]))
                 <!--*
                 *
                 * AUTHENTICATION LISTING
@@ -581,6 +608,7 @@
 
                     </ul>
                 </li>
+                @endif
         </div>
     </div>
 </div>

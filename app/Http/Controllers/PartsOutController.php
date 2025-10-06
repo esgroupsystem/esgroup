@@ -150,76 +150,49 @@ class PartsOutController extends Controller
             'products' => $products,
         ]);
     }
-
     
     // POST adding Parts-Out Transaction
     public function saveParts(Request $request)
     {
-        $request->validate([
-            'partout_id'      => 'required|string|max:255',
-            'bus_details'     => 'required|string|max:255',
-            'gar_name'        => 'required|string|max:255',
-            'kilometers'      => 'required|numeric|min:0',
-            'category_id'     => 'required|array',
-            'category_id.*'   => 'required|string|max:255',
-            'product_code'    => 'required|array',
-            'product_code.*'  => 'required|string|max:255',
-            'serial'          => 'required|array',
-            'serial.*'        => 'nullable|string|max:255',
-            'product_name'    => 'required|array',
-            'product_name.*'  => 'required|string|max:255',
-            'brand'           => 'required|array',
-            'brand.*'         => 'required|string|max:255',
-            'unit'            => 'required|array',
-            'unit.*'          => 'required|string|max:255',
-            'details'         => 'required|array',
-            'details.*'       => 'nullable|string|max:255',
-            'total_qty'       => 'required|array',
-            'total_qty.*'     => 'required|numeric|min:0',
-            'quantity'        => 'required|array',
-            'quantity.*'      => 'required|numeric|min:1',
-            'name_id'         => 'required|array',
-            'name_id.*'       => 'required|numeric',
-        ]);
-    
         DB::beginTransaction();
+        
         try {
             // Map the garage name to the corresponding model
             $stockModels = [
-                'Mirasol' => \App\Models\product_total_stocks::class,
-                'VGC' => \App\Models\ProductStockVGC::class,
+                'Mirasol'    => \App\Models\product_total_stocks::class,
+                'VGC'        => \App\Models\ProductStockVGC::class,
                 'Balintawak' => \App\Models\ProductStockBalintawak::class,
             ];
-    
+
             $garageName = $request->gar_name;
-    
+
             if (!isset($stockModels[$garageName])) {
                 throw new \Exception('Invalid garage name.');
             }
-    
+
             $stockModel = $stockModels[$garageName];
-    
+
             foreach ($request->product_code as $key => $productCode) {
                 // Create the PartOut record with default value handling
                 $partOut = PartsOut::create([
-                    'partsout_id'    => $request->partout_id,
+                    'partsout_id'      => $request->partout_id,
                     'product_category' => $request->category_id[$key],
-                    'product_code'  => $productCode,
-                    'product_serial' => $request->serial[$key] ?? null, // Set to null if not provided
-                    'product_name'  => $request->product_name[$key],
-                    'product_brand' => $request->brand[$key],
-                    'product_unit'  => $request->unit[$key],
-                    'product_details' => $request->details[$key] ?? null, // Set to null if not provided
-                    'product_outqty' => $request->quantity[$key],
-                    'bus_number'    => $request->bus_details ?? null, // Default to null if not provided
-                    'kilometers'    => $request->kilometers,
-                    'status'        => 'Done',
-                    'date_partsout' => Carbon::now(),
+                    'product_code'     => $productCode,
+                    'product_serial'   => $request->serial[$key] ?? null,
+                    'product_name'     => $request->product_name[$key],
+                    'product_brand'    => $request->brand[$key] ?? null,
+                    'product_unit'     => $request->unit[$key] ?? null,
+                    'product_details'  => $request->details[$key] ?? null,
+                    'product_outqty'   => $request->quantity[$key],
+                    'bus_number'       => $request->bus_details ?? null,
+                    'kilometers'       => $request->kilometers,
+                    'status'           => 'Done',
+                    'date_partsout'    => Carbon::now(),
                 ]);
-    
+
                 // Update the stock in the corresponding model
                 $stockRecord = $stockModel::where('product_id', $request->name_id[$key])->first();
-    
+
                 if ($stockRecord) {
                     $stockRecord->OutQty += $request->quantity[$key];
                     $stockRecord->save();
@@ -227,16 +200,16 @@ class PartsOutController extends Controller
                     throw new \Exception('Stock record not found for product ID: ' . $request->name_id[$key]);
                 }
             }
-    
+
             DB::commit();
             flash()->success('Successfully saved the Part Out request.');
             return redirect()->route('view.index');
+
         } catch (\Exception $e) {
             DB::rollback();
             \Log::error('Part Out save failed: ' . $e->getMessage());
             flash()->error('Failed to save the Part Out request. Please try again.');
             return redirect()->back()->withInput();
         }
-    }
-    
+    } 
 }
