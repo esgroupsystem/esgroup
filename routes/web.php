@@ -40,19 +40,19 @@ Route::group(['namespace' => 'App\Http\Controllers\Auth'],function()
         Route::get('/main-index', 'mainpages')->name('mainPages');
         Route::get('/login', 'login')->name('login');
         Route::post('/login', 'authenticate');
-        Route::get('/logout', 'logout')->name('logout');
+        Route::post('/logout', 'logout')->name('logout.user');
     });
 
     // ------------------------------ register ----------------------------------//
     Route::controller(RegisterController::class)->group(function () {
         Route::get('/register', 'register')->name('register');
-        Route::post('/register','storeUser')->name('register');    
+        Route::post('/register','storeUser')->name('register.user');    
     });
 
     // ----------------------------- forget password ----------------------------//
     Route::controller(ForgotPasswordController::class)->group(function () {
         Route::get('forget-password', 'getEmail')->name('forget-password');
-        Route::post('forget-password', 'postEmail')->name('forget-password');    
+        Route::post('forget-password', 'postEmail')->name('forget-password.user');    
     });
 
     // ----------------------------- reset password -----------------------------//
@@ -276,7 +276,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
             Route::get('form/shiftscheduling/page', 'shiftScheduLing')->name('form/shiftscheduling/page');
             Route::get('form/shiftlist/page', 'shiftList')->name('form/shiftlist/page');
 
-            Route::post('/schedule/store', 'storeSchedule')->name('schedule.store');
+            Route::post('/schedule/store', 'storeSchedule')->name('schedule.store.user');
             Route::post('/schedule/update', 'update')->name('schedule.update');
             Route::get('/driver-profiles', 'showDriverSchedules')->name('all.schedule');
             
@@ -387,7 +387,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
         Route::post('expenses/delete', 'deleteRecord')->name('expenses/delete');
         // ---------------------- search expenses  ---------------//
         Route::get('expenses/search', 'searchRecord')->name('expenses/search');
-        Route::post('expenses/search', 'searchRecord')->name('expenses/search');
+        Route::post('expenses/search', 'searchRecord')->name('expenses/search.user');
         
     });
 
