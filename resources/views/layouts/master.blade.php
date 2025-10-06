@@ -159,7 +159,7 @@
 				<!-- /Notifications -->
 				
 				<!-- Message Notifications -->
-				{{-- <li class="nav-item dropdown">
+				<li class="nav-item dropdown">
 					<a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
 						<i class="fa fa-comment-o"></i> <span class="badge badge-pill">8</span>
 					</a>
@@ -259,7 +259,7 @@
 						</div>
 						<div class="topnav-dropdown-footer"> <a href="chat.html">View all Messages</a> </div>
 					</div>
-				</li> --}}
+				</li>
 				<!-- /Message Notifications -->
 				<li class="nav-item dropdown has-arrow main-drop">
 					<a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
@@ -270,9 +270,7 @@
 					</a>
 					<div class="dropdown-menu">
 						<a class="dropdown-item" href="{{ route('profile_user') }}">My Profile</a>
-						@if(in_array(Auth::user()->role_name, ['Admin']))
 						<a class="dropdown-item" href="{{ route('company/settings/page') }}">Settings</a>
-						@endif
 						<a class="dropdown-item" href="{{ route('logout.user') }}">Logout</a>
 					</div>
 				</li>
