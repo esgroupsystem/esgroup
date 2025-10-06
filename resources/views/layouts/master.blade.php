@@ -4,9 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
-	<meta name="description" content="SoengSouy Admin Template">
 	<meta name="keywords" content="admin, estimates, bootstrap, business, corporate, creative, management, minimal, modern, accounts, invoice, html5, responsive, CRM, Projects">
-	<meta name="author" content="SoengSouy Admin Template">
 	<meta name="robots" content="noindex, nofollow">
 	<title>Dashboard - HRMS</title>
 	<!-- Favicon -->
@@ -161,7 +159,7 @@
 				<!-- /Notifications -->
 				
 				<!-- Message Notifications -->
-				<li class="nav-item dropdown">
+				{{-- <li class="nav-item dropdown">
 					<a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
 						<i class="fa fa-comment-o"></i> <span class="badge badge-pill">8</span>
 					</a>
@@ -261,7 +259,7 @@
 						</div>
 						<div class="topnav-dropdown-footer"> <a href="chat.html">View all Messages</a> </div>
 					</div>
-				</li>
+				</li> --}}
 				<!-- /Message Notifications -->
 				<li class="nav-item dropdown has-arrow main-drop">
 					<a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
@@ -272,8 +270,10 @@
 					</a>
 					<div class="dropdown-menu">
 						<a class="dropdown-item" href="{{ route('profile_user') }}">My Profile</a>
+						@if(in_array(Auth::user()->role_name, ['Admin']))
 						<a class="dropdown-item" href="{{ route('company/settings/page') }}">Settings</a>
-						<a class="dropdown-item" href="{{ route('logout') }}">Logout</a>
+						@endif
+						<a class="dropdown-item" href="{{ route('logout.user') }}">Logout</a>
 					</div>
 				</li>
 			</ul>
@@ -287,7 +287,7 @@
 				<div class="dropdown-menu dropdown-menu-right">
 					<a class="dropdown-item" href="{{ route('profile_user') }}">My Profile</a>
 					<a class="dropdown-item" href="{{ route('company/settings/page') }}">Settings</a>
-					<a class="dropdown-item" href="{{ route('logout') }}">Logout</a>
+					<a class="dropdown-item" href="{{ route('logout.user') }}">Logout</a>
 				</div>
 			</div>
 			<!-- /Mobile Menu -->
