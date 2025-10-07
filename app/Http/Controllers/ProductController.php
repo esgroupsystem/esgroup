@@ -121,47 +121,65 @@ class ProductController extends Controller
     public function updateProduct(Request $request)
     {
         $request->validate([
-            'id'                => 'required|integer|exists:products,id',
-            'product_status'   => 'required|string|max:255',
+            'id'                   => 'required|integer|exists:products,id',
+            'product_code'         => 'required|string|max:255',
+            'product_serial'       => 'nullable|string|max:255',
+            'product_name'         => 'required|string|max:255',
+            'product_brand'        => 'nullable|string|max:255',
+            'product_unit'         => 'nullable|string|max:255',
+            'product_parts_details'=> 'nullable|string|max:255',
+            'product_status'       => 'required|string|max:255',
         ]);
 
         DB::beginTransaction();
         try {
-            Products::where('id', $request->id)->update([
-                'product_status'   => $request->product_status,
+            $product = Products::findOrFail($request->id);
+
+            $product->update([
+                'product_code'          => $request->product_code,
+                'product_serial'        => $request->product_serial,
+                'product_name'          => $request->product_name,
+                // category stays unchanged
+                'product_brand'         => $request->product_brand,
+                'product_unit'          => $request->product_unit,
+                'product_parts_details' => $request->product_parts_details,
+                'product_status'        => $request->product_status,
             ]);
-            
+
             DB::commit();
-            flash()->success('Product updated successfully :)');
+            flash()->success('Product updated successfully ✅');
             return redirect()->back();
+
         } catch (\Exception $e) {
             DB::rollback();
-            flash()->error('Failed to update product :(');
+            \Log::error('Product update failed: '.$e->getMessage());
+            flash()->error('Failed to update product ❌');
             return redirect()->back();
         }
     }
-        /** Delete Record */
-        public function deleteProduct(Request $request)
-        {
-            $request->validate([
-                'id' => 'required|integer',
-            ]);
+    
+    /** Delete Record */
+    public function deleteProduct(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer',
+        ]);
+        
+        try {
+            $product = Products::find($request->id);
             
-            try {
-                $product = Products::find($request->id);
-                
-                if ($product) {
-                    $product->delete();
-                    flash()->success('Product deleted successfully!');
-                } else {
-                    flash()->error('Product not found!');
-                }
-                return redirect()->back();
-            } catch (\Exception $e) {
-                flash()->error('Failed to delete product.');
-                return redirect()->back();
+            if ($product) {
+                $product->delete();
+                flash()->success('Product deleted successfully!');
+            } else {
+                flash()->error('Product not found!');
             }
+            return redirect()->back();
+        } catch (\Exception $e) {
+            flash()->error('Failed to delete product.');
+            return redirect()->back();
         }
+    }
 
     /** 
      * Display All Category

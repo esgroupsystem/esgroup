@@ -50,21 +50,24 @@
                                         <td class="product_brand">{{ $items->product_serial ?? 'No Serial' }}</td>
                                         <td class="product_unit">{{ $items->unit_name ?? 'Unit not found' }}</td>
                                         <td class="product_details">{{ $items->product_parts_details ?? 'No Details' }}</td>
-                                        {{-- <td class="product_status">
-                                            <span class="badge badge-large
-                                                @if($items->product_status == 'Active') 
-                                                    bg-inverse-primary 
-                                                @elseif($items->product_status == 'InActive') 
-                                                    bg-inverse-danger
-                                                @endif">
-                                                {{$items->product_status}}
-                                            </span>
-                                        </td> --}}
                                         <td>
                                             <div class="dropdown dropdown-action">
                                                 <a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="material-icons">more_vert</i></a>
                                                 <div class="dropdown-menu dropdown-menu-right">
-                                                    <a class="dropdown-item productUpdate" data-toggle="modal" data-id="{{ $items->id }}" data-target="#edit_product"><i class="fa fa-pencil m-r-5"></i> Edit</a>
+                                                    <a class="dropdown-item productUpdate"
+                                                        data-toggle="modal"
+                                                        data-id="{{ $items->id }}"
+                                                        data-code="{{ $items->product_code }}"
+                                                        data-serial="{{ $items->product_serial }}"
+                                                        data-name="{{ $items->product_name }}"
+                                                        data-category="{{ $items->product_category }}"
+                                                        data-brand="{{ $items->product_brand }}"
+                                                        data-unit="{{ $items->product_unit }}"
+                                                        data-parts="{{ $items->product_parts_details }}"
+                                                        data-status="{{ $items->product_status }}"
+                                                        data-target="#edit_product">
+                                                        <i class="fa fa-pencil m-r-5"></i> Edit
+                                                    </a>
                                                     <a class="dropdown-item productDelete" href="#" data-toggle="modal" data-target="#delete_product"><i class="fa fa-trash-o m-r-5"></i> Delete</a>
                                                 </div>
                                             </div>
@@ -161,38 +164,74 @@
     </div>
         <!-- /Add Category Modal -->
 
-        <!-- Edit Category Modal -->
-        <div class="modal custom-modal fade" id="edit_product" role="dialog">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Edit Product</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form action="{{ route('form/product/update') }}" method="POST">
-                            @csrf
-                            <input type="hidden" name="id" id="e_id" value="">
-                            <div class="form-group">
-                                <label>Status <span class="text-danger">*</span></label>
-                                <div>
-                                    <select class="form-control custom-select" id="product_edit" name="product_status" required>
-                                        <option value="Active">Active</option>
-                                        <option value="InActive">InActive</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="submit-section">
-                                <button type="submit" class="btn btn-primary submit-btn">Save</button>
-                            </div>
-                        </form>
-                    </div>
+    <!-- Edit Product Modal -->
+    <div class="modal custom-modal fade" id="edit_product" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Product</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('form/product/update') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="id" id="e_id">
+
+                        <div class="form-group">
+                            <label>Product Code</label>
+                            <input type="text" class="form-control" id="e_product_code" name="product_code" readonly style="background-color:#f9f9f9;">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Serial</label>
+                            <input type="text" class="form-control" id="e_product_serial" name="product_serial">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Product Name</label>
+                            <input type="text" class="form-control" id="e_product_name" name="product_name">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Category</label>
+                            <input type="text" class="form-control" id="e_product_category" name="product_category" readonly style="background-color:#f9f9f9;">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Brand</label>
+                            <input type="text" class="form-control" id="e_product_brand" name="product_brand">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Unit</label>
+                            <input type="text" class="form-control" id="e_product_unit" name="product_unit">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Parts Details</label>
+                            <input type="text" class="form-control" id="e_product_parts_details" name="product_parts_details">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select class="form-control custom-select" id="e_product_status" name="product_status">
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+
+                        <div class="submit-section">
+                            <button type="submit" class="btn btn-primary submit-btn">Save Changes</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-        <!-- /Edit Category Modal -->
+    </div>
+    <!-- /Edit Product Modal -->
+
 
         <!-- Delete Category Modal -->
         <div class="modal custom-modal fade" id="delete_product" role="dialog">
@@ -300,19 +339,33 @@
         });
     </script>
 
-<script>
-    $(document).ready(function() {
-        var table = $('#productList').DataTable({
-            paging: true,
-            ordering: true,
-            info: true
-        });
+    <script>
+        $(document).ready(function() {
+            var table = $('#productList').DataTable({
+                paging: true,
+                ordering: true,
+                info: true
+            });
 
-        $('#productSearch').on('keyup', function() {
-            table.search(this.value).draw();
+            $('#productSearch').on('keyup', function() {
+                table.search(this.value).draw();
+            });
         });
-    });
-</script>
+    </script>
+
+    <script>
+        $(document).on('click', '.productUpdate', function () {
+            $('#e_id').val($(this).data('id'));
+            $('#e_product_code').val($(this).data('code'));
+            $('#e_product_serial').val($(this).data('serial'));
+            $('#e_product_name').val($(this).data('name'));
+            $('#e_product_category').val($(this).data('category'));
+            $('#e_product_brand').val($(this).data('brand'));
+            $('#e_product_unit').val($(this).data('unit'));
+            $('#e_product_parts_details').val($(this).data('parts'));
+            $('#e_product_status').val($(this).data('status'));
+        });
+    </script>
     
 
     @endsection
