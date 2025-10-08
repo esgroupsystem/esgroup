@@ -59,7 +59,7 @@
                                     </tr>
                                     <tr>
                                         <th colspan="3" class="text-right">Total:</th>
-                                        <th>Php {{ number_format($receipt->sum(fn($order) => $order->amount), 2) }}</th>
+                                        <th>Php {{ number_format($receipt->sum(fn($order) => $order->total_amount), 2) }}</th>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -73,7 +73,7 @@
                                 </div>
                                 <div class="col-md-6 text-right">
                                     <p>Prepared & Approved By:</p>
-                                    <h5>Eng. Mark Lexter San Jose</h5>
+                                    <h5>Myca Lavella Maderse</h5>
                                     <p>( Purchaser )</p>
                                 </div>
                             </div>
