@@ -70,10 +70,9 @@
                                     <th>Category</th>
                                     <th>Code</th>
                                     <th>Name</th>
-                                    <th>Serial</th>
-                                    <th>Brand</th>
                                     <th>Unit</th>
                                     <th>Details</th>
+                                    <th>Qty Out</th>
                                     <th>Date Issue</th>
                                     {{-- <th class="text-right">Action</th> --}}
                                 </tr>
@@ -85,10 +84,9 @@
                                     <td>{{ $item->category_name }}</td>
                                     <td>{{ $item->product_code }}</td>
                                     <td>{{ $item->product_name }}</td>
-                                    <td>{{ $item->product_serial }}</td>
-                                    <td>{{ $item->product_brand }}</td>
                                     <td>{{ $item->product_unit }}</td>
                                     <td>{{ $item->product_details }}</td>
+                                    <td>{{ $item->product_outqty }}</td>
                                     <td>{{ $item->date_partsout }}</td>
                                     {{-- <td><span class="badge bg-inverse-success">Accepted</span></td>
                                     <td class="text-right">

@@ -461,6 +461,7 @@ Route::group(['namespace' => 'App\Http\Controllers'],function()
             Route::get('/requestIndex/{requestId}','requestIndex')->name('update.index');
             Route::get('/receivingIndex','receivingIndex')->name('receiving.index');
             Route::get('/fetch-purchase-order/{id}','fetchPurchaseOrder');
+            Route::get('/receivedItems','receivedList')->name('received.items');
             Route::post('/save-received','saveReceived')->name('save.received');
             Route::post('updateRequest/form', 'updateRequest')->name('update.requestID');
             Route::get('/get-latest-request-number', 'getLatestRequestNumber');

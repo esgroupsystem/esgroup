@@ -74,6 +74,7 @@
                                     <th>Brand</th>
                                     <th>Unit</th>
                                     <th>Details</th>
+                                    <th>Transfered</th>
                                     <th>Date Issue</th>
                                     {{-- <th class="text-right">Action</th> --}}
                                 </tr>
@@ -89,6 +90,7 @@
                                     <td>{{ $item->product_brand }}</td>
                                     <td>{{ $item->product_unit }}</td>
                                     <td>{{ $item->product_details }}</td>
+                                    <td>{{ $item->product_outqty }}</td>
                                     <td>{{ $item->date_transfer }}</td>
                                     {{-- <td><span class="badge bg-inverse-success">Accepted</span></td>
                                     <td class="text-right">

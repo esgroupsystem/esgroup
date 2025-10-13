@@ -82,10 +82,10 @@
                                                         <span class="badge bg-inverse-warning">Pending</span>
                                                     @elseif($item->status == 'Done')
                                                         <span class="badge bg-inverse-success">Done</span>
-                                                    @elseif($item->status == 'Partial')
-                                                        <span class="badge bg-inverse-info">Partial</span>
+                                                    @elseif($item->status == 'Partial Order')
+                                                        <span class="badge bg-inverse-info">Partial Order</span>
                                                     @else
-                                                        <span class="badge bg-inverse-info">Unknown</span>
+                                                        <span class="badge bg-inverse-info">Partial Order</span>
                                                     @endif
                                                 </td>
                                                 <td id="requestDATE">

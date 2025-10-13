@@ -14,23 +14,24 @@
                                     <p>#14 Mirasol, San Roque Cubao<br> Quezon City, Metro Manila<br>
                                         <a href="www.estransport.ph">www.estransport.ph</a><br>
                                         <strong>Email:</strong> espurchasingdept@gmail.com<br>
-                                        <strong>Tel:</strong> 8421-0728 | <strong>Fax:</strong> 8421-0725</p>
+                                    </p>
                                 </div>
                                 <div class="col-md-6 text-right">
                                     <h4 class="border p-2 d-inline-block">Purchase Order</h4>
-                                    <p><strong>Order #:</strong> {{ $purchaseOrder->po_number }}</p>
-                                    <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($purchaseOrder->created_at)->format('m/d/Y') }}</p>
+                                    <p><strong>Order #:</strong> {{ $transaction->purchase_id }}</p>
+                                    <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($transaction->created_at)->format('m/d/Y') }}</p>
                                 </div>
                             </div>
 
                             <div class="mt-4">
-                                <p><strong>Vendor Address:</strong> {{ $supplier->supplier_name ?? 'N/A' }}</p>
-                                <p><strong>Contact:</strong> Ms. Camille</p>
-                                <p><strong>Phone:</strong> 09176728634</p>
+                                <p><strong>Vendor:</strong> {{ $supplier->supplier_name ?? $transaction->supplier_name }}</p>
+                                <p><strong>Contact:</strong> {{ $supplier->contact_person ?? 'N/A' }}</p>
+                                <p><strong>Phone:</strong> {{ $supplier->contact_number ?? 'N/A' }}</p>
                             </div>
 
                             <div class="mt-4 border p-2">
-                                <p><strong>Payment Terms:</strong> {{ $purchaseOrder->payment_terms ?? 'N/A' }}</p>
+                                <p><strong>Payment Terms:</strong> {{ $transaction->payment_terms ?? 'N/A' }}</p>
+                                <p><strong>Status:</strong> {{ $transaction->status_receiving ?? 'N/A' }}</p>
                             </div>
 
                             <table class="table table-bordered mt-3">
@@ -43,23 +44,23 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($receipt as $order)
+                                    @foreach ($transactions as $item)
                                         <tr>
-                                            <td>{{ $order->product_name }}</td>
-                                            <td>{{ $order->qty }}</td>
-                                            <td>Php {{ number_format($order->amount / $order->qty, 2) }}</td>
-                                            <td>Php {{ number_format($order->amount, 2) }}</td>
+                                            <td>{{ $item->product_complete_name }}</td>
+                                            <td>{{ $item->product_qty }}</td>
+                                            <td>₱ {{ number_format($item->grand_total / max($item->product_qty, 1), 2) }}</td>
+                                            <td>₱ {{ number_format($item->grand_total, 2) }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                                 <tfoot>
                                     <tr>
                                         <th colspan="3" class="text-right">Sub-total:</th>
-                                        <th>Php {{ number_format($receipt->sum(fn($order) => $order->amount), 2) }}</th>
+                                        <th>₱ {{ number_format($transactions->sum('grand_total'), 2) }}</th>
                                     </tr>
                                     <tr>
-                                        <th colspan="3" class="text-right">Total:</th>
-                                        <th>Php {{ number_format($receipt->sum(fn($order) => $order->total_amount), 2) }}</th>
+                                        <th colspan="3" class="text-right">Total Amount:</th>
+                                        <th>₱ {{ number_format($transactions->sum('total_amount'), 2) }}</th>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -68,13 +69,13 @@
                                 <div class="col-md-6">
                                     <div class="border p-2">
                                         <p><strong>Remarks:</strong></p>
-                                        <p>R.O. #</p>
+                                        <p>{{ $transaction->remarks ?? 'N/A' }}</p>
                                     </div>
                                 </div>
                                 <div class="col-md-6 text-right">
                                     <p>Prepared & Approved By:</p>
                                     <h5>Myca Lavella Maderse</h5>
-                                    <p>( Purchaser )</p>
+                                    <p>(Purchaser)</p>
                                 </div>
                             </div>
                         </div>
@@ -93,8 +94,8 @@
 
     <script>
         function printPurchaseOrder() {
-            var printContents = document.getElementById('print-area').innerHTML;
-            var originalContents = document.body.innerHTML;
+            const printContents = document.getElementById('print-area').innerHTML;
+            const originalContents = document.body.innerHTML;
 
             document.body.innerHTML = printContents;
             window.print();

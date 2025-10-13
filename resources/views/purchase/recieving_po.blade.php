@@ -92,8 +92,6 @@
                                         <tr>
                                             <th>Product Code</th>
                                             <th>Product Name</th>
-                                            <th>Brand</th>
-                                            <th>Unit</th>
                                             <th>Ordered Qty</th>
                                             <th>Received Qty</th>
                                         </tr>
@@ -189,52 +187,72 @@
                     updateStatus(); // Recalculate status whenever received_qty is updated
                 });
         
-                // Load purchase order items into the modal
                 $('.btn-view').on('click', function () {
-                    const purchaseId = $(this).data('id');
-                    const productsTable = $('#tablePurchaseOrder tbody');
-                    productsTable.empty(); // Clear previous items
+                const purchaseId = $(this).data('id');
+                const productsTable = $('#tablePurchaseOrder tbody');
+                productsTable.empty();
 
-                    $('#purchase_id').val(purchaseId);
+                // set hidden input
+                $('#purchase_id').val(purchaseId);
 
-                    $.ajax({
-                        url: `/fetch-purchase-order/${purchaseId}`,
-                        method: 'GET',
-                        success: function (response) {
-                            if (response.purchaseOrders) {
-                                response.purchaseOrders.forEach(po => {
-                                    $('#status_receiving').text(po.status_receiving);
+                // update modal title dynamically
+                $('.modal-title').text(`Received Qty — ${purchaseId}`);
 
-                                    // Set the hidden input for garage_name
-                                    $('#garage_name').val(po.garage_name); 
+                $.ajax({
+                    url: `/fetch-purchase-order/${purchaseId}`,
+                    method: 'GET',
+                    success: function (response) {
+                        const po = response.purchaseOrder;
 
-                                    po.items.forEach(item => {
-                                        const remainingQty = Math.max(item.qty - item.qty_received, 0); // Ensure no negative values
-                                        const disabledAttr = remainingQty === 0 ? 'disabled' : ''; 
+                        if (po) {
+                            // ✅ Fill form header
+                        $('#status_receiving')
+                            .text(po.status_receiving)
+                            .removeClass()
+                            .addClass('badge')
+                            .addClass(po.status_receiving === 'Delivered' 
+                                ? 'bg-inverse-success' 
+                                : (po.status_receiving === 'Partial Delivered' 
+                                    ? 'bg-inverse-info' 
+                                    : 'bg-inverse-warning'));
 
-                                        const row = `
-                                            <tr>
-                                                <td hidden><input type="hidden" name="product_id[]" value="${item.id}"></td>
-                                                <td><input class="form-control" name="product_code[]" value="${item.product_code}" readonly></td>
-                                                <td><input class="form-control" name="product_name[]" value="${item.product_name}" readonly></td>
-                                                <td><input class="form-control" name="brand[]" value="${po.product_brand}" readonly></td>
-                                                <td><input class="form-control" name="unit[]" value="${po.product_unit}" readonly></td>
-                                                <td><input class="form-control" name="qty[]" value="${remainingQty}" readonly></td> <!-- Updated -->
-                                                <td><input class="form-control" name="received_qty[]" value="0" min="0" max="${remainingQty}"></td>
-                                            </tr>`;
-                                        productsTable.append(row);
-                                    });
-                                });
-                            } else {
-                                alert('No data found for this Purchase Order.');
-                            }
-                        },
-                        error: function () {
-                            alert('Failed to fetch purchase order data. Please try again.');
-                        },
-                    });
+                            $('#garage_name').val(po.garage_name);
+                            $('#supplier_name').val(po.supplier_name);
+                            $('#payment_terms').val(po.payment_terms);
+                            $('#remarks').val(po.remarks);
+                            $('#date_received').val(po.date_received);
+
+                            const productsTable = $('#tablePurchaseOrder tbody');
+                            productsTable.empty();
+
+                            // ✅ Populate products
+                            po.items.forEach(item => {
+                                const remainingQty = Math.max(item.product_qty - item.product_qty_received, 0);
+
+                                // ✅ Skip fully delivered items
+                                if (remainingQty === 0) return;
+
+                                const row = `
+                                    <tr>
+                                        <td hidden><input type="hidden" name="product_id[]" value="${item.id}"></td>
+                                        <td><input class="form-control" name="product_code[]" value="${item.product_code || ''}" readonly></td>
+                                        <td><input class="form-control" name="product_name[]" value="${item.product_complete_name || ''}" readonly></td>
+                                        <td><input class="form-control" name="qty[]" value="${remainingQty}" readonly></td>
+                                        <td><input class="form-control" name="received_qty[]" type="number" value="0" min="0" max="${remainingQty}"></td>
+                                    </tr>`;
+                                productsTable.append(row);
+                            });
+                        } else {
+                            alert('No data found for this Purchase Order.');
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error(xhr.responseText);
+                        alert('Failed to fetch purchase order data. Please try again.');
+                    },
                 });
             });
+        });
         </script>        
         
     @endsection

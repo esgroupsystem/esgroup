@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Models\PurchaseRequestOrder;
 use App\Models\product_total_stocks;
 use App\Models\PurchaseTransaction;
 use App\Models\PurchaseOrder;
@@ -26,17 +27,32 @@ class PurchaseOrderController extends Controller
      */
     public function receipt($po_number)
     {
-        $purchaseOrders = PurchaseOrder::where('po_number', $po_number)->get();
-        $purchaseOrderIds = $purchaseOrders->pluck('id');
-        $receipt = PurchaseOrderItem::whereIn('purchase_order_id', $purchaseOrderIds)->get();
-        $purchaseOrder = $purchaseOrders->first();
-    
-        // Fetch supplier information
-        $supplier = Supplier::find($purchaseOrder->product_supplier);
-    
-        return view('purchase.receipt', compact('purchaseOrder', 'receipt', 'supplier'));
+        // Fetch purchase transaction records by purchase_id
+        $transactions = PurchaseTransaction::where('purchase_id', trim($po_number))->get();
+
+        if ($transactions->isEmpty()) {
+            return redirect()->back()->with('error', 'No transaction found for #' . $po_number);
+        }
+
+        // Get the first record for header info
+        $transaction = $transactions->first();
+
+        // Detect supplier
+        $supplierValue = $transaction->supplier_name;
+        if (is_numeric($supplierValue)) {
+            $supplier = Supplier::find($supplierValue);
+        } else {
+            $supplier = Supplier::where('supplier_name', $supplierValue)->first();
+        }
+
+        return view('purchase.receipt', [
+            'transaction' => $transaction,
+            'transactions' => $transactions, // list of all products under this PO
+            'supplier' => $supplier,
+        ]);
     }
         
+    // All Stocks
     public function stockMirasol(Request $request)
     {
         $categories = ProductCategory::with([
@@ -55,6 +71,7 @@ class PurchaseOrderController extends Controller
         return view('purchase.stockmirasol', compact('categories'));
     }
     
+    // All Stocks
     public function stockBalintawak(Request $request)
     {
         $categories = ProductCategory::with([
@@ -73,12 +90,12 @@ class PurchaseOrderController extends Controller
         return view('purchase.stockbalintawak', compact('categories'));
     }
 
+    // All Stocks
     public function stockVGC(Request $request)
     {
         $categories = ProductCategory::with(['products.productStockVgc'])->get();
         return view('purchase.stockVGC', compact('categories'));
     }
-
 
     /**
      * END OF ALL STOCKS
@@ -86,18 +103,18 @@ class PurchaseOrderController extends Controller
     // Index for main
     public function mainIndex(Request $request)
     {
-        $poOrder = PurchaseOrder::get()->unique('request_id');
-    
+        $poOrder = PurchaseRequestOrder::get()->unique('request_id');
+
         $pendingCount = 0;
         $partialCount = 0;
-    
-        // **Fix the Counting Logic for Waiting for Delivery and Partial Received**
-        $waitingDeliveryCount = PurchaseTransaction::where('status_receiving', 'For Delivery')->count();
-        $partialReceivedCount = PurchaseTransaction::where('status_receiving', 'Partial Delivered')->count();
-    
+
+        // ✅ Fix: Count "Waiting for Delivery" and "Partial Received" correctly
+        $waitingDeliveryCount = PurchaseTransaction::where('status_receiving', 'For Delivery')->distinct('purchase_id')->count('purchase_id');
+        $partialReceivedCount = PurchaseTransaction::where('status_receiving', 'Partial Delivered')->distinct('purchase_id')->count('purchase_id');
+
         foreach ($poOrder as $order) {
             $statuses = PurchaseOrder::where('request_id', $order->request_id)->pluck('status');
-    
+
             if ($statuses->every(fn($status) => $status == 'Pending')) {
                 $order->status = 'Pending';
                 $pendingCount++;
@@ -110,21 +127,36 @@ class PurchaseOrderController extends Controller
                 $order->status = 'Unknown';
             }
         }
-    
+
         $poOrder = $poOrder->sortBy(function ($item) {
             return array_search($item->status, ['Pending', 'Partial', 'Done']);
         });
-    
-        $requestOrder = PurchaseTransaction::get();
-    
+
+        // ✅ Fix: Only one per PO number
+        $requestOrder = PurchaseTransaction::select(
+                'purchase_id',
+                'request_id',
+                'status_receiving',
+                'payment_terms',
+                DB::raw('SUM(total_amount) as total_amount')
+            )
+            ->groupBy('purchase_id', 'request_id', 'status_receiving', 'payment_terms')
+            ->orderBy('purchase_id', 'desc')
+            ->get();
+
         return view('purchase.purchase_order', compact(
-            'poOrder', 'requestOrder', 'pendingCount', 'partialCount', 'waitingDeliveryCount', 'partialReceivedCount'
+            'poOrder',
+            'requestOrder',
+            'pendingCount',
+            'partialCount',
+            'waitingDeliveryCount',
+            'partialReceivedCount'
         ));
     }
     
-    
     // View for Request
-    public function purchaseIndex(Request $request){
+    public function purchaseIndex(Request $request)
+    {
 
         $garage = Garage::get();
         $category = ProductCategory::get();
@@ -141,68 +173,131 @@ class PurchaseOrderController extends Controller
     // View for updating request
     public function requestIndex(Request $request, $requestId)
     {
-        $requestDetails = PurchaseOrder::where('request_id', $requestId)
-            ->leftJoin('product_categories', 'purchase_orders.product_category', '=', 'product_categories.id')
-            ->select('purchase_orders.*', 'product_categories.category_name')
+        // Get request details (header info)
+        $requestDetails = PurchaseRequestOrder::where('request_id', $requestId)
+            ->leftJoin('product_categories', 'purchase_request_orders.product_category', '=', 'product_categories.id')
+            ->select(
+                'purchase_request_orders.request_id',
+                'purchase_request_orders.garage_name',
+                'product_categories.category_name',
+                'purchase_request_orders.request_date',
+                'purchase_request_orders.request_status'
+            )
             ->first();
-    
-        // Filter products to show only those with "Pending" status
-        $products = PurchaseOrder::where('purchase_orders.request_id', $requestId)
-            ->where('purchase_orders.status', 'Pending') // Only Pending
-            ->leftJoin('product_categories', 'purchase_orders.product_category', '=', 'product_categories.id')
-            ->leftJoin('purchase_order_items', 'purchase_orders.id', '=', 'purchase_order_items.purchase_order_id')
-            ->select('purchase_orders.*', 'product_categories.category_name', 'purchase_order_items.qty')
-            ->get();
-    
+
+        // Fetch all product lines for this request
+        $products = PurchaseRequestOrder::where('purchase_request_orders.request_id', $requestId)
+            ->leftJoin('product_categories', 'purchase_request_orders.product_category', '=', 'product_categories.id')
+            ->select(
+                'purchase_request_orders.id',
+                'purchase_request_orders.request_id',
+                'purchase_request_orders.garage_name',
+                'product_categories.category_name',
+                'purchase_request_orders.product_name',
+                'purchase_request_orders.product_code',
+                'purchase_request_orders.product_serial',
+                'purchase_request_orders.product_brand',
+                'purchase_request_orders.product_unit',
+                'purchase_request_orders.product_qty',
+                'purchase_request_orders.product_qty_sold',
+                'purchase_request_orders.product_details',
+                'purchase_request_orders.request_date',
+                'purchase_request_orders.request_status',
+                'purchase_request_orders.created_at'
+            )
+            ->orderBy('purchase_request_orders.id', 'asc')
+            ->get()
+            ->map(function ($item) {
+                // Compute remaining quantity
+                $item->remaining_qty = max(($item->product_qty ?? 0) - ($item->product_qty_sold ?? 0), 0);
+                return $item;
+            });
+
+        // If you have a supplier table
         $supplier = Supplier::all();
+
+        // Optional PO number generator
         $newPoNumber = $this->generatePoNumber();
-    
-        return view('purchase.update_request_to_purchase', compact('requestDetails', 'products', 'newPoNumber', 'supplier'));
+
+        return view('purchase.update_request_to_purchase', compact(
+            'requestDetails',
+            'products',
+            'newPoNumber',
+            'supplier'
+        ));
     }
-    
+
 
     // Viewing for Receiving all products
     public function receivingIndex(Request $request)
     {
-        $purchaseReceived = PurchaseTransaction::get();
+        // Get all PO items with relevant status
+        $purchaseItems = PurchaseTransaction::select(
+                'purchase_id',
+                'request_id',
+                'garage_name',
+                'supplier_name',
+                'payment_terms',
+                'status_receiving'
+            )
+            ->whereIn('status_receiving', ['For Delivery', 'Partial Delivered'])
+            ->orderByDesc('purchase_id')
+            ->get();
 
-        return view('purchase.recieving_po', compact('purchaseReceived'));
+        // Group by purchase_id
+        $purchaseGrouped = $purchaseItems->groupBy('purchase_id');
+
+        // Pick only the “highest” status per PO
+        $purchaseReceived = $purchaseGrouped->map(function ($items) {
+            // Check if any item is Partial Delivered
+            $partial = $items->firstWhere('status_receiving', 'Partial Delivered');
+
+            if ($partial) {
+                return $partial; // show Partial Delivered
+            } else {
+                return $items->first(); // show For Delivery
+            }
+        });
+
+        return view('purchase.recieving_po', ['purchaseReceived' => $purchaseReceived]);
     }
 
-    // Retrieve the PO
+
     public function fetchPurchaseOrder($id)
     {
-        // Retrieve purchase orders and their items
-        $purchaseOrders = PurchaseOrder::where('po_number', $id)
-            ->with(['items' => function ($query) {
-                $query->select('id', 'purchase_order_id', 'product_code', 'product_name', 'qty', 'qty_received');
-            }])
-            ->get();
-    
-        if ($purchaseOrders->isEmpty()) {
+        $transactions = PurchaseTransaction::where('purchase_id', $id)->get();
+
+        if ($transactions->isEmpty()) {
             return response()->json(['error' => 'Purchase order not found.'], 404);
         }
-    
-        // Compute remaining qty before sending response
-        foreach ($purchaseOrders as $po) {
-            foreach ($po->items as $item) {
-                $item->remaining_qty = max($item->qty - $item->qty_received, 0); // Prevent negative values
-            }
-        }
-    
-        return response()->json(['purchaseOrders' => $purchaseOrders]);
+
+        $header = $transactions->first();
+
+        return response()->json([
+            'purchaseOrder' => [
+                'purchase_id' => $header->purchase_id,
+                'status_receiving' => $header->status_receiving,
+                'garage_name' => $header->garage_name,
+                'supplier_name' => $header->supplier_name,
+                'payment_terms' => $header->payment_terms,
+                'remarks' => $header->remarks,
+                'date_received' => $header->date_received,
+                'items' => $transactions,
+            ]
+        ]);
     }
-    
+
+
     // Generate New PO Number
     public function generatePoNumber()
     {
-        $lastPo = PurchaseOrder::where('po_number', 'like', 'PO-%')
-            ->orderByRaw('CAST(SUBSTRING(po_number, 4) AS UNSIGNED) DESC')
+        $lastPo = PurchaseTransaction::where('purchase_id', 'like', 'PO-%')
+            ->orderByRaw('CAST(SUBSTRING(purchase_id, 4) AS UNSIGNED) DESC')
             ->first();
     
         $latestNumber = 9908;
     
-        if ($lastPo && preg_match('/^PO-(\d{4})$/', $lastPo->po_number, $matches)) {
+        if ($lastPo && preg_match('/^PO-(\d{4})$/', $lastPo->purchase_id, $matches)) {
             $latestNumber = (int) $matches[1];
         }
 
@@ -213,8 +308,9 @@ class PurchaseOrderController extends Controller
     }
 
     // Generate New Request Number
-    public function getLatestRequestNumber() {
-        $latestRequest = PurchaseOrder::where('request_id', 'like', 'Request-%')
+    public function getLatestRequestNumber() 
+    {
+        $latestRequest = PurchaseRequestOrder::where('request_id', 'like', 'Request-%')
             ->orderByRaw('CAST(SUBSTRING(request_id, 9) AS UNSIGNED) DESC')
             ->first();
         
@@ -249,7 +345,6 @@ class PurchaseOrderController extends Controller
             'product_names' => $productCodes
         ]);
     }
-    
 
     public function getProductDetails(Request $request)
     {
@@ -275,57 +370,34 @@ class PurchaseOrderController extends Controller
         ]);
     }
 
-    // This function is for saving REQUEST
-    public function saveRequest(Request $request){
-
-        $request->validate([
-            'request_id'      => 'required|string|max:255',
-            'gar_name'        => 'required|string|max:255',
-            'category'        => 'required|array',
-            'category.*'      => 'required|string|max:255',
-            'product_code'    => 'required|array',
-            'product_code.*'  => 'required|string|max:255',
-            'product_name'    => 'required|array',
-            'product_name.*'  => 'required|string|max:255',
-            // 'brand'           => 'required|array',
-            // 'brand.*'         => 'required|string|max:255',
-            'unit'            => 'required|array',
-            'unit.*'          => 'required|string|max:255',
-        ]);
+    public function saveRequest(Request $request)
+    {
 
         DB::beginTransaction();
-        try{
-            foreach ($request->product_code as $key => $product_code) {
 
-                $purchaseOrder = PurchaseOrder::create([
+        try {
+            foreach ($request->product_code as $key => $product_code) {
+                PurchaseRequestOrder::create([
                     'request_id'        => $request->request_id,
                     'garage_name'       => $request->gar_name,
-                    'product_code'      => $product_code,
-                    'product_name'      => $request->product_name[$key],
                     'product_category'  => $request->category[$key],
-                    // 'product_brand'     => $request->brand[$key],
+                    'product_name'      => $request->product_name[$key],
+                    'product_code'      => $product_code,
                     'product_unit'      => $request->unit[$key],
-                    'status'            => 'Pending',
+                    'product_qty'       => $request->qty[$key],
                     'request_date'      => now()->toDateString(),
                 ]);
-
-                PurchaseOrderItem::create([
-                    'purchase_order_id' => $purchaseOrder->id,
-                    'request_id'        => $purchaseOrder->request_id,
-                    'product_code'      => $product_code,
-                    'product_name'      => $request->product_name[$key],
-                    'qty'               => $request->qty[$key],
-                ]);
             }
-            
+
             DB::commit();
-            flash()->success('Successfully submitted, please for wait for confirmation :)');
+            flash()->success('Successfully saved request!');
             return redirect()->route('purchase.index');
-        }catch (\Exception $e) {
-            DB::rollback();
-            \Log::error('Request failed: ' . $e->getMessage());
-            flash()->error('Failed to request :(');
-            return redirect()->back();
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Save request failed: ' . $e->getMessage());
+            flash()->error('Failed to save request.');
+            return redirect()->back()->withInput();
         }
     }
 
@@ -333,158 +405,196 @@ class PurchaseOrderController extends Controller
     public function updateRequest(Request $request)
     {
         DB::beginTransaction();
+
         try {
-            // Get removed items from request
-            $removedProductIds = $request->removed_items ? explode(',', $request->removed_items) : [];
-
-            // Loop through displayed items and update them
             foreach ($request->product_id as $key => $productId) {
+                $partialQty = isset($request->partial_qty[$key]) ? (float)$request->partial_qty[$key] : 0;
+                $amount     = isset($request->amount[$key]) ? (float)$request->amount[$key] : 0;
 
-                // Skip removed items
-                if (in_array($productId, $removedProductIds)) {
-                    continue;
-                }
+                if ($partialQty <= 0) continue; // skip empty rows
 
-                // Update purchase order details for each item
-                PurchaseOrder::where('id', $productId)->update([
-                    'po_number'        => $request->po_number,
-                    'product_supplier' => $request->supp_name,
-                    'payment_terms'    => $request->payment_terms,
-                    'remarks'          => $request->remarks,
-                    'status'           => 'Done',
-                    'purchase_date'    => now()->toDateString(),
-                ]);
+                $itemTotal = $partialQty * $amount;
 
-                $productCode = $request->product_code[$key];
-                $itemTotal = $request->qty[$key] * $request->amount[$key];
+                $requestOrder = PurchaseRequestOrder::find($productId);
 
-                // Ensure the product exists before updating
-                $product = Products::where('product_code', $productCode)->first();
-                if (!$product) {
-                    flash()->error("Product not found: $productCode");
-                    continue;
-                }
-
-                // Update purchase order items
-                PurchaseOrderItem::where('request_id', $request->request_id)
-                    ->where('product_code', $productCode)
-                    ->update([
-                        'amount'       => $request->amount[$key],
-                        'total_amount' => $itemTotal,
+                if ($requestOrder) {
+                    $newQtySold = ($requestOrder->product_qty_sold ?? 0) + $partialQty;
+                    $requestOrder->update([
+                        'product_qty_sold' => $newQtySold,
+                        'updated_at' => now(),
                     ]);
-            }
+                }
 
-            // Remove deleted products from the order
-            if (!empty($removedProductIds)) {
-                PurchaseOrderItem::whereIn('id', $removedProductIds)->delete();
+                PurchaseTransaction::create([
+                    'purchase_id'           => $request->po_number,
+                    'request_id'            => $request->request_id,
+                    'garage_name'           => $request->garage_name,
+                    'supplier_name'         => $request->supp_name,
+                    'product_code'          => $request->product_code[$key],
+                    'product_complete_name' => $request->product_name[$key],
+                    'product_qty'           => $partialQty,
+                    'grand_total'           => $itemTotal,
+                    'total_amount'          => str_replace(['₱', ',', ' '], '', $request->grand_total),
+                    'payment_terms'         => $request->payment_terms,
+                    'status_receiving'      => 'For Delivery',
+                    'remarks'               => $request->remarks,
+                    'date_received'         => null,
+                    'created_at'            => now(),
+                ]);
             }
-
-            // Create purchase transaction
-            PurchaseTransaction::create([
-                'purchase_id'   => $request->po_number,
-                'request_id'    => $request->request_id,
-                'total_amount'  => $request->grand_total,
-                'payment_terms' => $request->payment_terms,
-            ]);
 
             DB::commit();
-            flash()->success('Successfully saved purchase order, please wait for delivery.');
+            flash()->success('Purchase transaction saved successfully!');
             return redirect()->route('purchase.index');
+
         } catch (\Exception $e) {
-            DB::rollback();
+            DB::rollBack();
             \Log::error('Update request failed: ' . $e->getMessage());
-            flash()->error('Failed to update the purchase order.');
-            return redirect()->back();
+            flash()->error('Failed to save purchase transaction.');
+            return redirect()->back()->withInput();
         }
-    }      
+    }
+
 
     // Function for receiving a items
     public function saveReceived(Request $request)
     {
         DB::beginTransaction();
+
         try {
+            // ✅ Validation
             $validated = $request->validate([
                 'product_id' => 'required|array',
-                'product_id.*' => 'integer|exists:purchase_order_items,id',
+                'product_id.*' => 'integer|exists:purchase_transactions,id',
                 'received_qty' => 'required|array',
-                'received_qty.*' => 'integer|min:0',
+                'received_qty.*' => 'nullable|integer|min:0',
                 'purchase_id' => 'required|exists:purchase_transactions,purchase_id',
                 'garage_name' => 'required|in:Mirasol,VGC,Balintawak',
             ]);
-    
-            if (count($request->product_id) !== count($request->received_qty)) {
-                return redirect()->back()->withErrors('Mismatched product and quantity arrays.');
-            }
-    
-            $allItemsFullyReceived = true;
+
             $garageName = $request->input('garage_name');
-    
+
             $tableMapping = [
                 'Mirasol'    => 'product_total_stocks',
                 'VGC'        => 'product_stock_v_g_c_s',
                 'Balintawak' => 'product_stock_balintawaks',
             ];
-    
+
             $tableName = $tableMapping[$garageName] ?? null;
-    
             if (!$tableName) {
                 return redirect()->back()->withErrors('Invalid garage name.');
             }
-    
-            foreach ($request->product_id as $index => $productId) {
 
-                $orderItem = PurchaseOrderItem::findOrFail($productId);
-                $newQty = $orderItem->qty_received + $request->received_qty[$index];
-    
-                if ($newQty > $orderItem->qty) {
-                    return redirect()->back()->withErrors('Received quantity cannot exceed the ordered quantity.');
+            $anyItemReceived = false;
+
+            // 1️⃣ Update only the items that were actually received
+            foreach ($request->product_id as $index => $productId) {
+                $receivedQty = $request->received_qty[$index] ?? 0;
+                if ($receivedQty <= 0) continue;
+
+                $orderItem = PurchaseTransaction::findOrFail($productId);
+
+                // Skip items already delivered
+                if ($orderItem->status_receiving === 'Delivered') continue;
+
+                $anyItemReceived = true;
+
+                $newQty = $orderItem->product_qty_received + $receivedQty;
+                if ($newQty > $orderItem->product_qty) {
+                    return redirect()->back()->withErrors(
+                        "Received quantity cannot exceed ordered quantity for {$orderItem->product_code}."
+                    );
                 }
-    
-                $orderItem->qty_received = $newQty;
+
+                // ✅ Update received quantity and item-level status
+                $orderItem->product_qty_received = $newQty;
+                $orderItem->status_receiving = $newQty == $orderItem->product_qty ? 'Delivered' : 'Partial Delivered';
                 $orderItem->save();
-    
+
+                // ✅ Update stock table
                 $product = Products::where('product_code', $orderItem->product_code)->first();
-    
                 if (!$product) {
-                    return redirect()->back()->withErrors('Product not found in the products table.');
+                    return redirect()->back()->withErrors("Product not found: {$orderItem->product_code}");
                 }
-    
+
                 $existingRecord = DB::table($tableName)->where('product_id', $product->id)->first();
                 if ($existingRecord) {
                     DB::table($tableName)
                         ->where('product_id', $product->id)
-                        ->update([
-                            'InQty' => $existingRecord->InQty + $request->received_qty[$index],
-                        ]);
+                        ->update(['InQty' => $existingRecord->InQty + $receivedQty]);
                 } else {
                     DB::table($tableName)->insert([
                         'product_id' => $product->id,
-                        'InQty' => $request->received_qty[$index],
+                        'InQty' => $receivedQty,
                         'OutQty' => 0,
                     ]);
                 }
 
-                if ($newQty < $orderItem->qty) {
-                    $allItemsFullyReceived = false;
-                }
+                // ✅ Log to received_transactions
+                DB::table('received_transactions')->insert([
+                    'po_id' => $request->purchase_id,
+                    'product_code' => $orderItem->product_code,
+                    'product_name' => $request->product_name[$index] ?? $orderItem->product_complete_name,
+                    'product_brand' => $orderItem->product_brand,
+                    'product_unit' => $orderItem->product_unit,
+                    'qty_received' => $receivedQty,
+                    'status' => 'Received',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
             }
 
-            $purchaseTransaction = PurchaseTransaction::where('purchase_id', $request->purchase_id)->first();
-            if (!$purchaseTransaction) {
-                return redirect()->back()->withErrors('Purchase transaction not found.');
+            if (!$anyItemReceived) {
+                return redirect()->back()->withErrors('No quantity entered for receiving.');
             }
-            $purchaseTransaction->status_receiving = $allItemsFullyReceived ? 'Delivered' : 'Partial Delivered';
-            $purchaseTransaction->save();
-    
+
+            // 2️⃣ Update **all items in the same PO** to ensure consistent PO-level status
+            $poItems = PurchaseTransaction::where('purchase_id', $request->purchase_id)->get();
+
+            $allDelivered = $poItems->every(fn($item) => $item->product_qty_received >= $item->product_qty);
+
+            foreach ($poItems as $item) {
+                // Update status for each item
+                if ($allDelivered) {
+                    $item->status_receiving = 'Delivered';
+                } elseif ($item->product_qty_received > 0) {
+                    $item->status_receiving = 'Partial Delivered';
+                } else {
+                    $item->status_receiving = 'For Delivery';
+                }
+                $item->save();
+            }
+
+            // ✅ Optionally update a PO-level reference (if you have one)
+            // Here we use the first item as PO reference
+            $purchase = $poItems->first();
+            $purchase->status_receiving = $allDelivered ? 'Delivered' : 'Partial Delivered';
+            $purchase->date_received = now();
+            $purchase->save();
+
             DB::commit();
-            flash()->success('Successfully saved the records :)');
+            flash()->success('Successfully saved received items and updated PO status.');
             return redirect()->route('receiving.index');
+
         } catch (\Exception $e) {
-            DB::rollback();
-            \Log::error('Failed to save received items', ['error' => $e->getMessage()]);
-            flash()->error('Failed to update the request order.');
+            DB::rollBack();
+            \Log::error('❌ Failed to save received items', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+            flash()->error('Failed to update receiving. Please try again.');
             return redirect()->back();
         }
     }
 
+    // View for received items
+    public function receivedList()
+    {
+        $receivedTransactions = DB::table('received_transactions')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('purchase.received_items', compact('receivedTransactions'));
+    }
 }

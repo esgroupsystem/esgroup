@@ -36,16 +36,10 @@
                                     <input class="form-control" id="garage" name="garage_name" value="{{ $requestDetails->garage_name }}" readonly>
                                 </div>
                             </div>
-                            {{-- <div class="col-sm-6 col-md-3">
-                                <div class="form-group">
-                                    <label>Purchase Order ID <span class="text-danger">(For Accounting)*</span></label>
-                                    <input class="form-control" id="auto_po_id" name="po_number" value="{{ $newPoNumber }}" readonly>
-                                </div>
-                            </div> --}}
                             <div class="col-sm-6 col-md-3">
                                 <div class="form-group">
                                     <label>Purchase Order ID <span class="text-danger">(For Accounting)*</span></label>
-                                    <input class="form-control" id="auto_po_id" name="po_number">
+                                    <input class="form-control" id="auto_po_id" name="po_number" value="{{ $newPoNumber }}" readonly>
                                 </div>
                             </div>
                             <div class="col-sm-6 col-md-3">
@@ -68,18 +62,22 @@
                                     <table class="table table-hover table-white" id="tablePurchaseOrder">
                                         <thead>
                                             <tr>
-                                                <th class="col-sm-1.5">Category</th>
-                                                <th class="col-md-2">Product Code</th>
+                                                <th class="col-sm-2">Category</th>
+                                                <th class="col-md-1">Product Code</th>
                                                 <th class="col-md-3">Product Name</th>
                                                 <th class="col-md-1">Brand</th>
                                                 <th class="col-md-1">Unit</th>
                                                 <th class="col-md-1">Qty</th>
+                                                <th class="col-md-1">Partial Qty</th>
                                                 <th>Amount</th>
-                                                <th>Actions</th> <!-- New column for Remove button -->
+                                                <th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach ($products as $item)
+                                                @php
+                                                    $isDisabled = ($item->remaining_qty ?? 0) <= 0;
+                                                @endphp
                                                 <tr>
                                                     <td>
                                                         <input class="form-control" name="category_name[]" value="{{ $item->category_name }}" readonly>
@@ -97,15 +95,18 @@
                                                         <input class="form-control" name="unit[]" value="{{ $item->product_unit }}" readonly>
                                                     </td>
                                                     <td>
-                                                        <input class="form-control" name="qty[]" value="{{ $item->qty ?? 0 }}" readonly>
+                                                        <input class="form-control text-center"  name="qty[]" value="{{ $item->remaining_qty }}" readonly>
                                                     </td>
                                                     <td>
-                                                        <input class="form-control" name="amount[]" value="{{ $item->amount }}">
+                                                        <input class="form-control text-center partial-input" type="number" name="partial_qty[]" value="0" min="0" max="{{ $item->remaining_qty ?? 0 }}" {{ $isDisabled ? 'readonly disabled' : '' }} oninput="validatePartialQty(this)">
                                                     </td>
                                                     <td>
-                                                        <!-- Remove button -->
+                                                        <input class="form-control text-right"  type="number"step="0.01"name="amount[]" value="{{ $item->amount }}" {{ $isDisabled ? 'readonly disabled' : '' }} required>
+                                                    </td>
+                                                    <td>
                                                         <button type="button" class="btn btn-danger remove-row">Remove</button>
                                                     </td>
+
                                                     <input type="hidden" name="product_id[]" value="{{ $item->id }}">
                                                 </tr>
                                             @endforeach

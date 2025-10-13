@@ -467,18 +467,14 @@
                     </ul>
                 </li>
 
-                <li class="{{ set_active(['receiving.index']) }} submenu">
-                    <a href="#" class="{{ set_active(['receiving.index']) ? 'noti-dot' : '' }}">
-                        <i class="la la-truck"></i> <span>Receving</span> <span class="menu-arrow"></span>
+                <li class="{{ set_active(['receiving.index', 'received.items']) }} submenu">
+                    <a href="#" class="{{ set_active(['receiving.index', 'received.items']) ? 'noti-dot' : '' }}">
+                        <i class="la la-truck"></i> <span>Receiving</span> <span class="menu-arrow"></span>
                     </a>
                     <ul style="{{ request()->is('/*') ? 'display: block;' : 'display: none;' }}">
                         <li>
-                            {!! privilege_link(
-                                'receiving.index',
-                                ['Maintenance', 'Admin'],
-                                'Manage Orders',
-                                set_active(['receiving.index']),
-                            ) !!}
+                            {!! privilege_link( 'receiving.index', ['Maintenance', 'Admin'],'Pending/Partial Items', set_active(['receiving.index']),) !!}
+                            {!! privilege_link( 'received.items', ['Maintenance', 'Admin'],'Received Items', set_active(['received.items']),) !!}
                         </li>
                     </ul>
                 </li>
