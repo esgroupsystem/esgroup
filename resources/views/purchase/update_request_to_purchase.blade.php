@@ -39,7 +39,7 @@
                             <div class="col-sm-6 col-md-3">
                                 <div class="form-group">
                                     <label>Purchase Order ID <span class="text-danger">(For Accounting)*</span></label>
-                                    <input class="form-control" id="auto_po_id" name="po_number" value="{{ $newPoNumber }}" readonly>
+                                    <input class="form-control" name="po_number">
                                 </div>
                             </div>
                             <div class="col-sm-6 col-md-3">
