@@ -27,12 +27,15 @@ use Auth;
 class JobOrderController extends Controller
 {
 
-    /** Display All Holidays */
     public function jobordersIndex()
     {
         try {
-            $joborderview = Joborder::all();
+            // ✅ Get latest job orders by job_datestart
+            $joborderview = Joborder::orderBy('created_at', 'desc')->get();
+
+            // Get specific users
             $users = User::whereIn('role_name', ['IT', 'Safety Office', 'Admin'])->get();
+
             return view('joborders.joborder', compact('joborderview', 'users'));
         } catch (\Exception $e) {
             Log::error('Job Order Index Error: ' . $e->getMessage());
@@ -40,6 +43,7 @@ class JobOrderController extends Controller
             return redirect()->back();
         }
     }
+
         
         /** Page Create Jobs */
     public function createJobOrderIndex()

@@ -9,6 +9,9 @@
 	<meta name="author" content="SoengSouy Admin Template">
 	<meta name="robots" content="noindex, nofollow">
 	<title>Dashboard - HRMS</title>
+	<!-- DataTables Buttons CSS -->
+	<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+
 	<!-- Favicon -->
 	<link rel="shortcut icon" type="image/x-icon" href="{{ URL::to('assets/img/gg.png') }}">
 	<!-- Bootstrap CSS -->
@@ -328,6 +331,13 @@
 	<!-- Datatable JS -->
 	<script src="{{ URL::to('assets/js/jquery.dataTables.min.js') }}"></script>
 	<script src="{{ URL::to('assets/js/dataTables.bootstrap4.min.js') }}"></script>
+	<!-- DataTables Buttons + Export Dependencies -->
+	<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
 	<!-- Multiselect JS -->
 	<script src="{{ URL::to('assets/js/multiselect.min.js') }}"></script>
 	<!-- validation-->

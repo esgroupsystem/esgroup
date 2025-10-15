@@ -80,8 +80,8 @@
                                     <td hidden>{{ $item->id }}</td>
                                     <td class="fw-semibold text-primary">{{ $item->job_name }}</td>
                                     <td>{{ $item->job_type }}</td>
-                                    <td data-order="{{ $item->job_datestart }}">
-                                        {{ date('j M Y', strtotime($item->job_datestart)) }}
+                                    <td data-order="{{ \Carbon\Carbon::parse($item->job_datestart)->timestamp }}">
+                                        {{ \Carbon\Carbon::parse($item->job_datestart)->format('j M Y') }}
                                     </td>
                                     <td>
                                         <span class="badge rounded-pill px-3 py-2 fs-6 
@@ -93,8 +93,8 @@
                                         </span>
                                     </td>
                                     <td>{{ $item->job_creator }}</td>
-                                    <td data-order="{{ $item->created_at }}">
-                                        {{ date('j M Y (h:i A)', strtotime($item->created_at)) }}
+                                    <td data-order="{{ \Carbon\Carbon::parse($item->created_at)->timestamp }}">
+                                        {{ \Carbon\Carbon::parse($item->created_at)->format('j M Y (h:i A)') }}
                                     </td>
                                     <td class="text-end">
                                         <a class="btn btn-outline-info btn-sm" title="View"
@@ -130,6 +130,7 @@
                 </div>
             </div>
         </div>
+        
         <!-- /Page Content -->
 
         <!-- Delete Modal -->
@@ -205,65 +206,89 @@
     <!-- /Page Wrapper -->
 
 @section('script')
-    <script>
-        // Custom Date Sorting (EU Format)
-        $.fn.dataTable.ext.type.order['date-eu'] = function(data) {
-            return moment(data, 'D MMM YYYY (h:mm A)').unix();
-        };
+<style>
+    /* Make DataTable export buttons use Bootstrap colors properly */
+    .dt-buttons .btn {
+        color: #fff !important;
+        border: none !important;
+        font-weight: 500;
+        border-radius: 6px;
+        margin-right: 6px;
+        padding: 6px 12px;
+    }
 
-        $(document).ready(function() {
-            const table = $('#jobList').DataTable({
-                lengthMenu: [
-                    [10, 25, 50, 100],
-                    [10, 25, 50, 100]
-                ],
-                pageLength: 10,
-                order: [
-                    [3, 'desc']
-                ],
-                processing: true,
-                serverSide: false,
-                columnDefs: [{
-                    type: 'date-eu',
-                    targets: 3
-                }]
-            });
+    .dt-buttons .buttons-excel {
+        background-color: #28a745 !important; /* green */
+    }
 
-            // 🔹 Set default filter to show only Pending on load
-            $('#status_filter').val('Pending');
-            table.column(4).search('Pending').draw();
+    .dt-buttons .buttons-pdf {
+        background-color: #dc3545 !important; /* red */
+    }
 
-            // 🔹 Custom Status Filter
-            $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
-                const selectedStatus = $('#status_filter').val();
-                const rowStatus = data[4].trim();
-                return selectedStatus === "" || rowStatus === selectedStatus;
-            });
+    .dt-buttons .buttons-csv {
+        background-color: #17a2b8 !important; /* teal/blue */
+    }
 
-            // 🔹 Search button click event
-            $('.btn_search').on('click', function() {
-                const selectedStatus = $('#status_filter').val();
+    .dt-buttons .buttons-print {
+        background-color: #6c757d !important; /* gray */
+    }
 
-                if (selectedStatus) {
-                    table.column(4).search(selectedStatus).draw();
-                } else {
-                    table.column(4).search('').draw();
-                }
-            });
+    /* Optional: hover effect for nicer UI */
+    .dt-buttons .btn:hover {
+        opacity: 0.9;
+    }
+</style>
+<script>
+$(document).ready(function() {
 
-            // 🔹 Delete Order Modal
-            $(document).on('click', '.delete_order', function() {
-                const id = $(this).closest('tr').find('.id').text().trim();
-                $('.e_id').val(id);
-            });
-
-            // 🔹 Edit Order Modal
-            $(document).on('click', '.edit_joborder', function() {
-                $('#e_id').val($(this).data('id'));
-                $('select[name="job_status"]').val($(this).data('job_status'));
-                $('select[name="job_assign_person"]').val($(this).data('job_assign-person'));
-            });
+    $.fn.dataTable.ext.order['dom-data-order'] = function(settings, col) {
+        return this.api().column(col, { order: 'index' }).nodes().map(function(td) {
+            return $(td).attr('data-order') * 1 || 0;
         });
-    </script>
+    };
+
+    // ✅ Initialize DataTable with export buttons
+    const table = $('#jobList').DataTable({
+        lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+        pageLength: 10,
+        order: [[6, 'desc']],
+        columnDefs: [
+            { targets: [0], visible: false },
+            { orderDataType: 'dom-data-order', targets: [3] }
+        ],
+        dom: 'Bfrtip', // ✅ add buttons container
+        buttons: [
+            { extend: 'excelHtml5', text: '<i class="fa fa-file-excel-o"></i> Excel', className: 'btn btn-success btn-sm text-white' },
+            { extend: 'pdfHtml5', text: '<i class="fa fa-file-pdf-o"></i> PDF', className: 'btn btn-danger btn-sm text-white', orientation: 'landscape', pageSize: 'A4', exportOptions: { columns: ':visible:not(:last-child)' } },
+            { extend: 'csvHtml5', text: '<i class="fa fa-file-text-o"></i> CSV', className: 'btn btn-info btn-sm text-white' },
+            { extend: 'print', text: '<i class="fa fa-print"></i> Print', className: 'btn btn-secondary btn-sm text-white' }
+        ]
+    });
+
+    // ✅ Filter logic
+    $('#status_filter').val('Pending');
+    table.column(4).search('Pending').draw();
+
+    $('.btn_search').on('click', function() {
+        const status = $('#status_filter').val();
+        table.column(4).search(status || '').draw();
+    });
+
+    // ✅ Edit Modal
+    $(document).on('click', '.edit_joborder', function() {
+        $('#e_id').val($(this).data('id'));
+        $('select[name="job_status"]').val($(this).data('job_status'));
+        $('select[name="job_assign_person"]').val($(this).data('job_assign-person'));
+    });
+
+    // ✅ Delete Modal
+    $(document).on('click', '.delete_order', function() {
+        const id = $(this).closest('tr').find('td:first').text().trim();
+        $('.e_id').val(id);
+    });
+});
+
+</script>
 @endsection
+
 @endsection
