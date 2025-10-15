@@ -26,15 +26,30 @@ use Auth;
 
 class PartsOutController extends Controller
 {
+
     public function mainIndex(Request $request)
     {
         $partsrecords = PartsOut::leftJoin('product_categories', 'parts_outs.product_category', '=', 'product_categories.id')
-            ->select('parts_outs.*', 'product_categories.category_name as category_name')
-            ->get();
-    
+            ->leftJoin('bus_details', 'parts_outs.bus_number', '=', 'bus_details.id')
+            ->select(
+                'parts_outs.*',
+                'product_categories.category_name as category_name',
+                'bus_details.name as bus_name',
+                'bus_details.body_number as body_number',
+                'bus_details.plate_number as plate_number'
+            )
+            ->get()
+            ->map(function ($item) {
+                $item->bus_full_details = trim(
+                    collect([$item->bus_name, $item->body_number, $item->plate_number])
+                        ->filter() // remove null/empty parts
+                        ->join(' - ')
+                );
+                return $item;
+            });
+
         return view('partsout.partsout', compact('partsrecords'));
     }
-    
 
     public function createRequest(Request $request){
         
@@ -176,6 +191,7 @@ class PartsOutController extends Controller
                 // Create the PartOut record with default value handling
                 $partOut = PartsOut::create([
                     'partsout_id'      => $request->partout_id,
+                    'garage_name'      => $garageName,
                     'product_category' => $request->category_id[$key],
                     'product_code'     => $productCode,
                     'product_serial'   => $request->serial[$key] ?? null,

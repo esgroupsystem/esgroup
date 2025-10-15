@@ -11,6 +11,7 @@ class PartsOut extends Model
 
     protected $fillable = [
         'partsout_id',
+        'garage_name',
         'product_category',
         'product_code',
         'product_name',

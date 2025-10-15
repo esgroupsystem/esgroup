@@ -27,11 +27,26 @@ use Auth;
 
 class StockTransferController extends Controller
 {
-    public function transferIndex (Request $request){
 
+    public function transferIndex(Request $request)
+    {
         $viewTransfer = StockTransferRecords::leftJoin('product_categories', 'stock_transfer_records.product_category', '=', 'product_categories.id')
-            ->select('stock_transfer_records.*', 'product_categories.category_name as category_name')
-            ->get();
+            ->select(
+                'stock_transfer_records.*',
+                'product_categories.category_name as category_name'
+            )
+            ->get()
+            ->map(function ($item) {
+                // Combine From - To
+                $item->transfer_route = $item->sourceGarage && $item->receiverGarage
+                    ? "{$item->sourceGarage} → {$item->receiverGarage}"
+                    : ($item->sourceGarage ?? $item->receiverGarage ?? 'N/A');
+
+                // Combine quantity and unit (e.g. "5 pcs")
+                $item->product_qty_display = trim("{$item->product_outqty} {$item->product_unit}");
+
+                return $item;
+            });
 
         return view('transfer.stocktransfer', compact('viewTransfer'));
     }

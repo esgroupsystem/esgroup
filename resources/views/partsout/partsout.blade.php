@@ -64,46 +64,33 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="table-responsive">
-                        <table class="table table-striped custom-table mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Category</th>
-                                    <th>Code</th>
-                                    <th>Name</th>
-                                    <th>Unit</th>
-                                    <th>Details</th>
-                                    <th>Qty Out</th>
-                                    <th>Date Issue</th>
-                                    {{-- <th class="text-right">Action</th> --}}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($partsrecords as $item )
-                                <tr>
-                                    <td hidden>{{ $item->id }}</td>
-                                    <td>{{ $item->category_name }}</td>
-                                    <td>{{ $item->product_code }}</td>
-                                    <td>{{ $item->product_name }}</td>
-                                    <td>{{ $item->product_unit }}</td>
-                                    <td>{{ $item->product_details }}</td>
-                                    <td>{{ $item->product_outqty }}</td>
-                                    <td>{{ $item->date_partsout }}</td>
-                                    {{-- <td><span class="badge bg-inverse-success">Accepted</span></td>
-                                    <td class="text-right">
-                                        <div class="dropdown dropdown-action">
-                                            <a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                                <i class="material-icons">more_vert</i>
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-right">
-                                                <a class="dropdown-item" href="{{ url('edit/estimate/'.$item->estimate_number) }}"><i class="fa fa-pencil m-r-5"></i> Edit</a>
-                                                <a class="dropdown-item delete_estimate" href="#" data-toggle="modal" data-target="#delete_estimate"><i class="fa fa-trash-o m-r-5"></i> Delete</a>
-                                            </div>
-                                        </div>
-                                    </td> --}}
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                    <table class="table table-striped custom-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Bus Name</th>
+                                <th>Category</th>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>Bus Garage</th>
+                                <th>Qty Out</th>
+                                <th>Date Issue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($partsrecords as $item)
+                            <tr>
+                                <td>{{ $item->bus_full_details }}</td>
+                                <td hidden>{{ $item->id }}</td>
+                                <td>{{ $item->category_name }}</td>
+                                <td>{{ $item->product_code }}</td>
+                                <td>{{ $item->product_name }}</td>
+                                <td>{{ $item->garage_name }}</td>
+                                <td>{{ $item->product_outqty }} {{ $item->product_unit }}</td>
+                                <td>{{ $item->date_partsout }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                     </div>
                 </div>
             </div>

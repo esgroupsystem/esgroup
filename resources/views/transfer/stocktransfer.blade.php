@@ -67,43 +67,29 @@
                         <table class="table table-striped custom-table mb-0">
                             <thead>
                                 <tr>
+                                    <th>From → To</th>
                                     <th>Category</th>
                                     <th>Code</th>
                                     <th>Name</th>
                                     <th>Serial</th>
                                     <th>Brand</th>
-                                    <th>Unit</th>
                                     <th>Details</th>
-                                    <th>Transfered</th>
+                                    <th>Transferred</th>
                                     <th>Date Issue</th>
-                                    {{-- <th class="text-right">Action</th> --}}
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($viewTransfer as $item )
+                                @foreach ($viewTransfer as $item)
                                 <tr>
-                                    <td hidden>{{ $item->id }}</td>
+                                    <td>{{ $item->transfer_route }}</td>
                                     <td>{{ $item->category_name }}</td>
                                     <td>{{ $item->product_code }}</td>
                                     <td>{{ $item->product_name }}</td>
                                     <td>{{ $item->product_serial }}</td>
                                     <td>{{ $item->product_brand }}</td>
-                                    <td>{{ $item->product_unit }}</td>
                                     <td>{{ $item->product_details }}</td>
-                                    <td>{{ $item->product_outqty }}</td>
+                                    <td>{{ $item->product_qty_display }}</td>
                                     <td>{{ $item->date_transfer }}</td>
-                                    {{-- <td><span class="badge bg-inverse-success">Accepted</span></td>
-                                    <td class="text-right">
-                                        <div class="dropdown dropdown-action">
-                                            <a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                                <i class="material-icons">more_vert</i>
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-right">
-                                                <a class="dropdown-item" href="{{ url('edit/estimate/'.$item->estimate_number) }}"><i class="fa fa-pencil m-r-5"></i> Edit</a>
-                                                <a class="dropdown-item delete_estimate" href="#" data-toggle="modal" data-target="#delete_estimate"><i class="fa fa-trash-o m-r-5"></i> Delete</a>
-                                            </div>
-                                        </div>
-                                    </td> --}}
                                 </tr>
                                 @endforeach
                             </tbody>
