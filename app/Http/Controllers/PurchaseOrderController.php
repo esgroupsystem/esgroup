@@ -129,7 +129,7 @@ class PurchaseOrderController extends Controller
         }
 
         $poOrder = $poOrder->sortBy(function ($item) {
-            return array_search($item->status, ['Pending', 'Partial', 'Done']);
+            return array_search($item->request_status, ['Pending', 'Partial', 'Done']);
         });
 
         // ✅ Fix: Only one per PO number
