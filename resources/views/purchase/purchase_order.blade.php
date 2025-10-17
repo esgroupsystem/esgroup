@@ -78,11 +78,11 @@
                                                 </td>
                                                 <td id="requestGarage">{{ $item->garage_name }}</td>
                                                 <td>
-                                                    @if($item->status == 'Pending')
+                                                    @if($item->request_status == 'Pending')
                                                         <span class="badge bg-inverse-warning">Pending</span>
-                                                    @elseif($item->status == 'Done')
+                                                    @elseif($item->request_status == 'Done')
                                                         <span class="badge bg-inverse-success">Done</span>
-                                                    @elseif($item->status == 'Partial Order')
+                                                    @elseif($item->request_status == 'Partial Order')
                                                         <span class="badge bg-inverse-info">Partial Order</span>
                                                     @else
                                                         <span class="badge bg-inverse-info">Partial Order</span>
